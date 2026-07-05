@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسعودي | لوحة تحكم المسؤول الإدارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ─── Admin-specific Overrides ─── */
+        :root {
+            --orange: #FF7A1F;
+            --orange-glow: rgba(255,122,31,0.30);
+            --orange-deep: #35241C;
+            --dark-bg: #1A110D;
+            --card-bg: rgba(41,27,21,0.80);
+            --border: rgba(255,122,31,0.18);
+        }
+
+        body { background: var(--dark-bg); }
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .admin-tab {
+            flex-shrink: 0;
+            padding: 9px 18px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border);
+            background: var(--card-bg);
+            color: #aaa;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .admin-tab.active, .admin-tab:hover {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #fff;
+            box-shadow: 0 0 14px var(--orange-glow);
+        }
+
+        .tab-panel { display: none; padding: 0 15px 30px; }
+        .tab-panel.active { display: block; }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+        .stat-card .stat-val {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--orange);
+        }
+        .stat-card .stat-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* Search Bar */
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .search-box input {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            outline: none;
+        }
+        .search-box input::placeholder { color: #666; }
+        .search-box input:focus { border-color: var(--orange); }
+        .search-box select {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Player Cards */
+        .player-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .player-card:hover { border-color: var(--orange); }
+        .player-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+        }
+        .player-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--orange), #D45A00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .player-info-main { flex: 1; min-width: 0; }
+        .player-name-admin {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .player-meta {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .player-balance-badge {
+            background: rgba(255,122,31,0.12);
+            border: 1px solid rgba(255,122,31,0.3);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--orange);
+            white-space: nowrap;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-dot.active { background: #00E676; box-shadow: 0 0 8px #00E676; }
+        .status-dot.suspended { background: #ff5252; box-shadow: 0 0 8px #ff5252; }
+
+        /* Player Controls Panel */
+        .player-controls {
+            display: none;
+            border-top: 1px solid var(--border);
+            padding: 16px;
+        }
+        .player-controls.open { display: block; }
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .control-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+        .control-info-row:last-child { border-bottom: none; }
+        .control-info-row .lbl { color: #888; }
+        .control-info-row .val { color: #fff; font-weight: 700; }
+
+        /* Wallet Action Row */
+        .wallet-action-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            align-items: center;
+        }
+        .wallet-action-row input {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 12px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+        }
+        .wallet-action-row input:focus { border-color: var(--orange); }
+
+        /* Action Buttons */
+        .btn-action {
+            border: none;
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-add-funds  { background: rgba(0,230,118,0.15); color: #00E676; border: 1px solid rgba(0,230,118,0.3); }
+        .btn-add-funds:hover  { background: #00E676; color: #000; }
+        .btn-sub-funds  { background: rgba(255,82,82,0.15); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
+        .btn-sub-funds:hover  { background: #ff5252; color: #fff; }
+        .btn-suspend    { background: rgba(255,152,0,0.15); color: #FF9800; border: 1px solid rgba(255,152,0,0.3); }
+        .btn-suspend:hover    { background: #FF9800; color: #fff; }
+        .btn-activate   { background: rgba(0,230,118,0.15); color: #00E676; border: 1px solid rgba(0,230,118,0.3); }
+        .btn-activate:hover   { background: #00E676; color: #000; }
+        .btn-reset-pw   { background: rgba(100,100,255,0.15); color: #8888ff; border: 1px solid rgba(100,100,255,0.3); }
+        .btn-reset-pw:hover   { background: #6464ff; color: #fff; }
+        .btn-delete-player { background: rgba(255,50,50,0.15); color: #ff5252; border: 1px solid rgba(255,50,50,0.3); }
+        .btn-delete-player:hover { background: #ff3232; color: #fff; }
+
+        /* Transactions mini-list */
+        .mini-tx-list { margin-top: 10px; }
+        .mini-tx-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        .mini-tx-row .tx-amt.pos { color: #00E676; }
+        .mini-tx-row .tx-amt.neg { color: #ff5252; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #291B15;
+            border: 1.5px solid var(--orange);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 0 40px rgba(255,122,31,0.3);
+        }
+        .modal-box h3 { font-size: 16px; color: var(--orange); margin-bottom: 16px; }
+        .modal-box input {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 11px 14px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        .modal-box input:focus { border-color: var(--orange); }
+        .modal-actions { display: flex; gap: 8px; margin-top: 4px; }
+        .btn-modal-confirm {
+            flex: 1;
+            background: var(--orange);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 11px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn-modal-cancel {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            color: #aaa;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 11px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .section-header-row h3 {
+            font-size: 16px;
+            color: #fff;
+        }
+        .player-count-badge {
+            background: rgba(255,122,31,0.15);
+            border: 1px solid rgba(255,122,31,0.3);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--orange);
+        }
+
+        /* Add Player Form */
+        .add-player-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            display: none;
+        }
+        .add-player-form.open { display: block; }
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .form-field label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        .form-field input, .form-field select {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 12px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+        }
+        .form-field input:focus { border-color: var(--orange); }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Session Guard ─── -->
+    <script>
+        (function() {
+            const token = sessionStorage.getItem('adminToken');
+            if (!token) {
+                window.location.replace('/admin-login.html');
+            }
+            // Expose session info globally
+            window.ADMIN_TOKEN       = token;
+            window.ADMIN_NAME        = sessionStorage.getItem('adminName') || 'المشرف العام';
+            window.ADMIN_ROLE        = sessionStorage.getItem('adminRole') || 'admin';
+        })();
+    </script>
+
+    <div class="glow-bg-emerald" style="top:-200px;width:600px;height:600px;opacity:0.4;"></div>
+    <div class="glow-bg-gold" style="bottom:-200px;width:600px;height:600px;opacity:0.4;"></div>
+
+    <div class="app-container" style="max-width:860px; padding-bottom:30px;">
+
+        <!-- Header -->
+        <header class="vip-header glass-card" style="border-top-color:var(--orange);margin-bottom:20px;">
+            <div class="profile-section">
+                <div class="icon-circle gold-glow" style="width:48px;height:48px;font-size:18px;background:linear-gradient(135deg,#FF7A1F,#D45A00);">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div class="player-info">
+                    <div class="player-name-row">
+                        <h2 class="player-name" id="adminHeaderName">بوابة التحكم الإدارية</h2>
+                        <span class="vip-badge" style="background:rgba(255,122,31,0.15);color:var(--orange);border-color:var(--orange);" id="adminRoleBadge">
+                            <i class="fa-solid fa-user-shield"></i> المشرف العام
+                        </span>
+                    </div>
+                    <span class="player-id">منصة مسعودي للألعاب — الإصدار 2.0</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button class="btn-action btn-reset-pw" onclick="openModal('changePwModal')" style="font-size:11px;padding:6px 10px;">
+                    <i class="fa-solid fa-key"></i> كلمة المرور
+                </button>
+                <button class="btn-action btn-add-funds" id="addAdminBtn" onclick="openModal('addAdminModal')" style="font-size:11px;padding:6px 10px;display:none;">
+                    <i class="fa-solid fa-user-plus"></i> مشرف جديد
+                </button>
+                <button class="btn-action btn-delete-player" onclick="adminLogout()" style="font-size:11px;padding:6px 10px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> خروج
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Summary -->
+        <div style="padding:0 15px 16px;">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-val" id="statTotalPlayers">—</div>
+                    <div class="stat-label">إجمالي اللاعبين</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="statActivePlayers">—</div>
+                    <div class="stat-label">نشطون</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="statTotalBalance">—</div>
+                    <div class="stat-label">إجمالي الأرصدة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('tab-players')">
+                <i class="fa-solid fa-users"></i> إدارة اللاعبين
+            </button>
+            <button class="admin-tab" onclick="switchTab('tab-providers')">
+                <i class="fa-solid fa-plug"></i> مزودات الـ API
+            </button>
+            <button class="admin-tab" onclick="switchTab('tab-games')">
+                <i class="fa-solid fa-gamepad"></i> ألعاب المنصة
+            </button>
+            <button class="admin-tab" onclick="switchTab('tab-settings')">
+                <i class="fa-solid fa-gears"></i> إعدادات التطبيق
+            </button>
+            <button class="admin-tab" onclick="switchTab('tab-agents')">
+                <i class="fa-solid fa-truck-fast"></i> وكلاء الشحن
+            </button>
+            <button class="admin-tab" onclick="switchTab('tab-p2p')">
+                <i class="fa-solid fa-user-shield"></i> وكلاء التطبيق (P2P)
+            </button>
+        </div>
+
+        <main>
+
+            <!-- ═══════════════ TAB: PLAYERS ═══════════════ -->
+            <div id="tab-players" class="tab-panel active">
+
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-users" style="color:var(--orange);margin-left:6px;"></i>قائمة اللاعبين</h3>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span class="player-count-badge" id="playerCountBadge">0 لاعب</span>
+                        <button class="btn-action btn-add-funds" onclick="toggleAddPlayerForm()" style="padding:7px 12px;font-size:11px;">
+                            <i class="fa-solid fa-user-plus"></i> إضافة لاعب
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Player Form -->
+                <div class="add-player-form" id="addPlayerForm">
+                    <h4 style="font-size:14px;color:var(--orange);margin-bottom:14px;">
+                        <i class="fa-solid fa-user-plus"></i> إضافة لاعب جديد
+                    </h4>
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label>الاسم الكامل</label>
+                            <input type="text" id="newPlayerName" placeholder="أحمد محمد">
+                        </div>
+                        <div class="form-field">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" id="newPlayerEmail" placeholder="ahmed@mail.com">
+                        </div>
+                        <div class="form-field">
+                            <label>الرصيد الأولي ($)</label>
+                            <input type="number" id="newPlayerBalance" placeholder="0" min="0">
+                        </div>
+                        <div class="form-field">
+                            <label>الحالة</label>
+                            <select id="newPlayerStatus">
+                                <option value="active">نشط ✅</option>
+                                <option value="suspended">موقوف ⛔</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-submit btn-submit-deposit" onclick="addNewPlayer()" style="width:100%;padding:10px;">
+                        <i class="fa-solid fa-user-check" style="margin-left:6px;"></i> إنشاء الحساب
+                    </button>
+                </div>
+
+                <!-- Search -->
+                <div class="search-box">
+                    <input type="text" id="playerSearch" placeholder="🔍  ابحث بالاسم أو البريد أو رقم اللاعب..." oninput="renderPlayers()">
+                    <select id="playerFilter" onchange="renderPlayers()">
+                        <option value="all">الكل</option>
+                        <option value="active">نشط فقط</option>
+                        <option value="suspended">موقوف فقط</option>
+                    </select>
+                </div>
+
+                <!-- Player Cards -->
+                <div id="playersContainer">
+                    <!-- Dynamic cards rendered by JS -->
+                </div>
+
+            </div>
+
+            <!-- ═══════════════ TAB: PROVIDERS ═══════════════ -->
+            <div id="tab-providers" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-plug" style="color:var(--orange);margin-left:6px;"></i>ربط مزودات جديدة</h3>
+                </div>
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <h4 style="font-size:15px;margin-bottom:14px;"><i class="fa-solid fa-building text-gold"></i> بيانات الشركة المزودة</h4>
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label>اسم الشركة</label>
+                            <input type="text" id="providerNameInput" placeholder="مثال: PG Soft">
+                        </div>
+                        <div class="form-field">
+                            <label>رابط الـ API Endpoint</label>
+                            <input type="url" id="providerApiInput" placeholder="https://api.pgsoft.com/v2" style="direction:ltr;text-align:left;">
+                        </div>
+                    </div>
+                    <div class="form-field" style="margin-bottom:14px;">
+                        <label>مفتاح الترخيص (Secret Key)</label>
+                        <input type="password" id="providerKeyInput" placeholder="••••••••••••••••" style="direction:ltr;text-align:left;">
+                    </div>
+                    <button class="btn-submit btn-submit-deposit" onclick="addNewProvider()" style="width:100%;">
+                        <i class="fa-solid fa-plus" style="margin-left:8px;"></i> ربط وتفويض الشركة
+                    </button>
+                </div>
+
+                <div class="transaction-history glass-card" style="margin-bottom:20px;">
+                    <h4 style="font-size:15px;"><i class="fa-solid fa-network-wired text-gold"></i> الشركات المتصلة</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>اسم الشركة</th><th>API Endpoint</th><th>الحالة</th><th>حذف</th></tr></thead>
+                            <tbody id="providersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB: GAMES ═══════════════ -->
+            <div id="tab-games" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-gamepad" style="color:var(--orange);margin-left:6px;"></i>إضافة لعبة جديدة</h3>
+                </div>
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label>اسم اللعبة</label>
+                            <input type="text" id="gameNameInput" placeholder="عجلة الحظ الكبرى">
+                        </div>
+                        <div class="form-field">
+                            <label>تصنيف اللعبة</label>
+                            <select id="gameCategoryInput">
+                                <option value="slots">سلوتس (Slots)</option>
+                                <option value="table">ألعاب طاولة</option>
+                                <option value="live">كازينو مباشر</option>
+                                <option value="crash">ألعاب فورية</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>الشركة المزودة</label>
+                            <select id="gameProviderSelect"></select>
+                        </div>
+                        <div class="form-field">
+                            <label>صورة غلاف اللعبة</label>
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <input type="file" id="gameImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('gameImageUpload', 'gameImageInputVal', 'gameUploadStatus')">
+                                <button class="btn-action btn-add-funds" onclick="document.getElementById('gameImageUpload').click()" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة
+                                </button>
+                                <input type="text" id="gameImageInputVal" placeholder="مثال: images/slots.png" style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
+                            </div>
+                            <span id="gameUploadStatus" style="font-size:11px;color:#888;margin-top:4px;display:block;">يمكنك كتابة المسار يدوياً أو الضغط على رفع</span>
+                        </div>
+                    </div>
+                    <div class="form-field" style="margin-bottom:14px;">
+                        <label>رابط تشغيل اللعبة (Launch URL)</label>
+                        <input type="url" id="gameLaunchUrlInput" placeholder="https://launcher.provider.com/play?game=xxx" style="direction:ltr;text-align:left;">
+                    </div>
+                    <button class="btn-submit btn-submit-withdraw" onclick="addNewGame()" style="width:100%;">
+                        <i class="fa-solid fa-plus" style="margin-left:8px;"></i> إضافة اللعبة وتحديث المنصة
+                    </button>
+                </div>
+
+                <div class="transaction-history glass-card">
+                    <h4 style="font-size:15px;"><i class="fa-solid fa-list-check text-gold"></i> ألعاب المنصة الحالية</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th style="width:80px;text-align:center;">الغلاف</th><th>اسم اللعبة</th><th>النوع</th><th>المزود</th><th style="width:180px;text-align:center;">الإجراءات</th></tr></thead>
+                            <tbody id="adminGamesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB: SETTINGS ═══════════════ -->
+            <div id="tab-settings" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-gears" style="color:var(--orange);margin-left:6px;"></i>إعدادات الشاشة المصغرة للتطبيق</h3>
+                </div>
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#fff;font-weight:bold;font-size:14px;">
+                            <input type="checkbox" id="settingEnablePreview" style="width:20px;height:20px;accent-color:var(--orange);">
+                            تفعيل الشاشة المصغرة (Game Preview) للألعاب
+                        </label>
+                        <p style="font-size:12px;color:#888;margin-right:30px;margin-top:4px;">عند إلغاء التفعيل، سيتم فتح اللعبة مباشرة دون عرض شاشة المعاينة.</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#fff;font-weight:bold;font-size:14px;">
+                            <input type="checkbox" id="settingShowBalance" style="width:20px;height:20px;accent-color:var(--orange);">
+                            إظهار رصيد اللاعب في شاشة المعاينة
+                        </label>
+                        <p style="font-size:12px;color:#888;margin-right:30px;margin-top:4px;">إظهار الرصيد الحالي للمستخدم كـ Chip في المعاينة.</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#fff;font-weight:bold;font-size:14px;">
+                            <input type="checkbox" id="settingShowLiveBadge" style="width:20px;height:20px;accent-color:var(--orange);">
+                            إظهار شارة البث المباشر (LIVE) للألعاب المباشرة
+                        </label>
+                        <p style="font-size:12px;color:#888;margin-right:30px;margin-top:4px;">عرض شارة حمراء تومض للألعاب المصنفة كـ كازينو مباشر.</p>
+                    </div>
+
+                    <div class="form-field" style="margin-bottom:20px;">
+                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">نص زر بدء اللعب (Play Button Text)</label>
+                        <input type="text" id="settingPlayButtonText" placeholder="العب الآن" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
+                    </div>
+
+                    <div class="form-field" style="margin-bottom:20px;">
+                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">سعر شراء الكوينز من الوكلاء مقابل 1$ (شراء المستخدمين - مثال: 10000 كوينز لكل 1$)</label>
+                        <input type="number" id="settingCoinBuyRate" placeholder="10000" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
+                    </div>
+
+                    <div class="form-field" style="margin-bottom:20px;">
+                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">سعر بيع الكوينز للوكلاء مقابل 1$ (بيع المستخدمين - مثال: 20000 كوينز لكل 1$)</label>
+                        <input type="number" id="settingCoinSellRate" placeholder="20000" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
+                    </div>
+
+
+                    <button class="btn-submit btn-submit-deposit" onclick="saveSettings()" style="width:100%;padding:12px;font-size:14px;font-weight:900;">
+                        <i class="fa-solid fa-floppy-disk" style="margin-left:8px;"></i> حفظ الإعدادات وتحديث تطبيق الهاتف
+                    </button>
+                </div>
+
+                <!-- ─── Banners Board ─── -->
+                <div class="section-header-row" style="margin-top: 30px;">
+                    <h3><i class="fa-solid fa-rectangle-ad" style="color:var(--orange);margin-left:6px;"></i>لوحة البنرات الإعلانية (Promo Banners)</h3>
+                </div>
+
+                <!-- Add Banner Form -->
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <h4 style="font-size:14px;color:var(--orange);margin-bottom:14px;">
+                        <i class="fa-solid fa-plus"></i> إضافة بنر إعلاني جديد
+                    </h4>
+                    <div class="form-field" style="margin-bottom:14px;">
+                        <label>لون وتصميم البنر (Theme)</label>
+                        <select id="newBannerTheme" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
+                            <option value="orange">برتقالي مسعودي 🦊</option>
+                            <option value="emerald">أخضر زمردي (VIP) 💚</option>
+                            <option value="purple">أرجواني ملكي 💜</option>
+                            <option value="gold">ذهبي جاكبوت 💛</option>
+                            <option value="crimson">أحمر قرمزي ❤️</option>
+                        </select>
+                    </div>
+                    <div class="form-field" style="margin-bottom:20px;">
+                        <label>صورة البنر (الخلفية الممتدة)</label>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="file" id="bannerImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('bannerImageUpload', 'newBannerImage', 'bannerUploadStatus')">
+                            <button class="btn-action btn-add-funds" onclick="document.getElementById('bannerImageUpload').click()" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة
+                            </button>
+                            <input type="text" id="newBannerImage" placeholder="مثال: images/slots.png" style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
+                        </div>
+                        <span id="bannerUploadStatus" style="font-size:11px;color:#888;margin-top:4px;display:block;">يمكنك كتابة المسار يدوياً أو الضغط على رفع</span>
+                    </div>
+
+                    <button class="btn-submit btn-submit-deposit" onclick="addNewBanner()" style="width:100%;">
+                        <i class="fa-solid fa-plus" style="margin-left:8px;"></i> إضافة البنر ونشره فوراً
+                    </button>
+                </div>
+
+                <!-- Banners List -->
+                <div class="transaction-history glass-card" style="margin-bottom: 20px;">
+                    <h4 style="font-size:15px;"><i class="fa-solid fa-list-check text-gold"></i> البنرات الحالية النشطة</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>البنر</th><th>حذف</th></tr></thead>
+                            <tbody id="adminBannersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB: AGENTS ═══════════════ -->
+            <div id="tab-agents" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-truck-fast" style="color:var(--orange);margin-left:6px;"></i>إدارة وكلاء الشحن المعتمدين</h3>
+                </div>
+
+                <!-- Add Agent Form -->
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <h4 style="font-size:14px;color:var(--orange);margin-bottom:14px;">
+                        <i class="fa-solid fa-user-plus"></i> إضافة وكيل شحن جديد
+                    </h4>
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label>اسم الوكيل</label>
+                            <input type="text" id="newAgentName" placeholder="مثال: مكتب الرافدين">
+                        </div>
+                        <div class="form-field" style="grid-column:1/-1;">
+                            <label>الدول التي يغطيها الوكيل <small style="color:#8B909E;">(يمكن اختيار أكثر من دولة)</small></label>
+                            <!-- Selected countries tags -->
+                            <div id="agentCountriesTags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:6px 8px;background:rgba(0,0,0,0.2);border:1.5px solid var(--border);border-radius:10px 10px 0 0;border-bottom:none;">
+                                <span style="color:#555;font-size:12px;align-self:center;" id="agentCountriesPlaceholder">اختر دولة أو أكثر من القائمة...</span>
+                            </div>
+                            <!-- Country dropdown -->
+                            <select id="newAgentCountrySelector" onchange="addAgentCountryTag(this.value)" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:0 0 10px 10px;padding:10px 12px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;height:42px;">
+                                <option value="">— اختر دولة لإضافتها —</option>
+                                <option value="🇮🇶 العراق">🇮🇶 العراق</option>
+                                <option value="🇪🇬 مصر">🇪🇬 مصر</option>
+                                <option value="🇾🇪 اليمن">🇾🇪 اليمن</option>
+                                <option value="🇸🇦 السعودية">🇸🇦 السعودية</option>
+                                <option value="🇰🇼 الكويت">🇰🇼 الكويت</option>
+                                <option value="🇦🇪 الإمارات">🇦🇪 الإمارات</option>
+                                <option value="🇶🇦 قطر">🇶🇦 قطر</option>
+                                <option value="🇯🇴 الأردن">🇯🇴 الأردن</option>
+                                <option value="🇱🇾 ليبيا">🇱🇾 ليبيا</option>
+                                <option value="🇵🇸 فلسطين">🇵🇸 فلسطين</option>
+                                <option value="🇸🇩 السودان">🇸🇩 السودان</option>
+                                <option value="🇩🇿 الجزائر">🇩🇿 الجزائر</option>
+                                <option value="🇲🇦 المغرب">🇲🇦 المغرب</option>
+                                <option value="🇹🇳 تونس">🇹🇳 تونس</option>
+                                <option value="🇴🇲 عُمان">🇴🇲 عُمان</option>
+                                <option value="🇧🇭 البحرين">🇧🇭 البحرين</option>
+                                <option value="🇸🇾 سوريا">🇸🇾 سوريا</option>
+                                <option value="🇱🇧 لبنان">🇱🇧 لبنان</option>
+                            </select>
+                            <input type="hidden" id="newAgentCountriesHidden" value="">
+                        </div>
+                        <div class="form-field">
+                            <label>رقم الواتساب أو الهاتف (مع رمز الدولة)</label>
+                            <input type="text" id="newAgentPhone" placeholder="مثال: +9647701234567">
+                        </div>
+                        <div class="form-field">
+                            <label>طرق الدفع المتوفرة</label>
+                            <input type="text" id="newAgentPayments" placeholder="مثال: زين كاش، فودافون كاش">
+                        </div>
+                        <div class="form-field">
+                            <label style="color:#00E676;">🔗 معرف حساب الوكيل في التطبيق (Player ID)</label>
+                            <input type="text" id="newAgentPlayerId" placeholder="مثال: 123456" style="border-color:#00897B;">
+                            <small style="color:#8B909E;font-size:11px;">عند بيع اللاعبين كوينزهم لهذا الوكيل ستُحوَّل مباشرةً لمحفظته</small>
+                        </div>
+                    </div>
+                    <div class="form-field" style="margin-top:10px;margin-bottom:20px;">
+                        <label>سعر الصرف الشحن (Rate)</label>
+                        <input type="text" id="newAgentRate" placeholder="مثال: 1$ = 1,000 كوين">
+                    </div>
+                    <button class="btn-submit btn-submit-deposit" onclick="addNewAgent()" style="width:100%;">
+                        <i class="fa-solid fa-plus" style="margin-left:8px;"></i> إضافة الوكيل وتعميمه
+                    </button>
+                </div>
+
+                <!-- Agents List -->
+                <div class="transaction-history glass-card" style="margin-bottom: 20px;">
+                    <h4 style="font-size:15px;"><i class="fa-solid fa-list-check text-gold"></i> وكلاء الشحن المعتمدين حالياً</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الدول</th>
+                                    <th>اسم الوكيل</th>
+                                    <th>معرف التطبيق</th>
+                                    <th>رقم الواتساب</th>
+                                    <th>طرق الدفع</th>
+                                    <th>سعر الشحن</th>
+                                    <th>حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminAgentsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB: P2P AGENTS ═══════════════ -->
+            <div id="tab-p2p" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-user-shield" style="color:var(--orange);margin-left:6px;"></i>تفعيل وإدارة وكلاء التطبيق (P2P)</h3>
+                </div>
+
+                <!-- Activate Player as Agent -->
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <h4 style="font-size:14px;color:var(--orange);margin-bottom:14px;">
+                        <i class="fa-solid fa-plus"></i> تفعيل وكيل جديد بواسطة معرف اللاعب
+                    </h4>
+                    <div style="display:flex;gap:10px;align-items:flex-end;">
+                        <div class="form-field" style="margin:0;width:100%;">
+                            <label>معرّف حساب اللاعب في التطبيق (ID المكون من 6 أرقام)</label>
+                            <input type="text" id="p2pAgentPlayerId" placeholder="مثال: 519997" style="width:100%;height:42px;">
+                        </div>
+                        <button class="btn-submit btn-submit-deposit" onclick="activateP2pAgent()" style="margin:0;height:42px;width:180px;flex-shrink:0;">
+                            <i class="fa-solid fa-user-plus" style="margin-left:6px;"></i> تفعيل كوكيل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- P2P Agents List Table -->
+                <div class="transaction-history glass-card" style="margin-bottom: 20px;">
+                    <h4 style="font-size:15px;"><i class="fa-solid fa-shield-halved text-gold"></i> الوكلاء المفعلون حالياً في النظام</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>المعرف (ID)</th>
+                                    <th>الاسم</th>
+                                    <th>رصيد الكوينز الحالي</th>
+                                    <th>إرسال كوينز للوكيل</th>
+                                    <th>حالة الوكيل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminP2pAgentsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ─── Player Wallet Modal ─── -->
+    <div class="modal-overlay" id="walletModal">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-wallet" style="margin-left:8px;"></i><span id="modalPlayerName">اللاعب</span></h3>
+            <p style="font-size:12px;color:#888;margin-bottom:16px;">معرف اللاعب: <strong id="modalPlayerId" style="color:var(--orange);"></strong></p>
+            <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-bottom:14px;text-align:center;">
+                <div style="font-size:11px;color:#888;">الرصيد الحالي</div>
+                <div style="font-size:26px;font-weight:900;color:var(--orange);" id="modalBalance">0 $</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;">مكافآت: <span id="modalBonus" style="color:#00E676;">0 $</span></div>
+            </div>
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">المبلغ</label>
+            <input type="number" id="modalAmount" placeholder="أدخل المبلغ..." min="1">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">نوع العملية</label>
+            <select id="modalAction" style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:14px;outline:none;">
+                <option value="add_primary">إضافة رصيد رئيسي ✅</option>
+                <option value="add_bonus">إضافة مكافأة 🎁</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal('walletModal')">إلغاء</button>
+                <button class="btn-modal-confirm" onclick="executeWalletAction()">تنفيذ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Confirm Delete Modal ─── -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <h3 style="color:#ff5252;"><i class="fa-solid fa-triangle-exclamation" style="margin-left:8px;"></i>تأكيد الحذف</h3>
+            <p style="font-size:13px;color:#aaa;margin-bottom:20px;">هل أنت متأكد من حذف حساب اللاعب <strong id="deletePlayerName" style="color:#fff;"></strong>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal('deleteModal')">إلغاء</button>
+                <button class="btn-modal-confirm" style="background:#ff5252;" onclick="confirmDeletePlayer()">حذف نهائي</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i id="toastIcon" class="fa-solid fa-circle-check"></i>
+            <span id="toastMessage">عملية ناجحة</span>
+        </div>
+    </div>
+
+    <!-- ─── Edit Game Modal ─── -->
+    <div class="modal-overlay" id="editGameModal">
+        <div class="modal-box" style="max-width: 500px; width: 90%;">
+            <h3><i class="fa-solid fa-gamepad" style="margin-left:8px;"></i>تعديل بيانات وصورة اللعبة</h3>
+            <input type="hidden" id="editGameIndex">
+            
+            <div class="form-field" style="margin-bottom:14px;">
+                <label>اسم اللعبة</label>
+                <input type="text" id="editGameNameInput" placeholder="اسم اللعبة...">
+            </div>
+            
+            <div class="form-field" style="margin-bottom:14px;">
+                <label>تصنيف اللعبة</label>
+                <select id="editGameCategoryInput" style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
+                    <option value="slots">سلوتس (Slots)</option>
+                    <option value="table">ألعاب طاولة</option>
+                    <option value="live">كازينو مباشر</option>
+                    <option value="crash">ألعاب فورية</option>
+                </select>
+            </div>
+            
+            <div class="form-field" style="margin-bottom:14px;">
+                <label>الشركة المزودة</label>
+                <select id="editGameProviderSelect" style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;"></select>
+            </div>
+            
+            <div class="form-field" style="margin-bottom:14px;">
+                <label>صورة غلاف اللعبة</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="file" id="editGameImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('editGameImageUpload', 'editGameImageInputVal', 'editGameUploadStatus')">
+                    <button class="btn-action btn-add-funds" onclick="document.getElementById('editGameImageUpload').click()" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة جديدة
+                    </button>
+                    <input type="text" id="editGameImageInputVal" placeholder="مسار الصورة..." style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
+                </div>
+                <span id="editGameUploadStatus" style="font-size:11px;color:#888;margin-top:4px;display:block;">يمكنك رفع صورة جديدة أو تعديل المسار</span>
+            </div>
+            
+            <div class="form-field" style="margin-bottom:14px;">
+                <label>رابط تشغيل اللعبة (Launch URL)</label>
+                <input type="url" id="editGameLaunchUrlInput" placeholder="https://..." style="direction:ltr;text-align:left;">
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal('editGameModal')">إلغاء</button>
+                <button class="btn-modal-confirm" onclick="saveEditedGame()">حفظ التغييرات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Change Password Modal ─── -->
+    <div class="modal-overlay" id="changePwModal">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-key" style="margin-left:8px;"></i>تغيير كلمة المرور</h3>
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">كلمة المرور الحالية</label>
+            <input type="password" id="oldPwInput" placeholder="أدخل كلمة المرور الحالية...">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">كلمة المرور الجديدة</label>
+            <input type="password" id="newPwInput" placeholder="أدخل كلمة المرور الجديدة...">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">تأكيد كلمة المرور الجديدة</label>
+            <input type="password" id="confirmPwInput" placeholder="أعد كتابة كلمة المرور الجديدة...">
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal('changePwModal')">إلغاء</button>
+                <button class="btn-modal-confirm" onclick="doChangePassword()">تغيير</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Add Admin Modal ─── -->
+    <div class="modal-overlay" id="addAdminModal">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-user-plus" style="margin-left:8px;"></i>إضافة مشرف جديد</h3>
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">اسم المستخدم</label>
+            <input type="text" id="newAdminUsername" placeholder="مثال: manager1">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">الاسم الظاهر</label>
+            <input type="text" id="newAdminDisplay" placeholder="مثال: مدير العمليات">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">كلمة المرور</label>
+            <input type="password" id="newAdminPw" placeholder="كلمة مرور قوية...">
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">الصلاحية</label>
+            <select id="newAdminRole" style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:14px;outline:none;">
+                <option value="admin">مشرف عادي</option>
+                <option value="superadmin">مشرف عام</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal('addAdminModal')">إلغاء</button>
+                <button class="btn-modal-confirm" onclick="doAddAdmin()">إنشاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

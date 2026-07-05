@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="مسعودي - المنصة الفاخرة للألعاب الآمنة والمتميزة. استمتع بتجربة ألعاب لا مثيل لها ورعاية ممتازة.">
+    <title>مسعودي | منصة الألعاب الفاخرة</title>
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="images/app_icon.png">
+</head>
+<body>
+
+    <!-- Splash Screen Start Page -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content glass-card">
+            <div class="splash-logo">
+                <i class="fa-solid fa-gem splash-crown"></i>
+            </div>
+            <h1 class="splash-title">مسعودي</h1>
+            <p class="splash-subtitle">بوابة الألعاب الفاخرة والمتميزة</p>
+            <div class="splash-loader" id="splashLoader">
+                <div class="loader-bar" id="loaderBar"></div>
+            </div>
+            <button class="btn-enter-app" id="btnEnterApp" onclick="enterApp()">
+                دخول المنصة الفاخرة <i class="fa-solid fa-gem text-gold"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Light effects backgrounds -->
+    <div class="glow-bg-emerald"></div>
+    <div class="glow-bg-gold"></div>
+
+    <div class="app-container">
+
+        <!-- Top Profile & Wallet Header -->
+        <header class="vip-header glass-card">
+            <div class="profile-section">
+                <div class="avatar-container">
+                    <img src="images/player_avatar.png" alt="صورة اللاعب" class="player-avatar" id="avatarImg">
+                    <div class="vip-badge-mini">1</div>
+                </div>
+                <div class="player-info">
+                    <div class="player-name-row">
+                        <h2 class="player-name" id="playerName">أحمد الحربي</h2>
+                        <span class="vip-badge"><i class="fa-solid fa-gem"></i> رتبة 1</span>
+                    </div>
+                    <span class="player-id">رقم اللاعب: <span id="playerId">#879,204</span></span>
+                </div>
+            </div>
+            
+            <!-- Quick Wallet Card -->
+            <div class="quick-wallet">
+                <div class="balance-label">الرصيد الحالي</div>
+                <div class="balance-amount"><span id="headerBalance">250,500.00</span> <span class="currency">ر.س</span></div>
+            </div>
+        </header>
+
+        <!-- Quick Actions & Last Transaction -->
+        <section class="quick-actions-bar">
+            <div class="action-buttons">
+                <button class="btn btn-deposit glass-card" onclick="openDepositModal()">
+                    <span class="icon-circle emerald-glow"><i class="fa-solid fa-arrow-down-to-bracket"></i></span>
+                    <span class="btn-text">إيداع سريع</span>
+                </button>
+                <button class="btn btn-withdraw glass-card" onclick="openWithdrawModal()">
+                    <span class="icon-circle gold-glow"><i class="fa-solid fa-paper-plane"></i></span>
+                    <span class="btn-text">سحب سريع</span>
+                </button>
+            </div>
+            
+            <div class="last-transaction glass-card">
+                <span class="tx-title">آخر عملية:</span>
+                <span class="tx-details" id="lastTxDetails">شحن رصيد بقيمة <span class="plus-txt">+5,000 ر.س</span> - ناجحة</span>
+            </div>
+        </section>
+
+        <!-- Live Winners Ticker Section -->
+        <section class="winners-ticker-section glass-card">
+            <div class="ticker-label">
+                <span class="pulse-indicator"></span>
+                <span>آخر الفائزين</span>
+            </div>
+            <div class="ticker-container">
+                <div class="ticker-wrap" id="winnersTicker">
+                    <!-- Dynamic winner cards will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Views (Home, Games, Wallet, Rewards, Profile) -->
+        <main class="main-content">
+            
+            <!-- VIEW 1: HOME -->
+            <section id="view-home" class="app-view active">
+                <div class="section-title-row">
+                    <h3>الألعاب المضافة</h3>
+                </div>
+                
+                <div class="games-grid" id="dynamicGamesGrid">
+                    <!-- Dynamically populated from localStorage -->
+                </div>
+            </section>
+
+            <!-- VIEW 3: WALLET -->
+            <section id="view-wallet" class="app-view">
+                <div class="wallet-balance-card glass-card glow-border-gold">
+                    <div class="card-chip"><i class="fa-solid fa-gem text-gold"></i> رتبة مسعودي 1</div>
+                    <div class="wallet-label">مجموع رصيد المحفظة</div>
+                    <div class="wallet-total-amount"><span id="walletBalance">250,500.00</span> <span class="currency">ر.س</span></div>
+                    <div class="wallet-breakdown">
+                        <div class="breakdown-item">
+                            <span class="b-lbl">الرصيد الأساسي</span>
+                            <span class="b-val" id="primaryBalance">240,000.00 ر.س</span>
+                        </div>
+                        <div class="breakdown-item border-left">
+                            <span class="b-lbl">رصيد المكافآت</span>
+                            <span class="b-val" id="bonusBalance">10,500.00 ر.س</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wallet-actions-grid">
+                    <div class="quick-form-card glass-card">
+                        <h4>عملية إيداع سريعة</h4>
+                        <div class="amount-presets">
+                            <button onclick="setDepositAmount(1000)">1,000 ر.س</button>
+                            <button onclick="setDepositAmount(5000)">5,000 ر.س</button>
+                            <button onclick="setDepositAmount(10000)">10,000 ر.س</button>
+                        </div>
+                        <div class="custom-amount-input">
+                            <input type="number" id="depositInput" placeholder="أدخل مبلغ الإيداع...">
+                            <span class="input-currency">ر.س</span>
+                        </div>
+                        <button class="btn-submit btn-submit-deposit" onclick="executeDeposit()">إيداع الآن</button>
+                    </div>
+
+                    <div class="quick-form-card glass-card">
+                        <h4>عملية سحب سريعة</h4>
+                        <div class="amount-presets">
+                            <button onclick="setWithdrawAmount(1000)">1,000 ر.س</button>
+                            <button onclick="setWithdrawAmount(5000)">5,000 ر.س</button>
+                            <button onclick="setWithdrawAmount(10000)">10,000 ر.س</button>
+                        </div>
+                        <div class="custom-amount-input">
+                            <input type="number" id="withdrawInput" placeholder="أدخل مبلغ السحب...">
+                            <span class="input-currency">ر.س</span>
+                        </div>
+                        <button class="btn-submit btn-submit-withdraw" onclick="executeWithdraw()">سحب الآن</button>
+                    </div>
+                </div>
+
+                <div class="transaction-history glass-card">
+                    <h4>سجل العمليات الأخيرة</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>رقم المعاملة</th>
+                                    <th>النوع</th>
+                                    <th>المبلغ</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="txTableBody">
+                                <!-- Dynamic transactions will go here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 5: PROFILE -->
+            <section id="view-profile" class="app-view">
+                <div class="profile-hero-card glass-card">
+                    <div class="profile-main-info">
+                        <div class="avatar-large-container">
+                            <img src="images/player_avatar.png" alt="Avatar" class="avatar-large">
+                            <div class="level-indicator-large">1</div>
+                        </div>
+                        <h3 class="profile-name">أحمد الحربي</h3>
+                        <span class="vip-status-large"><i class="fa-solid fa-gem text-gold"></i> عضو متميز - رتبة 1</span>
+                    </div>
+
+                    <div class="vip-level-progress">
+                        <div class="progress-labels">
+                            <span>التقدم للمستوى الثاني</span>
+                            <span>70%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: 70%"></div>
+                        </div>
+                        <div class="progress-details-text">
+                            تبقى لك إيداع بقيمة 15,000 ر.س أو لعب بمبلغ 50,000 ر.س للترقية التلقائية.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-settings-grid">
+                    <div class="settings-card glass-card">
+                        <h4>تفاصيل الحساب الشخصي</h4>
+                        <div class="detail-row">
+                            <span class="det-label"><i class="fa-regular fa-envelope"></i> البريد الإلكتروني</span>
+                            <span class="det-val">a.harbi@masoudi.com</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="det-label"><i class="fa-solid fa-mobile-screen-button"></i> رقم الجوال</span>
+                            <span class="det-val">+966 50 **** 123</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="det-label"><i class="fa-regular fa-calendar"></i> تاريخ التسجيل</span>
+                            <span class="det-val">12 مايو 2026</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="det-label"><i class="fa-solid fa-shield-halved"></i> توثيق الحساب</span>
+                            <span class="det-val text-emerald"><i class="fa-solid fa-circle-check"></i> موثق بالكامل</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-card glass-card">
+                        <h4>خيارات الأمان والتحكم</h4>
+                        <button class="settings-btn"><i class="fa-solid fa-key"></i> تغيير كلمة المرور</button>
+                        <button class="settings-btn"><i class="fa-solid fa-wallet"></i> إدارة الحسابات البنكية</button>
+                        <button class="settings-btn"><i class="fa-solid fa-headset"></i> التواصل مع مدير الدعم المخصص</button>
+                        <button class="settings-btn text-danger"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav-bar glass-card">
+            <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+                <i class="fa-solid fa-house"></i>
+                <span>الرئيسية</span>
+            </button>
+            <button class="nav-item nav-wallet-item" onclick="switchTab('wallet')" id="nav-wallet">
+                <div class="wallet-btn-icon-wrapper">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span>المحفظة</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('profile')" id="nav-profile">
+                <i class="fa-solid fa-user"></i>
+                <span>حسابي</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- MODAL 1: Deposit Modal -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content glass-card">
+            <span class="close-modal" onclick="closeDepositModal()">&times;</span>
+            <div class="modal-header">
+                <h3>إيداع أموال</h3>
+                <p>قم بشحن محفظتك بشكل آمن وفوري</p>
+            </div>
+            <div class="modal-body">
+                <div class="payment-methods">
+                    <div class="method-card active"><i class="fa-brands fa-cc-visa"></i> بطاقة ائتمان</div>
+                    <div class="method-card"><i class="fa-solid fa-building-columns"></i> تحويل بنكي</div>
+                    <div class="method-card"><i class="fa-brands fa-apple-pay"></i> Apple Pay</div>
+                </div>
+                <div class="custom-amount-input">
+                    <input type="number" id="modalDepositInput" placeholder="أدخل مبلغ الإيداع...">
+                    <span class="input-currency">ر.س</span>
+                </div>
+                <button class="btn-submit btn-submit-deposit" onclick="executeModalDeposit()">إتمام الشحن</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Withdraw Modal -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content glass-card">
+            <span class="close-modal" onclick="closeWithdrawModal()">&times;</span>
+            <div class="modal-header">
+                <h3>سحب أموال</h3>
+                <p>سحب سريع ومباشر لحسابك البنكي أو محفظتك الشخصية</p>
+            </div>
+            <div class="modal-body">
+                <div class="payment-methods">
+                    <div class="method-card active"><i class="fa-solid fa-building-columns"></i> التحويل البنكي الفوري</div>
+                    <div class="method-card"><i class="fa-brands fa-cc-mastercard"></i> ماستركارد</div>
+                </div>
+                <div class="custom-amount-input">
+                    <input type="number" id="modalWithdrawInput" placeholder="أدخل مبلغ السحب...">
+                    <span class="input-currency">ر.س</span>
+                </div>
+                <button class="btn-submit btn-submit-withdraw" onclick="executeModalWithdraw()">تأكيد السحب الفوري</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Game Player Modal (The actual game zone) -->
+    <div class="modal" id="gamePlayModal">
+        <div class="modal-content game-modal-content glass-card">
+            <span class="close-modal" onclick="closeGamePlayModal()">&times;</span>
+            
+            <div class="game-modal-header">
+                <h3 id="gameModalTitle">اسم اللعبة</h3>
+                <span class="game-modal-balance"><i class="fa-solid fa-wallet text-gold"></i> الرصيد: <span id="gamePlayBalance">250,500.00</span> ر.س</span>
+            </div>
+            
+            <div class="game-play-area" id="gamePlayArea">
+                <!-- Dynamic game view based on the clicked game -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i id="toastIcon" class="fa-solid fa-circle-check"></i>
+            <span id="toastMessage">عملية ناجحة</span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

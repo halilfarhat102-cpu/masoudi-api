@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسعودي | تسجيل دخول المسؤول</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --orange: #FF7A1F;
+            --orange-dim: rgba(255,122,31,0.15);
+            --orange-glow: rgba(255,122,31,0.35);
+            --dark: #0E0906;
+            --card: #1C120C;
+            --border: rgba(255,122,31,0.2);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ─── Animated Background ─── */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: orb-float 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(255,122,31,0.18), transparent 70%);
+            top: -150px; left: -150px;
+            animation-delay: 0s;
+        }
+        .bg-orb-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(212,90,0,0.12), transparent 70%);
+            bottom: -100px; right: -100px;
+            animation-delay: -4s;
+        }
+        @keyframes orb-float {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.05); }
+        }
+
+        /* ─── Grid Pattern ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,122,31,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,122,31,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+        }
+
+        /* ─── Login Card ─── */
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 36px;
+            box-shadow:
+                0 0 60px rgba(255,122,31,0.12),
+                0 30px 80px rgba(0,0,0,0.5);
+            animation: card-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes card-in {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ─── Logo ─── */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .logo-icon {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, var(--orange), #D45A00);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 14px;
+            box-shadow: 0 0 30px var(--orange-glow);
+            animation: pulse-logo 3s ease-in-out infinite;
+        }
+        @keyframes pulse-logo {
+            0%, 100% { box-shadow: 0 0 30px var(--orange-glow); }
+            50% { box-shadow: 0 0 50px rgba(255,122,31,0.5); }
+        }
+        .login-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .login-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* ─── Form ─── */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 13px 44px 13px 14px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.25s;
+        }
+        .form-input::placeholder { color: #444; }
+        .form-input:focus {
+            border-color: var(--orange);
+            background: rgba(255,122,31,0.05);
+            box-shadow: 0 0 0 3px rgba(255,122,31,0.1);
+        }
+        .form-input:focus + .input-icon { color: var(--orange); }
+
+        /* Password toggle */
+        .toggle-pw {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            cursor: pointer;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+        .toggle-pw:hover { color: var(--orange); }
+
+        /* ─── Login Button ─── */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--orange), #D45A00);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .btn-login:hover::after { opacity: 1; }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--orange-glow);
+        }
+        .btn-login:active { transform: translateY(0); }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-login .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── Error Message ─── */
+        .error-msg {
+            display: none;
+            background: rgba(255,82,82,0.1);
+            border: 1px solid rgba(255,82,82,0.3);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #ff5252;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 14px;
+        }
+        .error-msg.show { display: block; animation: shake 0.4s ease; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* ─── Footer ─── */
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 11px;
+            color: #444;
+        }
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: #555;
+        }
+        .badge i { color: var(--orange); font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+
+            <!-- Logo -->
+            <div class="login-logo">
+                <div class="logo-icon">🦊</div>
+                <div class="login-title">بوابة المسؤولين</div>
+                <div class="login-subtitle">منصة مسعودي للألعاب — دخول حصري</div>
+            </div>
+
+            <!-- Form -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fa-solid fa-user" style="margin-left:6px;color:var(--orange);"></i>
+                    اسم المستخدم
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="usernameInput" class="form-input" placeholder="أدخل اسم المستخدم..." autocomplete="username">
+                    <i class="fa-solid fa-user input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fa-solid fa-lock" style="margin-left:6px;color:var(--orange);"></i>
+                    كلمة المرور
+                </label>
+                <div class="input-wrapper">
+                    <input type="password" id="passwordInput" class="form-input" placeholder="أدخل كلمة المرور..." autocomplete="current-password">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <i class="fa-solid fa-eye toggle-pw" id="togglePw" onclick="togglePassword()"></i>
+                </div>
+            </div>
+
+            <button class="btn-login" id="loginBtn" onclick="doLogin()">
+                <span id="loginBtnText"><i class="fa-solid fa-right-to-bracket" style="margin-left:8px;"></i>تسجيل الدخول</span>
+                <div class="spinner" id="loginSpinner"></div>
+            </button>
+
+            <div class="error-msg" id="errorMsg"></div>
+
+            <div class="login-footer">
+                <div>🔒 اتصال آمن ومشفر</div>
+                <div class="security-badges">
+                    <span class="badge"><i class="fa-solid fa-shield-halved"></i> SHA-256</span>
+                    <span class="badge"><i class="fa-solid fa-user-shield"></i> صلاحيات محدودة</span>
+                    <span class="badge"><i class="fa-solid fa-clock-rotate-left"></i> جلسة مؤقتة</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── Check if already logged in ───
+        const existingToken = sessionStorage.getItem('adminToken');
+        if (existingToken) {
+            window.location.replace('/admin.html');
+        }
+
+        // ─── Enter key support ───
+        document.getElementById('passwordInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+        document.getElementById('usernameInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('passwordInput').focus();
+        });
+
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            const icon  = document.getElementById('togglePw');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash toggle-pw';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye toggle-pw';
+            }
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const btn      = document.getElementById('loginBtn');
+            const btnText  = document.getElementById('loginBtnText');
+            const spinner  = document.getElementById('loginSpinner');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!username || !password) {
+                showError('الرجاء إدخال اسم المستخدم وكلمة المرور');
+                return;
+            }
+
+            // Loading state
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            errorMsg.classList.remove('show');
+
+            try {
+                const res = await fetch('/api/admin-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    // Save session
+                    sessionStorage.setItem('adminToken', data.token);
+                    sessionStorage.setItem('adminName', data.displayName);
+                    sessionStorage.setItem('adminRole', data.role);
+
+                    // Success animation then redirect
+                    btn.style.background = 'linear-gradient(135deg, #00E676, #00b050)';
+                    btnText.innerHTML = '<i class="fa-solid fa-check" style="margin-left:8px;"></i>جاري الدخول...';
+                    btnText.style.display = 'block';
+                    spinner.style.display = 'none';
+                    setTimeout(() => window.location.replace('/admin.html'), 800);
+                } else {
+                    showError(data.error || 'فشل تسجيل الدخول');
+                    btn.disabled = false;
+                    btnText.style.display = 'block';
+                    spinner.style.display = 'none';
+                }
+            } catch (e) {
+                showError('تعذّر الاتصال بالخادم. تأكد من تشغيل السيرفر.');
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = '⚠️  ' + msg;
+            el.classList.remove('show');
+            void el.offsetWidth; // reflow for animation replay
+            el.classList.add('show');
+        }
+    </script>
+</body>
+</html>
