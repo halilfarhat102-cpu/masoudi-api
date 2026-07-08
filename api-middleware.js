@@ -156,7 +156,14 @@ export function apiMiddleware(req, res, next) {
 
         fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(player));
+        
+        const adminEmails = ['halilfarhat102@gmail.com', 'management135790@gmail.com'];
+        const isAdmin = player.isAdmin === true || adminEmails.includes(player.email);
+        
+        res.end(JSON.stringify({
+          ...player,
+          isAdmin: isAdmin
+        }));
       } catch (e) {
         res.statusCode = 500;
         res.end(JSON.stringify({ error: e.message }));
