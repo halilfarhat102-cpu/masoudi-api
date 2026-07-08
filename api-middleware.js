@@ -700,6 +700,410 @@ export function apiMiddleware(req, res, next) {
         res.end(JSON.stringify({ error: e.message }));
       }
     });
+
+  // ══════════════════════════════════════════════════════════════
+  //  🎮 SEAMLESS WALLET API — Game Provider Integration Endpoints
+  //  These endpoints are called by the game provider (e.g. PG Soft)
+  //  when players bet, win, or need balance verification.
+  // ══════════════════════════════════════════════════════════════
+
+  } else if (req.url === '/api/game/verify-session' && req.method === 'POST') {
+    // Called by game provider to verify the player's session token
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const payload = JSON.parse(body || '{}');
+
+        // Game provider sends: { token, operatorToken }
+        const token = payload.token || payload.session_token || payload.sessionToken;
+
+        if (!token) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Missing token', data: null }));
+        }
+
+        // Find player by session token stored in db
+        if (!db.players) db.players = [];
+        const player = db.players.find(p => p.sessionToken === token);
+
+        if (!player) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Invalid session token', data: null }));
+        }
+
+        // Update last login
+        player.lastLogin = new Date().toISOString().split('T')[0];
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          code: 1,
+          msg: 'success',
+          data: {
+            player_id: player.id,
+            username: player.name,
+            currency: 'USD',
+            balance: ((player.balance || 0) / 100).toFixed(2), // in major units
+            nickname: player.name
+          }
+        }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, data: null }));
+      }
+    });
+
+  } else if (req.url === '/api/game/get-balance' && req.method === 'POST') {
+    // Called by game provider to get current player balance
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const payload = JSON.parse(body || '{}');
+
+        const token = payload.token || payload.session_token || payload.sessionToken;
+        const playerId = payload.player_id || payload.playerId || payload.uid;
+
+        if (!db.players) db.players = [];
+
+        // Find by token or player ID
+        let player = null;
+        if (token) player = db.players.find(p => p.sessionToken === token);
+        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+
+        if (!player) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
+        }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          code: 1,
+          msg: 'success',
+          balance: ((player.balance || 0) / 100).toFixed(2),
+          currency: 'USD',
+          player_id: player.id
+        }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+      }
+    });
+
+  } else if (req.url === '/api/game/adjustment' && req.method === 'POST') {
+    // Called by game provider to deduct (bet) or add (win) balance
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const payload = JSON.parse(body || '{}');
+
+        const token = payload.token || payload.session_token || payload.sessionToken;
+        const playerId = payload.player_id || payload.playerId || payload.uid;
+        // Amount in major currency units (e.g. 1.50 USD)
+        const amountRaw = parseFloat(payload.amount || payload.bet_amount || 0);
+        const txType = payload.type || payload.transaction_type || 'adjustment';
+        const txId = payload.transaction_id || payload.txid || payload.bet_id || ('TX-' + Date.now());
+        const gameName = payload.game_name || payload.game_code || 'Game';
+
+        if (!db.players) db.players = [];
+
+        let player = null;
+        if (token) player = db.players.find(p => p.sessionToken === token);
+        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+
+        if (!player) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
+        }
+
+        // Convert to internal coin units (multiply by 100)
+        const amountCoins = Math.round(amountRaw * 100);
+
+        // Check for duplicate transaction
+        if (!db.processedTxIds) db.processedTxIds = [];
+        if (db.processedTxIds.includes(txId)) {
+          // Idempotent: return current balance without re-processing
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({
+            code: 1,
+            msg: 'duplicate_ignored',
+            balance: ((player.balance || 0) / 100).toFixed(2),
+            transaction_id: txId
+          }));
+        }
+
+        // Determine debit or credit
+        // Negative amount = deduct (bet), positive = add (win/refund)
+        const isDebit = amountCoins < 0;
+        const absAmount = Math.abs(amountCoins);
+
+        if (isDebit && (player.balance || 0) < absAmount) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Insufficient balance', balance: ((player.balance || 0) / 100).toFixed(2) }));
+        }
+
+        player.balance = (player.balance || 0) + amountCoins;
+        if (player.balance < 0) player.balance = 0;
+
+        if (!player.transactions) player.transactions = [];
+        player.transactions.push({
+          type: amountCoins < 0 ? `رهان — ${gameName}` : `فوز — ${gameName}`,
+          amount: amountCoins,
+          txId: txId,
+          date: new Date().toLocaleTimeString('ar')
+        });
+
+        // Mark transaction as processed
+        db.processedTxIds.push(txId);
+        if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          code: 1,
+          msg: 'success',
+          balance: ((player.balance || 0) / 100).toFixed(2),
+          transaction_id: txId,
+          player_id: player.id
+        }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+      }
+    });
+
+  } else if (req.url === '/api/game/bet' && req.method === 'POST') {
+    // Deduct bet amount from player balance
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const payload = JSON.parse(body || '{}');
+
+        const token = payload.token || payload.session_token || payload.sessionToken;
+        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const betAmount = parseFloat(payload.amount || payload.bet_amount || 0);
+        const txId = payload.transaction_id || payload.bet_id || ('BET-' + Date.now());
+        const gameName = payload.game_name || payload.game_code || 'Game';
+
+        if (!db.players) db.players = [];
+        let player = null;
+        if (token) player = db.players.find(p => p.sessionToken === token);
+        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+
+        if (!player) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
+        }
+
+        const betCoins = Math.round(betAmount * 100);
+
+        // Duplicate check
+        if (!db.processedTxIds) db.processedTxIds = [];
+        if (db.processedTxIds.includes(txId)) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
+        }
+
+        if ((player.balance || 0) < betCoins) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Insufficient balance', balance: ((player.balance || 0) / 100).toFixed(2) }));
+        }
+
+        player.balance = (player.balance || 0) - betCoins;
+        if (!player.transactions) player.transactions = [];
+        player.transactions.push({ type: `رهان — ${gameName}`, amount: -betCoins, txId, date: new Date().toLocaleTimeString('ar') });
+
+        db.processedTxIds.push(txId);
+        if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId, player_id: player.id }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+      }
+    });
+
+  } else if (req.url === '/api/game/payout' && req.method === 'POST') {
+    // Add winnings to player balance
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const payload = JSON.parse(body || '{}');
+
+        const token = payload.token || payload.session_token || payload.sessionToken;
+        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const winAmount = parseFloat(payload.amount || payload.win_amount || 0);
+        const txId = payload.transaction_id || payload.payout_id || ('WIN-' + Date.now());
+        const gameName = payload.game_name || payload.game_code || 'Game';
+
+        if (!db.players) db.players = [];
+        let player = null;
+        if (token) player = db.players.find(p => p.sessionToken === token);
+        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+
+        if (!player) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
+        }
+
+        const winCoins = Math.round(winAmount * 100);
+
+        if (!db.processedTxIds) db.processedTxIds = [];
+        if (db.processedTxIds.includes(txId)) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
+        }
+
+        player.balance = (player.balance || 0) + winCoins;
+        if (!player.transactions) player.transactions = [];
+        player.transactions.push({ type: `فوز 🎉 — ${gameName}`, amount: winCoins, txId, date: new Date().toLocaleTimeString('ar') });
+
+        db.processedTxIds.push(txId);
+        if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId, player_id: player.id }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+      }
+    });
+
+  } else if (req.url === '/api/game/rollback' && req.method === 'POST') {
+    // Called by game provider to cancel/rollback a transaction
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const payload = JSON.parse(body || '{}');
+
+        const token = payload.token || payload.session_token;
+        const playerId = payload.player_id || payload.playerId;
+        const originalTxId = payload.original_transaction_id || payload.ref_transaction_id || payload.transaction_id;
+        const refundAmount = parseFloat(payload.amount || 0);
+        const txId = payload.rollback_id || ('RB-' + Date.now());
+
+        if (!db.players) db.players = [];
+        let player = null;
+        if (token) player = db.players.find(p => p.sessionToken === token);
+        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+
+        if (!player) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
+        }
+
+        if (!db.processedTxIds) db.processedTxIds = [];
+        if (db.processedTxIds.includes(txId)) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: ((player.balance || 0) / 100).toFixed(2) }));
+        }
+
+        // Refund the bet amount back to player
+        const refundCoins = Math.round(refundAmount * 100);
+        player.balance = (player.balance || 0) + refundCoins;
+        if (!player.transactions) player.transactions = [];
+        player.transactions.push({ type: `استرداد رهان (Rollback)`, amount: refundCoins, txId, ref: originalTxId, date: new Date().toLocaleTimeString('ar') });
+
+        db.processedTxIds.push(txId);
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+      }
+    });
+
+  } else if (req.url === '/api/game/downline' && req.method === 'POST') {
+    // Downline API — returns list of sub-agents/players under the operator
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+
+        const players = (db.players || []).map(p => ({
+          player_id: p.id,
+          username: p.name,
+          status: p.status || 'active',
+          currency: 'USD',
+          balance: ((p.balance || 0) / 100).toFixed(2)
+        }));
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 1, msg: 'success', data: players, total: players.length }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, data: [] }));
+      }
+    });
+
+  } else if (req.url === '/api/game/create-session' && req.method === 'POST') {
+    // Create a session token for a player (called by APK before launching a game)
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const { playerId } = JSON.parse(body || '{}');
+
+        if (!db.players) db.players = [];
+        const player = db.players.find(p => p.id === playerId);
+
+        if (!player) {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ error: 'اللاعب غير موجود' }));
+        }
+
+        // Generate a unique session token
+        const sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
+        player.sessionToken = sessionToken;
+        player.sessionCreatedAt = new Date().toISOString();
+
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true, sessionToken, playerId }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+
   } else {
     next();
   }
