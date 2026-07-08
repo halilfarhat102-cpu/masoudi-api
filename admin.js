@@ -319,8 +319,14 @@ function openWalletModal(id) {
     document.getElementById('walletModal').classList.add('open');
 }
 
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('open');
+}
+
 function closeModal(id) {
-    document.getElementById(id).classList.remove('open');
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
 }
 
 function executeWalletAction() {
@@ -1016,3 +1022,37 @@ async function sendCoinsToP2pAgent(playerId, inputId) {
         showToast('تعذر الاتصال بالخادم', 'error');
     }
 }
+
+// Expose functions globally for inline HTML onclick handlers
+Object.assign(window, {
+    openModal,
+    closeModal,
+    adminLogout,
+    switchTab,
+    toggleAddPlayerForm,
+    addNewPlayer,
+    addNewProvider,
+    addNewGame,
+    saveSettings,
+    addNewBanner,
+    addNewAgent,
+    activateP2pAgent,
+    executeWalletAction,
+    confirmDeletePlayer,
+    saveEditedGame,
+    doChangePassword,
+    doAddAdmin,
+    toggleCard,
+    openWalletModal,
+    toggleStatus,
+    resetBalance,
+    openDeleteModal,
+    quickWallet,
+    deleteProvider,
+    editGame,
+    deleteGame,
+    deleteBanner,
+    deleteAgent,
+    sendCoinsToP2pAgent,
+    deactivateP2pAgent
+});
