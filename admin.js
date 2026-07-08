@@ -235,7 +235,7 @@ function buildPlayerCard(p) {
         <div class="player-card-main-info" onclick="toggleCard('${p.id}')">
             <div class="player-avatar">${avatarContent}</div>
             <div class="player-details-col">
-                <div class="player-name-admin">${p.name}</div>
+                <div class="player-name-admin">${p.name} <span style="font-size:11px;color:#888;font-weight:normal;margin-right:6px;">#${p.id}</span></div>
                 <div class="player-badges-row">
                     <span class="badge-balance">🪙 ${formatNum(p.balance || 0)} كوين</span>
                     <span class="badge-status" style="background:${statusBg}; color:${statusColor}; border:1px solid ${statusBorder};">
