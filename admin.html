@@ -110,64 +110,133 @@
 
         /* Player Cards */
         .player-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            margin-bottom: 12px;
+            background: #1C120C;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             overflow: hidden;
-            transition: border-color 0.2s;
+            transition: all 0.25s ease;
         }
-        .player-card:hover { border-color: var(--orange); }
-        .player-card-header {
+        .player-card:hover { 
+            border-color: var(--orange); 
+            box-shadow: 0 4px 20px rgba(255, 122, 31, 0.15);
+        }
+        
+        .player-card-main-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
+            gap: 14px;
             cursor: pointer;
         }
+        
         .player-avatar {
-            width: 44px;
-            height: 44px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--orange), #D45A00);
+            border: 2px solid var(--orange);
+            box-shadow: 0 0 10px rgba(255, 122, 31, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: 900;
+            font-size: 20px;
+            font-weight: bold;
             color: #fff;
             flex-shrink: 0;
             overflow: hidden;
+            background: rgba(0,0,0,0.4);
         }
-        .player-info-main { flex: 1; min-width: 0; }
+        
+        .player-details-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
+        }
+        
         .player-name-admin {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 800;
             color: #fff;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .player-meta {
-            font-size: 11px;
-            color: #888;
-            margin-top: 2px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        
+        .player-badges-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        .player-balance-badge {
-            background: rgba(255,122,31,0.12);
-            border: 1px solid rgba(255,122,31,0.3);
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 12px;
+        
+        .badge-balance {
+            background: rgba(255, 122, 31, 0.15);
+            border: 1px solid rgba(255, 122, 31, 0.3);
+            border-radius: 50px;
+            padding: 3px 10px;
+            font-size: 11px;
             font-weight: 800;
             color: var(--orange);
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .mobile-balance-block { display: none; }
-        .mobile-only-meta { display: none; }
+        
+        .badge-status {
+            border-radius: 50px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .player-card-actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        
+        .btn-card-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-radius: 12px;
+            padding: 9px 0;
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-card-outline:hover {
+            border-color: #fff;
+            background: rgba(255,255,255,0.03);
+        }
+        
+        .btn-card-solid {
+            background: linear-gradient(135deg, var(--orange), #D45A00);
+            border: none;
+            color: #fff;
+            border-radius: 12px;
+            padding: 9px 0;
+            font-family: 'Cairo', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(255, 122, 31, 0.2);
+        }
+        .btn-card-solid:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(255, 122, 31, 0.3);
+        }
         .status-dot {
             width: 8px;
             height: 8px;

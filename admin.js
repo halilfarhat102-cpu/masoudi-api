@@ -218,7 +218,11 @@ function renderPlayers() {
 function buildPlayerCard(p) {
     const initial  = (p.name || '?')[0];
     const isActive = p.status === 'active';
-    const dotClass = isActive ? 'active' : 'suspended';
+    const statusText = isActive ? 'نشط' : 'موقوف';
+    const statusBg = isActive ? 'rgba(0, 230, 118, 0.12)' : 'rgba(255, 82, 82, 0.12)';
+    const statusColor = isActive ? '#00E676' : '#FF5252';
+    const statusBorder = isActive ? 'rgba(0, 230, 118, 0.25)' : 'rgba(255, 82, 82, 0.25)';
+    const statusIcon = isActive ? 'fa-solid fa-circle' : 'fa-solid fa-circle-minus';
     const txHtml   = buildMiniTx(p.transactions || []);
     
     const avatarContent = p.photoUrl 
@@ -227,47 +231,45 @@ function buildPlayerCard(p) {
 
     return `
     <div class="player-card" id="card-${p.id}">
-        <div class="player-card-header" onclick="toggleCard('${p.id}')">
+        <!-- Card Header / Avatar & Info -->
+        <div class="player-card-main-info" onclick="toggleCard('${p.id}')">
             <div class="player-avatar">${avatarContent}</div>
-            <div class="player-info-main">
+            <div class="player-details-col">
                 <div class="player-name-admin">${p.name}</div>
-                <div class="player-meta">
-                    <span class="status-dot ${dotClass}"></span>
-                    ${isActive ? 'نشط' : 'موقوف'} &nbsp;·&nbsp; #${p.id}
-                    <span class="desktop-only-meta"> &nbsp;·&nbsp; ${p.email || '—'}</span>
+                <div class="player-badges-row">
+                    <span class="badge-balance">🪙 ${formatNum(p.balance || 0)} كوين</span>
+                    <span class="badge-status" style="background:${statusBg}; color:${statusColor}; border:1px solid ${statusBorder};">
+                        <i class="${statusIcon}" style="font-size:8px; margin-left:4px;"></i> ${statusText}
+                    </span>
                 </div>
             </div>
-            <div class="player-balance-badge desktop-only-meta">🪙 ${formatNum(p.balance || 0)} كوين</div>
-            <i class="fa-solid fa-chevron-down" id="chev-${p.id}" style="color:#666;margin-right:8px;transition:transform 0.25s;"></i>
         </div>
-        
-        <!-- Mobile Dedicated Balance block (shown only on mobile via CSS) -->
-        <div class="mobile-balance-block" onclick="toggleCard('${p.id}')">
-            <div class="balance-sub-card">
-                <span class="label">🪙 الرصيد الرئيسي</span>
-                <span class="value">${formatNum(p.balance || 0)} كوين</span>
-            </div>
-            <div class="balance-sub-card" style="border-right: 1px solid rgba(255,255,255,0.08);">
-                <span class="label">🎁 رصيد المكافآت</span>
-                <span class="value" style="color:#00E676;">${formatNum(p.bonus || 0)} كوين</span>
-            </div>
+
+        <!-- Action Buttons (Side by Side) -->
+        <div class="player-card-actions-row">
+            <button class="btn-card-outline" onclick="toggleCard('${p.id}')">
+                <span id="btn-text-${p.id}"><i class="fa-solid fa-user-gear" style="margin-left:4px;"></i>عرض الملف</span>
+            </button>
+            <button class="btn-card-solid" onclick="openWalletModal('${p.id}')">
+                <i class="fa-solid fa-wallet" style="margin-left:4px;"></i>إدارة الحساب
+            </button>
         </div>
 
         <div class="player-controls" id="ctrl-${p.id}">
             <!-- Info rows -->
-            <div class="control-info-row mobile-only-meta">
+            <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-hashtag"></i> معرف اللاعب (ID)</span>
                 <span class="val">#${p.id}</span>
             </div>
-            <div class="control-info-row mobile-only-meta">
+            <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-envelope"></i> البريد الإلكتروني</span>
                 <span class="val" style="font-family:monospace;font-size:11px;color:#fff;">${p.email || '—'}</span>
             </div>
-            <div class="control-info-row desktop-only-meta">
+            <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-wallet"></i> الرصيد الرئيسي</span>
                 <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} كوين</span>
             </div>
-            <div class="control-info-row desktop-only-meta">
+            <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-gift"></i> رصيد المكافآت</span>
                 <span class="val" style="color:#00E676;" id="bon-${p.id}">${formatNum(p.bonus || 0)} كوين</span>
             </div>
@@ -282,9 +284,6 @@ function buildPlayerCard(p) {
 
             <!-- Action Buttons -->
             <div class="control-grid" style="margin-top:14px;">
-                <button class="btn-action btn-add-funds" onclick="openWalletModal('${p.id}')">
-                    <i class="fa-solid fa-wallet"></i> إدارة المحفظة
-                </button>
                 ${isActive
                     ? `<button class="btn-action btn-suspend" onclick="toggleStatus('${p.id}')"><i class="fa-solid fa-ban"></i> إيقاف الحساب</button>`
                     : `<button class="btn-action btn-activate" onclick="toggleStatus('${p.id}')"><i class="fa-solid fa-circle-check"></i> تفعيل الحساب</button>`
@@ -333,9 +332,13 @@ function buildMiniTx(txs) {
 // ─── Toggle Card Expand ──────────────────────
 function toggleCard(id) {
     const ctrl = document.getElementById(`ctrl-${id}`);
-    const chev = document.getElementById(`chev-${id}`);
+    const btnText = document.getElementById(`btn-text-${id}`);
     const isOpen = ctrl.classList.toggle('open');
-    chev.style.transform = isOpen ? 'rotate(180deg)' : '';
+    if (btnText) {
+        btnText.innerHTML = isOpen 
+            ? `<i class="fa-solid fa-eye-slash" style="margin-left:4px;"></i>إخفاء الملف` 
+            : `<i class="fa-solid fa-user-gear" style="margin-left:4px;"></i>عرض الملف`;
+    }
 }
 
 // ─── Wallet Modal ────────────────────────────
