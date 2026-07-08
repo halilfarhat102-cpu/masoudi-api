@@ -64,11 +64,33 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadGamesFromStorage() {
-    dynamicGames = JSON.parse(localStorage.getItem("masoudi_games")) || [
-        { id: "game-1", title: "روليت البرق (Lightning Roulette)", category: "live", provider: "Evolution Gaming", launchUrl: "https://v1.evolution.com/lightning-roulette-demo", image: "images/roulette.png" },
-        { id: "game-2", title: "فتحات بوابات أوليمبوس (Gates of Olympus)", category: "slots", provider: "Pragmatic Play", launchUrl: "https://demoplay.pragmaticplay.com/play/vs20olympgate", image: "images/slots.png" }
+    // Built-in games hosted on our server
+    const builtInGames = [
+        {
+            id: "fortune-gems",
+            title: "Fortune Gems 3 — سلوتس الجواهر",
+            category: "slots",
+            provider: "مسعودي Games",
+            launchUrl: "/public/games/fortune_gems.html",
+            image: "/public/games/fortune_gems_icon.png"
+        },
+        {
+            id: "fruit-slots",
+            title: "Fruit Slots — سلوت الفواكه الكلاسيكية",
+            category: "slots",
+            provider: "مسعودي Games",
+            launchUrl: "/public/games/fruit_slots.html",
+            image: "/public/games/fruit_slots_icon.png"
+        }
     ];
+
+    const savedGames = JSON.parse(localStorage.getItem("masoudi_games")) || [];
+    // Merge: built-in games first, then admin-added games (avoid duplicates by id)
+    const savedIds = savedGames.map(g => g.id);
+    const extras = savedGames.filter(g => !['fortune-gems', 'fruit-slots'].includes(g.id));
+    dynamicGames = [...builtInGames, ...extras];
 }
+
 
 // Update Balance UI everywhere
 function updateBalanceUI() {

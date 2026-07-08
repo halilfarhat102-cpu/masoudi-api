@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سلوت الفواكه الكلاسيكية | Fruit Slots</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Cairo:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ffd700;
+            --primary-glow: rgba(255, 215, 0, 0.35);
+            --accent: #ff4757;
+            --accent-glow: rgba(255, 71, 87, 0.4);
+            --bg-dark: #07030a;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Cairo', sans-serif;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top, rgba(147, 51, 234, 0.15), transparent 60%), linear-gradient(to bottom, rgba(7, 3, 10, 0.55), rgba(7, 3, 10, 0.85)), url('casino_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: var(--text-light);
+            font-family: var(--font-body);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Screen Container */
+        .screen-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: rgba(13, 8, 20, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: var(--glass-border);
+            border-right: var(--glass-border);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.95);
+            padding: 12px 14px;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* Header Layout */
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: var(--glass-border);
+            padding-bottom: 8px;
+            z-index: 10;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: var(--glass-border);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .back-btn:hover, .back-btn:active {
+            background: rgba(255, 255, 255, 0.12);
+            transform: scale(0.95);
+        }
+
+        .game-title-logo {
+            font-family: var(--font-display);
+            font-weight: 950;
+            font-size: 1.45rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary-glow);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .game-title-logo span {
+            color: #ffffff;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            margin-right: 4px;
+        }
+
+        /* Payline Indicator Map */
+        .payline-map-left, .payline-map-right {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 15;
+        }
+        .payline-map-left { left: 4px; }
+        .payline-map-right { right: 4px; }
+
+        .line-node {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 0.6rem;
+            font-weight: 900;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .line-node.active-line-1 { background: #3498db; border-color: #5dade2; color: #fff; box-shadow: 0 0 10px #3498db; }
+        .line-node.active-line-2 { background: #2ecc71; border-color: #58d68d; color: #fff; box-shadow: 0 0 10px #2ecc71; }
+        .line-node.active-line-3 { background: #e74c3c; border-color: #ec7063; color: #fff; box-shadow: 0 0 10px #e74c3c; }
+        .line-node.active-line-4 { background: #9b59b6; border-color: #af7ac5; color: #fff; box-shadow: 0 0 10px #9b59b6; }
+        .line-node.active-line-5 { background: #f1c40f; border-color: #f4d03f; color: #fff; box-shadow: 0 0 10px #f1c40f; }
+
+        /* Slots Outer Container Frame */
+        .slots-outer-frame {
+            position: relative;
+            width: 100%;
+            height: 290px;
+            background: linear-gradient(135deg, rgba(24, 9, 34, 0.75) 0%, rgba(13, 4, 19, 0.9) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.35);
+            border-radius: 24px;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.15),
+                inset 0 0 25px rgba(0, 0, 0, 0.8);
+            display: flex;
+            padding: 8px 12px;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        /* Payline Drawing Board Canvas overlay */
+        .payline-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Reel Column */
+        .reel-column {
+            flex: 1;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 8px 24px rgba(0,0,0,0.9);
+        }
+
+        .reel-strip {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            will-change: transform;
+        }
+
+        /* Slot Card design */
+        .slot-symbol-card {
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .slot-symbol-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.75rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .slot-symbol-card.winning-symbol {
+            animation: symbolWinPulse 0.5s ease-in-out infinite alternate;
+            z-index: 8;
+        }
+
+        .slot-symbol-card.winning-symbol .slot-symbol-inner {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 15px var(--primary));
+        }
+
+        @keyframes symbolWinPulse {
+            0% { background: rgba(255, 215, 0, 0.05); box-shadow: inset 0 0 5px rgba(255, 215, 0, 0.2); }
+            100% { background: rgba(255, 215, 0, 0.2); box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.5); }
+        }
+
+        /* Win Output Banner */
+        .win-display-strip {
+            width: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 71, 87, 0.08) 20%, rgba(255, 71, 87, 0.2) 50%, rgba(255, 71, 87, 0.08) 80%, transparent 100%);
+            border-top: 1px solid rgba(255, 71, 87, 0.25);
+            border-bottom: 1px solid rgba(255, 71, 87, 0.25);
+            padding: 8px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-display);
+            margin: 5px 0;
+        }
+
+        .win-label {
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .win-amount-text {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Bottom Controls layout */
+        .bottom-controls-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .controls-inner-row {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Round buttons for config */
+        .action-circle-btn {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--glass-border);
+            border-radius: 50%;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .action-circle-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .action-circle-btn:active {
+            transform: scale(0.92);
+        }
+
+        .action-circle-btn.toggle-active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(255, 71, 87, 0.1);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Bet adjuster panel */
+        .bet-display-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--glass-border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .bet-adjust-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .bet-adjust-btn:active {
+            transform: scale(0.85);
+        }
+
+        .bet-value-text {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 900;
+            min-width: 55px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        /* Spin Button */
+        .spin-button-outer {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 
+                0 8px 24px rgba(255, 140, 0, 0.4),
+                0 0 20px var(--primary-glow);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .spin-button-outer:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 
+                0 10px 28px rgba(255, 140, 0, 0.55),
+                0 0 25px var(--primary-glow);
+        }
+
+        .spin-button-outer:active {
+            transform: scale(0.92) translateY(0);
+        }
+
+        .spin-button-inner {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #ffe66d 0%, #ff8c00 100%);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #4a0200;
+            font-weight: 900;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .spin-button-inner .arrow-spin {
+            font-size: 1.15rem;
+            margin-top: -2px;
+            animation: spinArrow 5s linear infinite;
+        }
+
+        @keyframes spinArrow {
+            to { transform: rotate(-360deg); }
+        }
+
+        .spin-button-outer.disabled {
+            filter: grayscale(1);
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        /* Footer Stats Bar */
+        .footer-stats-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(13, 8, 20, 0.85);
+            border: var(--glass-border);
+            border-radius: 20px;
+            padding: 8px 12px;
+            direction: rtl;
+            z-index: 10;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .balance-pill-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .balance-value-val {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .recharge-pill-btn {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 0.8rem;
+            padding: 6px 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+            text-decoration: none;
+            font-family: var(--font-body);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .recharge-pill-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.35);
+        }
+
+        .recharge-pill-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* Standard Result Overlay */
+        .notification-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 4, 10, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 24px;
+        }
+
+        .notification-card {
+            width: 85%;
+            background: linear-gradient(135deg, rgba(30, 16, 45, 0.95) 0%, rgba(13, 5, 20, 0.98) 100%);
+            border: 1.5px solid rgba(255, 215, 0, 0.25);
+            border-radius: 28px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 
+                0 0 35px rgba(255, 215, 0, 0.15),
+                0 20px 45px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            direction: rtl;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.7) translateY(30px); }
+            to   { opacity: 1; transform: scale(1)   translateY(0); }
+        }
+
+        .notification-avatar {
+            font-size: 3.2rem;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .notification-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffe066;
+            text-shadow: 0 0 10px rgba(255, 224, 102, 0.4);
+        }
+
+        .notification-desc {
+            font-size: 1rem;
+            color: #e2e8f0;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .notification-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            color: #4a0200;
+            font-weight: 900;
+            font-size: 1.1rem;
+            padding: 10px 24px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            width: 100%;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.35);
+            transition: all 0.2s;
+        }
+
+        .notification-btn:hover {
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.5);
+        }
+
+        .notification-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Premium Win Celebration Overlays */
+        .celebration-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 150;
+            overflow: hidden;
+            direction: rtl;
+            border-radius: 24px;
+        }
+
+        .celebration-overlay.big-win {
+            background: radial-gradient(circle at center, #02360b 0%, #011404 60%, #000000 100%);
+            --tier-glow: #00ff87;
+        }
+        .celebration-overlay.mega-win {
+            background: radial-gradient(circle at center, #421e00 0%, #170b00 60%, #000000 100%);
+            --tier-glow: #ffaa00;
+        }
+        .celebration-overlay.super-win {
+            background: radial-gradient(circle at center, #4a0303 0%, #1c0101 60%, #000000 100%);
+            --tier-glow: #ff3838;
+        }
+        .celebration-overlay.grand-win {
+            background: radial-gradient(circle at center, #2e004a 0%, #12001e 60%, #000000 100%);
+            --tier-glow: #ffd700;
+            animation: grandBg 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes grandBg {
+            0%   { background: radial-gradient(circle at center, #2e004a 0%, #12001e 60%, #000000 100%); }
+            50%  { background: radial-gradient(circle at center, #002c3a 0%, #00121e 60%, #000000 100%); }
+            100% { background: radial-gradient(circle at center, #3a0022 0%, #17000e 60%, #000000 100%); }
+        }
+
+        .celebration-starburst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 750px;
+            height: 750px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .celebration-ray-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 700px;
+            height: 700px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            animation: spinRays 16s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.85;
+        }
+
+        .celebration-overlay.big-win .celebration-ray-bg {
+            background: repeating-conic-gradient(from 0deg, rgba(0, 255, 135, 0.1) 0deg 15deg, transparent 15deg 30deg);
+        }
+        .celebration-overlay.mega-win .celebration-ray-bg {
+            background: repeating-conic-gradient(from 0deg, rgba(255, 170, 0, 0.1) 0deg 15deg, transparent 15deg 30deg);
+        }
+        .celebration-overlay.super-win .celebration-ray-bg {
+            background: repeating-conic-gradient(from 0deg, rgba(255, 56, 56, 0.1) 0deg 15deg, transparent 15deg 30deg);
+        }
+        .celebration-overlay.grand-win .celebration-ray-bg {
+            background: repeating-conic-gradient(from 0deg, rgba(255, 215, 0, 0.12) 0deg 10deg, rgba(180, 80, 255, 0.12) 10deg 20deg, transparent 20deg 30deg);
+            animation: spinRays 8s linear infinite;
+        }
+
+        .celebration-content {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            gap: 15px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .win-title-blast {
+            font-family: var(--font-display);
+            font-size: 3.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 5px 0;
+            position: relative;
+            animation: titlePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, titlePulse 1.5s infinite alternate ease-in-out;
+            -webkit-text-stroke: 2px #ffffff;
+            z-index: 6;
+        }
+
+        @keyframes titlePop {
+            0% { transform: scale(0.3) rotate(-5deg); opacity: 0; }
+            70% { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes titlePulse {
+            0% { transform: scale(0.96); }
+            100% { transform: scale(1.05); }
+        }
+
+        .celebration-overlay.big-win .win-title-blast {
+            color: #00ff87;
+            text-shadow: 0 0 10px #00ff87, 0 0 20px #00ff87, 0 0 40px #00a85a, 0 4px 10px rgba(0,0,0,0.9);
+        }
+        .celebration-overlay.mega-win .win-title-blast {
+            color: #ffaa00;
+            text-shadow: 0 0 10px #ffaa00, 0 0 20px #ffaa00, 0 0 40px #d35400, 0 4px 10px rgba(0,0,0,0.9);
+        }
+        .celebration-overlay.super-win .win-title-blast {
+            color: #ff3838;
+            text-shadow: 0 0 10px #ff3838, 0 0 20px #ff3838, 0 0 40px #b30000, 0 4px 10px rgba(0,0,0,0.9);
+        }
+        .celebration-overlay.grand-win .win-title-blast {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 25px #ffd700, 0 0 50px #ff007f, 0 4px 10px rgba(0,0,0,0.9);
+            animation: titlePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, titlePulse 1.2s infinite alternate ease-in-out, rainbowGlow 3s linear infinite;
+        }
+
+        @keyframes rainbowGlow {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
+        }
+
+        .celebration-gems-container {
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            padding: 12px;
+            margin: 5px 0;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .celebration-gems-showcase {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .celebration-gem-icon {
+            width: 85px;
+            height: 85px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.75)) drop-shadow(0 0 12px var(--tier-glow));
+            animation: floatGem 1.6s ease-in-out infinite alternate;
+        }
+
+        .celebration-gem-icon .slot-symbol-inner {
+            font-size: 3.5rem;
+        }
+
+        .celebration-gem-icon:nth-child(2) {
+            animation-delay: 0.25s;
+            transform: scale(1.15);
+        }
+        .celebration-gem-icon:nth-child(3) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes floatGem {
+            from { transform: translateY(0px) rotate(0deg); }
+            to { transform: translateY(-12px) rotate(6deg); }
+        }
+
+        .celebration-payout-desc {
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 800;
+            line-height: 1.5;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+            margin: 5px 0;
+        }
+
+        .celebration-counter-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
+            border: 2px solid rgba(255, 215, 0, 0.35);
+            padding: 10px 32px;
+            border-radius: 50px;
+            box-shadow: 
+                inset 0 0 18px rgba(255, 215, 0, 0.2),
+                0 10px 30px rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            animation: counterPulse 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes counterPulse {
+            0% { transform: scale(0.97); box-shadow: inset 0 0 10px rgba(255,215,0,0.15), 0 8px 20px rgba(0,0,0,0.5); }
+            100% { transform: scale(1.05); box-shadow: inset 0 0 25px rgba(255,215,0,0.4), 0 15px 35px rgba(255, 215, 0, 0.25); }
+        }
+
+        .celebration-coin-emoji {
+            font-size: 3rem;
+            display: inline-block;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
+        }
+
+        #celebration-counter-val {
+            font-family: var(--font-display);
+            font-size: 3.6rem;
+            font-weight: 900;
+            display: inline-block;
+            background: linear-gradient(180deg, #ffffff 25%, #ffd700 65%, #ff9f43 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 15px rgba(255,215,0,0.85));
+        }
+
+        .celebration-multiplier-badge {
+            background: linear-gradient(135deg, #ff3838 0%, #ff8585 100%);
+            border: 2px solid #ffffff;
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 900;
+            padding: 6px 16px;
+            box-shadow: 0 4px 15px rgba(255, 56, 56, 0.5);
+            letter-spacing: 1px;
+            z-index: 6;
+            margin-bottom: 5px;
+            animation: pulseBtn 0.8s infinite alternate;
+        }
+
+        .falling-coins-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .falling-coin-particle {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            user-select: none;
+            animation: coinRain linear forwards;
+        }
+
+        @keyframes coinRain {
+            0% { transform: translateY(-50px) rotate(0deg) scale(0.5); opacity: 0; }
+            10% { opacity: 1; transform: translateY(0) rotate(20deg) scale(1); }
+            90% { opacity: 1; }
+            100% { transform: translateY(110dvh) rotate(360deg) scale(0.8); opacity: 0; }
+        }
+
+        .celebration-collect-button {
+            position: relative;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #ffd700 100%);
+            background-size: 200% auto;
+            border: 3.5px solid #ffffff;
+            border-radius: 22px;
+            color: #4a0200;
+            font-family: var(--font-body);
+            font-weight: 900;
+            font-size: 1.35rem;
+            padding: 14px 48px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.45), 0 8px 25px rgba(0, 0, 0, 0.65);
+            transition: all 0.2s ease;
+            outline: none;
+            width: 90%;
+            max-width: 320px;
+            overflow: hidden;
+            animation: shimmerBtn 3s infinite linear;
+            z-index: 10;
+        }
+
+        @keyframes shimmerBtn {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .celebration-collect-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -150%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+            transform: skewX(-25deg);
+            animation: sweepEffect 2.8s infinite;
+        }
+
+        @keyframes sweepEffect {
+            0% { left: -150%; }
+            30% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        .celebration-collect-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-container">
+        
+        <!-- Header -->
+        <header class="game-header">
+            <button class="back-btn" id="slots-back-btn">❮ العودة</button>
+            <h1 class="game-title-logo">Fruit<span>Slots</span></h1>
+            <div style="width: 55px;"></div> <!-- balance spacer -->
+        </header>
+
+        <!-- Slots Board Container -->
+        <div style="position: relative; width: 100%;">
+            <!-- Payline Indicator Nodes -->
+            <div class="payline-map-left">
+                <div class="line-node" id="node-L-1">1</div>
+                <div class="line-node" id="node-L-2">2</div>
+                <div class="line-node" id="node-L-3">3</div>
+                <div class="line-node" id="node-L-4">4</div>
+                <div class="line-node" id="node-L-5">5</div>
+            </div>
+            
+            <div class="payline-map-right">
+                <div class="line-node" id="node-R-1">1</div>
+                <div class="line-node" id="node-R-2">2</div>
+                <div class="line-node" id="node-R-3">3</div>
+                <div class="line-node" id="node-R-4">4</div>
+                <div class="line-node" id="node-R-5">5</div>
+            </div>
+
+            <!-- Slots Grid Frame -->
+            <div class="slots-outer-frame">
+                <!-- SVG Canvas to Draw Paylines dynamically -->
+                <svg class="payline-canvas" id="payline-svg" viewBox="0 0 350 274" preserveAspectRatio="none">
+                    <!-- Lines will be dynamically generated by JS -->
+                </svg>
+
+                <!-- Reel 1 -->
+                <div class="reel-column">
+                    <div class="reel-strip" id="reel-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Reel 2 -->
+                <div class="reel-column">
+                    <div class="reel-strip" id="reel-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Reel 3 -->
+                <div class="reel-column">
+                    <div class="reel-strip" id="reel-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Win Output Banner -->
+        <div class="win-display-strip">
+            <span class="win-label">الفوز الحالي:</span>
+            <span class="win-amount-text" id="slots-win-val">0</span>
+            <span style="color:var(--accent); font-size:1.1rem; filter:drop-shadow(0 0 5px var(--accent-glow));">🪙</span>
+        </div>
+
+        <!-- Bottom Controls -->
+        <div class="bottom-controls-section">
+            <div class="controls-inner-row">
+                <!-- Sound Toggle -->
+                <button class="action-circle-btn" id="slots-sound-btn" title="كتم الصوت">🎵</button>
+                
+                <!-- Bet panel -->
+                <div class="bet-display-panel">
+                    <button class="bet-adjust-btn" id="bet-minus-btn">-</button>
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <span style="font-size:0.6rem; color:var(--text-muted); font-weight:800; line-height:1;">الرهان</span>
+                        <span class="bet-value-text" id="slots-bet-val">100</span>
+                    </div>
+                    <button class="bet-adjust-btn" id="bet-plus-btn">+</button>
+                </div>
+
+                <!-- Turbo -->
+                <button class="action-circle-btn" id="slots-turbo-btn" title="وضع التوربو السريع">⚡</button>
+                
+                <!-- Auto -->
+                <button class="action-circle-btn" id="slots-auto-btn" title="دوران تلقائي">🔄</button>
+            </div>
+
+            <!-- Big Spin Button -->
+            <div style="display:flex; justify-content:center; width:100%;">
+                <div class="spin-button-outer" id="slots-spin-btn">
+                    <div class="spin-button-inner">
+                        <span class="arrow-spin">🔄</span>
+                        <span>SPIN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bar -->
+        <footer class="footer-stats-bar">
+            <div class="balance-pill-box">
+                <span class="balance-label" style="font-size:0.85rem; color:var(--text-muted); font-weight:800;">محفظتك:</span>
+                <span class="balance-value-val" id="slots-balance-val">0</span>
+                <span style="color:var(--primary);">🪙</span>
+            </div>
+            <a href="index.html?recharge=true" class="recharge-pill-btn">شحن المحفظة</a>
+        </footer>
+
+        <!-- Small Win Overlay -->
+        <div class="notification-overlay" id="slots-result-overlay">
+            <div class="notification-card">
+                <div class="notification-avatar" id="slots-result-avatar">🍒</div>
+                <h3 class="notification-title" id="slots-result-title">فوز رائع! 🏆</h3>
+                <p class="notification-desc" id="slots-result-desc">ربحت عن تماثل رموز الفاكهة!</p>
+                <button class="notification-btn" id="slots-result-close-btn">حسناً</button>
+            </div>
+        </div>
+
+        <!-- Giant Win Celebration Overlay -->
+        <div class="celebration-overlay" id="slots-celebration-overlay">
+            <div class="celebration-starburst"></div>
+            <div class="celebration-ray-bg"></div>
+            <div class="falling-coins-container" id="celebration-coins-container"></div>
+
+            <div class="celebration-content">
+                <div class="win-title-blast" id="celebration-win-title">MEGA WIN</div>
+
+                <div class="celebration-gems-container">
+                    <div class="celebration-gems-showcase" id="celebration-gems-showcase"></div>
+                </div>
+
+                <div class="celebration-payout-desc" id="celebration-payout-desc">تهانينا!</div>
+
+                <div class="celebration-counter-box">
+                    <span class="celebration-coin-emoji">🪙</span>
+                    <span id="celebration-counter-val">0</span>
+                </div>
+
+                <div class="celebration-multiplier-badge" id="celebration-mult-badge">×5 MULTIPLIER</div>
+
+                <button class="celebration-collect-button" id="celebration-collect-btn">جمع المكاسب 🏆</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script File -->
+    <script src="fruit_slots.js"></script>
+</body>
+</html>
