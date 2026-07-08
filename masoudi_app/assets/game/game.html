@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Farm</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="safari-theme">
+    <div class="safari-bg-overlay"></div>
+
+    <!-- Splash Loading Screen -->
+    <div id="splash-screen" class="screen-container">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%;">
+            <div class="logo-container">
+                <h1 class="game-logo letter-wave">
+                    <span class="word">
+                        <span style="--i:0">B</span>
+                        <span style="--i:1">I</span>
+                        <span style="--i:2">G</span>
+                    </span>
+                    <br>
+                    <span class="word accent">
+                        <span style="--i:3">F</span>
+                        <span style="--i:4">A</span>
+                        <span style="--i:5">R</span>
+                        <span style="--i:6">M</span>
+                    </span>
+                </h1>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="splash-progress"></div>
+            </div>
+            <div class="splash-loading-text">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <!-- Gameplay Screen -->
+    <div id="game-screen" class="screen-container hidden">
+        <!-- Modern Pastel Header -->
+        <header class="game-header">
+            <button id="game-back-btn" class="back-arrow-btn"><span class="back-circle">❮</span> Round 0001</button>
+            <div class="header-action-buttons">
+                <button id="header-quests-btn" class="action-circle-icon-btn">📜</button>
+                <button id="header-settings-btn" class="action-circle-icon-btn">🎵</button>
+                <button id="rule-btn" class="action-circle-icon-btn">❓</button>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="game-main">
+            <!-- Unified Round Pastel Grid Container -->
+            <section class="betting-grid-section">
+                <!-- Countdown timer bubble positioned centrally right on top of the yellow panel -->
+                <div class="header-status-decor">
+                    <span class="decor-bubble font-decor" id="decor-salad">🌿</span>
+                    <div class="timer-display-pill" id="timer-display-pill">29s</div>
+                    <span class="decor-bubble font-decor" id="decor-pizza">🥩</span>
+                </div>
+                <div class="betting-board-frame">
+                    <div class="betting-grid" id="betting-grid">
+                        <!-- 8/12 circular items will be drawn here -->
+                    </div>
+                </div>
+            </section>
+ 
+             <!-- Tactile Green/Orange Coin Buttons (Bevel style) -->
+             <section class="bet-quick-selection-section">
+                 <div class="quick-bet-buttons">
+                     <button class="quick-bet-btn" data-bet="500">
+                         <span class="btn-top">500</span>
+                     </button>
+                     <button class="quick-bet-btn active-bet-value" data-bet="1000">
+                         <span class="btn-top">1000</span>
+                     </button>
+                     <button class="quick-bet-btn" data-bet="2000">
+                         <span class="btn-top">2000</span>
+                     </button>
+                     <button class="quick-bet-btn" data-bet="5000">
+                         <span class="btn-top">5000</span>
+                     </button>
+                 </div>
+             </section>
+ 
+             <!-- Balance, Recharge, & Profit Stats Row -->
+             <section class="balance-recharge-section">
+                 <div class="stats-row">
+                     <div class="balance-pill-box">
+                         <span class="bean-icon">🪙</span>
+                         <span class="balance-value font-display" id="player-balance">0</span>
+                     </div>
+                     <button id="header-shop-btn" class="recharge-pill-btn">Recharge</button>
+                     <div class="today-profit-box">
+                         <span class="label-profit">Today's profits</span>
+                         <span class="profit-value font-display" id="today-profit-val">0</span>
+                     </div>
+                 </div>
+             </section>
+ 
+             <!-- Bottom History Ribbon (No Spin button) -->
+             <section class="bottom-history-ribbon-section">
+                 <div class="history-ribbon">
+                      <div class="history-list" id="history-list">
+                          <div class="history-item new-marker"><span class="item-pic">🦁</span><span class="new-badge">NEW</span></div>
+                          <div class="history-item"><span class="item-pic">🐘</span></div>
+                          <div class="history-item"><span class="item-pic">🦓</span></div>
+                          <div class="history-item"><span class="item-pic">🦒</span></div>
+                          <div class="history-item"><span class="item-pic">🐆</span></div>
+                          <div class="history-item"><span class="item-pic">🐊</span></div>
+                          <div class="history-item"><span class="item-pic">🦅</span></div>
+                          <div class="history-item"><span class="item-pic">🦌</span></div>
+                          <div class="history-item"><span class="item-pic">🦁</span></div>
+                     </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Shop Modal -->
+    <div class="modal-overlay" id="shop-modal">
+        <div class="modal-content">
+            <h2>🛒 STORE</h2>
+            <div class="modal-scroll-body">
+                <div class="store-section">
+                    <h3>Buy Coins</h3>
+                    <div class="store-grid">
+                        <div class="store-item" data-buy="coins" data-cost="10" data-amount="1000">
+                            <span class="item-title">1,000 Coins</span>
+                            <span class="cost-tag">💎 10 Gems</span>
+                        </div>
+                        <div class="store-item" data-buy="coins" data-cost="45" data-amount="5000">
+                            <span class="item-title">5,000 Coins</span>
+                            <span class="cost-tag">💎 45 Gems</span>
+                        </div>
+                        <div class="store-item" data-buy="coins" data-cost="80" data-amount="10000">
+                            <span class="item-title">10,000 Coins</span>
+                            <span class="cost-tag">💎 80 Gems</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="store-section">
+                    <h3>Buy Gems</h3>
+                    <div class="store-grid">
+                        <div class="store-item" data-buy="gems" data-cost="1" data-amount="20">
+                            <span class="item-title">20 Gems</span>
+                            <span class="cost-tag">$0.99</span>
+                        </div>
+                        <div class="store-item" data-buy="gems" data-cost="5" data-amount="120">
+                            <span class="item-title">120 Gems</span>
+                            <span class="cost-tag">$4.99</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="store-section">
+                    <h3>VIP Pass</h3>
+                    <div class="store-item vip-item" data-buy="vip" data-cost="10" data-amount="vip">
+                        <span class="item-title">⭐ VIP Membership</span>
+                        <span class="item-desc">2x Daily rewards & Double free chest coins!</span>
+                        <span class="cost-tag">$9.99 / Month</span>
+                    </div>
+                </div>
+            </div>
+            <button class="close-modal-btn">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- Gift / Daily Spin Modal -->
+    <div class="modal-overlay" id="gift-modal">
+        <div class="modal-content">
+            <h2>🎁 DAILY REWARDS</h2>
+            <div class="gift-body">
+                <div class="daily-reward-claim">
+                    <p>Daily Login Streak: <strong id="login-streak">1</strong> Days</p>
+                    <button id="claim-daily-btn" class="menu-btn play-btn">Claim Free Coins</button>
+                </div>
+                <hr class="modal-divider">
+                <div class="free-wheel-section">
+                    <h3>Free Daily Spin</h3>
+                    <canvas id="free-spin-canvas" width="200" height="200"></canvas>
+                    <button id="spin-free-wheel-btn" class="menu-btn shop-btn-purple">SPIN FREE WHEEL</button>
+                </div>
+            </div>
+            <button class="close-modal-btn">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- Quests Modal (Repurposed as History Log) -->
+    <div class="modal-overlay" id="quests-modal">
+        <div class="modal-content">
+            <h2>📜 سجل الجولات</h2>
+            <div class="modal-scroll-body" id="history-modal-body">
+                <div style="text-align: center; color: #ecd7c7; padding: 20px; font-size: 0.9rem;">
+                    لا توجد جولات مسجلة بعد. ابدأ اللعب لرؤية السجل!
+                </div>
+            </div>
+            <button class="close-modal-btn">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <h2>⚙️ SETTINGS</h2>
+            <div class="settings-body">
+                <div class="setting-row">
+                    <span>Background Music</span>
+                    <button id="settings-music-btn" class="settings-toggle-btn active">ON</button>
+                </div>
+                <div class="setting-row">
+                    <span>Sound Effects</span>
+                    <button id="settings-sound-btn" class="settings-toggle-btn active">ON</button>
+                </div>
+                <div class="setting-row">
+                    <span>VIP Status</span>
+                    <span id="vip-status-label" class="vip-status-label">NOT ACTIVE</span>
+                </div>
+            </div>
+            <button class="close-modal-btn">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div class="modal-overlay" id="rules-modal">
+        <div class="modal-content">
+            <h2>📜 HOW TO PLAY</h2>
+            <div class="rules-body">
+                <p>1. Tap any segment on the large animal wheel to select the animal you want to bet on.</p>
+                <p>2. Adjust your <strong>BET AMOUNT</strong> using the Minus (—) and Plus (+) buttons.</p>
+                <p>3. Select a Multiplier Ribbon boost (x1, x2, x5, or x10) to multiply both your bet and potential win!</p>
+                <p>4. Press <strong>SPIN</strong> or <strong>AUTO SPIN</strong> to rotate the wheel.</p>
+                <p>5. If the wheel lands on your chosen animal, you win: <strong>Bet × Animal Multiplier × Ribbon Boost</strong>!</p>
+            </div>
+            <button class="close-modal-btn">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- Win/Loss Notification Overlay Redesigned -->
+    <div class="notification-overlay" id="notification-overlay">
+        <div class="notification-card">
+            <!-- Top glowing winning icon banner -->
+            <div class="result-top-glow">
+                <div class="result-top-icon" id="result-top-icon">🦁</div>
+            </div>
+            
+            <div class="result-card-body">
+                <!-- Scalloped top border header decoration -->
+                <div class="scalloped-header"></div>
+                
+                <div class="result-main-content">
+                    <!-- Left Column: Emoji & Auto-close Timer -->
+                    <div class="result-left-panel">
+                        <div class="emoji-box">
+                            <span class="timer-badge" id="result-timer-badge">3.5s</span>
+                            <div class="emoji-avatar" id="result-emoji-avatar">😢</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Info & Message -->
+                    <div class="result-right-panel">
+                        <div class="round-results-box">
+                            <div class="round-results-header" id="result-round-label">The 0274 round's results:</div>
+                            <div class="round-results-icon" id="result-round-icon">🦁</div>
+                        </div>
+                        <div class="result-message-text" id="result-message-text">
+                            Sorry,<br>you just missed<br>the jackpot ~
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Cinematic Special Jackpot Intro Overlay -->
+    <div id="jackpot-intro-overlay" class="jackpot-intro-overlay">
+        <div class="jackpot-rays"></div>
+        <div class="jackpot-intro-content">
+            <div class="jackpot-intro-emoji" id="jackpot-intro-emoji">🥩</div>
+            <h1 class="jackpot-intro-title" id="jackpot-intro-title">PREDATOR JACKPOT!</h1>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

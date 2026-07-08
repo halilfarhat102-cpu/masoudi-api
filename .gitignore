@@ -1,4 +1,12 @@
 node_modules
 dist
-masoudi_app
 .DS_Store
+# Exclude large build artifacts from masoudi_app
+masoudi_app/build
+masoudi_app/.dart_tool
+masoudi_app/.idea
+masoudi_app/.gradle
+masoudi_app/linux
+masoudi_app/windows
+masoudi_app/macos
+masoudi_app/ios
