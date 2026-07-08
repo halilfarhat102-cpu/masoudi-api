@@ -45,14 +45,32 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = true;
     });
 
-    final localBigFarm = Game(
-      id: "local-big-farm",
-      title: "Big Farm — مزرعة الحظ السعيدة",
-      category: "slots",
-      provider: "ألعاب محلية",
-      launchUrl: "assets/game/game.html",
-      image: "assets/game/big_farm_icon.png"
-    );
+    final localGames = [
+      Game(
+        id: "local-big-farm",
+        title: "Big Farm — مزرعة الحظ السعيدة",
+        category: "slots",
+        provider: "ألعاب محلية",
+        launchUrl: "assets/game/game.html",
+        image: "assets/game/big_farm_icon.png"
+      ),
+      Game(
+        id: "local-fortune-gems",
+        title: "Fortune Gems 3 — سلوتس الجواهر",
+        category: "slots",
+        provider: "ألعاب محلية",
+        launchUrl: "assets/game/fortune_gems.html",
+        image: "assets/game/fortune_gems_icon.png"
+      ),
+      Game(
+        id: "local-fruit-slots",
+        title: "Fruit Slots — سلوت الفواكه الكلاسيكية",
+        category: "slots",
+        provider: "ألعاب محلية",
+        launchUrl: "assets/game/fruit_slots.html",
+        image: "assets/game/fruit_slots_icon.png"
+      )
+    ];
 
     try {
       final response = await http.get(Uri.parse('${widget.serverUrl}/api/data')).timeout(
@@ -64,9 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
         final List<dynamic> gamesList = decoded['games'] ?? [];
         List<Game> parsedGames = gamesList.map((g) => Game.fromJson(g)).toList();
         
-        // Exclude the ID if it matches
-        parsedGames = parsedGames.where((g) => g.id != 'local-big-farm').toList();
-        parsedGames.insert(0, localBigFarm);
+        // Exclude the local IDs if they match
+        final localIds = localGames.map((g) => g.id).toList();
+        parsedGames = parsedGames.where((g) => !localIds.contains(g.id)).toList();
+        parsedGames.insertAll(0, localGames);
 
         setState(() {
           _games = parsedGames;
@@ -79,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Error fetching games from API: $e. Falling back to default static games.");
       setState(() {
         _games = [
-          localBigFarm,
+          ...localGames,
           Game(
             id: "game-1",
             title: "روليت البرق (Lightning Roulette)",

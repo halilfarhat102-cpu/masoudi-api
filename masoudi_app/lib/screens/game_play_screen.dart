@@ -100,6 +100,15 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
       });
     }
 
+    String gameName = 'لعبة محلية';
+    if (widget.game.id == 'local-big-farm') {
+      gameName = 'مزرعة الحظ';
+    } else if (widget.game.id == 'local-fortune-gems') {
+      gameName = 'سلوتس الجواهر';
+    } else if (widget.game.id == 'local-fruit-slots') {
+      gameName = 'سلوتس الفواكه';
+    }
+
     // Update balance on the server database
     try {
       await http.post(
@@ -107,7 +116,7 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
         body: json.encode({
           'id': widget.playerId,
           'amount': diff,
-          'type': diff < 0 ? 'لعب (مزرعة الحظ)' : 'فوز (مزرعة الحظ)',
+          'type': diff < 0 ? 'لعب ($gameName)' : 'فوز ($gameName)',
         }),
       );
     } catch (e) {
