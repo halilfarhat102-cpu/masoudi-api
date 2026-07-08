@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { readDb, writeDb } from './db-adapter.js';
 import crypto from 'crypto';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -10,7 +11,7 @@ function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
 }
 
-export function apiMiddleware(req, res, next) {
+export async function apiMiddleware(req, res, next) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -26,7 +27,7 @@ export function apiMiddleware(req, res, next) {
     const dbPath = resolve(__dirname, 'db.json');
     if (req.method === 'GET') {
       try {
-        const data = fs.readFileSync(dbPath, 'utf-8');
+        const data = JSON.stringify(await readDb());
         res.setHeader('Content-Type', 'application/json');
         res.end(data);
       } catch (e) {
@@ -36,15 +37,15 @@ export function apiMiddleware(req, res, next) {
     } else if (req.method === 'POST') {
       let body = '';
       req.on('data', chunk => { body += chunk; });
-      req.on('end', () => {
+      req.on('end', async () => {
         try {
           const incoming = JSON.parse(body);
-          const existing = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+          const existing = await readDb();
           incoming.admins = existing.admins || incoming.admins || [];
           incoming.agents = incoming.agents || existing.agents || [];
           // ✔️ PRESERVE PLAYERS DATABASE (Never overwrite from admin panel settings updates!)
           incoming.players = existing.players || [];
-          fs.writeFileSync(dbPath, JSON.stringify(incoming, null, 2), 'utf-8');
+          await writeDb(incoming);
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ success: true }));
         } catch (e) {
@@ -56,7 +57,7 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/upload' && req.method === 'POST') {
     const chunks = [];
     req.on('data', chunk => chunks.push(chunk));
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const buffer = Buffer.concat(chunks);
         const contentType = req.headers['content-type'];
@@ -112,10 +113,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/sync-player' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const playerInput = JSON.parse(body);
 
         // Helper: is the name a pure numeric ID (not a real name)?
@@ -154,7 +155,7 @@ export function apiMiddleware(req, res, next) {
           player.lastLogin = new Date().toISOString().split('T')[0];
         }
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         
         const adminEmails = ['halilfarhat102@gmail.com', 'management135790@gmail.com'];
@@ -172,10 +173,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/update-player-balance' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body); // { id, amount, type }
 
         if (!db.players) db.players = [];
@@ -197,7 +198,7 @@ export function apiMiddleware(req, res, next) {
             amount: payload.amount,
             date: new Date().toLocaleTimeString('ar')
           });
-          fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+          await writeDb(db);
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(player));
         } else {
@@ -212,10 +213,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin/add-player' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { name, email, balance, status } = JSON.parse(body);
 
         if (!name) {
@@ -240,7 +241,7 @@ export function apiMiddleware(req, res, next) {
           ] : []
         };
         db.players.push(newPlayer);
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, player: newPlayer }));
       } catch (e) {
@@ -251,10 +252,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin/delete-player' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { playerId } = JSON.parse(body);
 
         if (!db.players) db.players = [];
@@ -267,7 +268,7 @@ export function apiMiddleware(req, res, next) {
           return;
         }
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true }));
       } catch (e) {
@@ -278,10 +279,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin/update-player-wallet' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { playerId, amount, action } = JSON.parse(body);
 
         if (!playerId || isNaN(amount) || amount <= 0) {
@@ -319,7 +320,7 @@ export function apiMiddleware(req, res, next) {
           date: now
         });
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, player: p }));
       } catch (e) {
@@ -330,10 +331,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin/toggle-player-status' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { playerId } = JSON.parse(body);
 
         if (!db.players) db.players = [];
@@ -345,7 +346,7 @@ export function apiMiddleware(req, res, next) {
         }
 
         p.status = p.status === 'active' ? 'suspended' : 'active';
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, player: p }));
       } catch (e) {
@@ -356,10 +357,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin/reset-player-balance' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { playerId } = JSON.parse(body);
 
         if (!db.players) db.players = [];
@@ -379,7 +380,7 @@ export function apiMiddleware(req, res, next) {
           date: new Date().toLocaleTimeString('ar')
         });
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, player: p }));
       } catch (e) {
@@ -390,10 +391,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/toggle-agent' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { playerId, isAgent } = JSON.parse(body);
 
         if (!db.players) db.players = [];
@@ -403,7 +404,7 @@ export function apiMiddleware(req, res, next) {
           if (isAgent) {
             player.agentBalance = player.agentBalance || 0;
           }
-          fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+          await writeDb(db);
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ success: true, player }));
         } else {
@@ -418,10 +419,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/update-agent-balance' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body); // { id, amount }
 
         if (!db.players) db.players = [];
@@ -439,7 +440,7 @@ export function apiMiddleware(req, res, next) {
             amount: payload.amount,
             date: new Date().toLocaleTimeString('ar')
           });
-          fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+          await writeDb(db);
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(player));
         } else {
@@ -454,10 +455,10 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/agent-transfer' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { agentId, recipientId, amount } = JSON.parse(body);
 
         if (!agentId || !recipientId || amount <= 0) {
@@ -510,7 +511,7 @@ export function apiMiddleware(req, res, next) {
           date: new Date().toLocaleTimeString('ar')
         });
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, agentBalance: agent.agentBalance }));
       } catch (e) {
@@ -522,10 +523,10 @@ export function apiMiddleware(req, res, next) {
     // 🔄 Player sells coins TO agent (works with both charging agents & P2P players)
     let body = '';
     req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         // agentId = the player-account ID of the agent
         // agentEntryId = the agents[] entry id (charging agent with playerId field)
         const { playerId, agentId, agentEntryId, amount } = JSON.parse(body);
@@ -605,7 +606,7 @@ export function apiMiddleware(req, res, next) {
           date: now
         });
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           success: true,
@@ -620,11 +621,11 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin-login' && req.method === 'POST') {
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { username, password } = JSON.parse(body);
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const admins = db.admins || [];
         const hash = sha256(password);
         const admin = admins.find(a => a.username === username && a.passwordHash === hash);
@@ -646,20 +647,20 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin-change-password' && req.method === 'POST') {
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { token, oldPassword, newPassword } = JSON.parse(body);
         const session = (global._adminTokens || {})[token];
         if (!session) { res.statusCode = 401; return res.end(JSON.stringify({ error: 'غير مصرح' })); }
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const admin = (db.admins || []).find(a => a.id === session.adminId);
         if (!admin || admin.passwordHash !== sha256(oldPassword)) {
           res.statusCode = 400;
           return res.end(JSON.stringify({ error: 'كلمة المرور الحالية غير صحيحة' }));
         }
         admin.passwordHash = sha256(newPassword);
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true }));
       } catch (e) {
@@ -670,7 +671,7 @@ export function apiMiddleware(req, res, next) {
   } else if (req.url === '/api/admin-add' && req.method === 'POST') {
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const { token, username, password, displayName, role } = JSON.parse(body);
         const session = (global._adminTokens || {})[token];
@@ -679,7 +680,7 @@ export function apiMiddleware(req, res, next) {
           return res.end(JSON.stringify({ error: 'صلاحيات غير كافية' }));
         }
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         if (!db.admins) db.admins = [];
         if (db.admins.find(a => a.username === username)) {
           res.statusCode = 400;
@@ -692,7 +693,7 @@ export function apiMiddleware(req, res, next) {
           role: role || 'admin',
           createdAt: new Date().toISOString().split('T')[0]
         });
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true }));
       } catch (e) {
@@ -711,10 +712,10 @@ export function apiMiddleware(req, res, next) {
     // Called by game provider to verify the player's session token
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         // Game provider sends: { token, operatorToken }
@@ -738,7 +739,7 @@ export function apiMiddleware(req, res, next) {
 
         // Update last login
         player.lastLogin = new Date().toISOString().split('T')[0];
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -763,10 +764,10 @@ export function apiMiddleware(req, res, next) {
     // Called by game provider to get current player balance
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken;
@@ -803,10 +804,10 @@ export function apiMiddleware(req, res, next) {
     // Called by game provider to deduct (bet) or add (win) balance
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken;
@@ -869,7 +870,7 @@ export function apiMiddleware(req, res, next) {
         db.processedTxIds.push(txId);
         if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           code: 1,
@@ -889,10 +890,10 @@ export function apiMiddleware(req, res, next) {
     // Deduct bet amount from player balance
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken;
@@ -932,7 +933,7 @@ export function apiMiddleware(req, res, next) {
         db.processedTxIds.push(txId);
         if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId, player_id: player.id }));
       } catch (e) {
@@ -946,10 +947,10 @@ export function apiMiddleware(req, res, next) {
     // Add winnings to player balance
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken;
@@ -983,7 +984,7 @@ export function apiMiddleware(req, res, next) {
         db.processedTxIds.push(txId);
         if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId, player_id: player.id }));
       } catch (e) {
@@ -997,10 +998,10 @@ export function apiMiddleware(req, res, next) {
     // Called by game provider to cancel/rollback a transaction
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token;
@@ -1032,7 +1033,7 @@ export function apiMiddleware(req, res, next) {
         player.transactions.push({ type: `استرداد رهان (Rollback)`, amount: refundCoins, txId, ref: originalTxId, date: new Date().toLocaleTimeString('ar') });
 
         db.processedTxIds.push(txId);
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
@@ -1047,10 +1048,10 @@ export function apiMiddleware(req, res, next) {
     // Downline API — returns list of sub-agents/players under the operator
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
 
         const players = (db.players || []).map(p => ({
           player_id: p.id,
@@ -1073,10 +1074,10 @@ export function apiMiddleware(req, res, next) {
     // Create a session token for a player (called by APK before launching a game)
     let body = '';
     req.on('data', c => { body += c; });
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const dbPath = resolve(__dirname, 'db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        const db = await readDb();
         const { playerId } = JSON.parse(body || '{}');
 
         if (!db.players) db.players = [];
@@ -1093,7 +1094,7 @@ export function apiMiddleware(req, res, next) {
         player.sessionToken = sessionToken;
         player.sessionCreatedAt = new Date().toISOString();
 
-        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf-8');
+        await writeDb(db);
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, sessionToken, playerId }));
