@@ -2294,4 +2294,158 @@ tr:last-child td {
     pointer-events: none;
 }
 
+/* ===== SPLASH SCREEN — APP ICON STYLE (مطابق للـ APK) ===== */
+.splash-screen {
+    background: linear-gradient(160deg, #0a0600 0%, #120d00 40%, #1a1100 100%);
+}
+
+.splash-content {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.splash-logo-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin-bottom: 8px;
+}
+
+.splash-app-icon {
+    width: 110px;
+    height: 110px;
+    border-radius: 26px;
+    object-fit: cover;
+    border: 3px solid rgba(255, 122, 31, 0.5);
+    box-shadow: 0 0 40px rgba(255, 122, 31, 0.35), 0 0 80px rgba(255, 122, 31, 0.15);
+    animation: splashIconPulse 2s ease-in-out infinite;
+}
+
+.splash-icon-fallback {
+    display: none;
+    width: 110px;
+    height: 110px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, #2a1a00, #3d2700);
+    border: 3px solid rgba(255, 122, 31, 0.5);
+    box-shadow: 0 0 40px rgba(255, 122, 31, 0.35);
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    color: var(--gold-text);
+}
+
+@keyframes splashIconPulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(255, 122, 31, 0.35), 0 0 60px rgba(255, 122, 31, 0.1); }
+    50% { box-shadow: 0 0 50px rgba(255, 122, 31, 0.55), 0 0 100px rgba(255, 122, 31, 0.2); }
+}
+
+/* ===== TOP APP BAR (شريط العنوان العلوي مثل التطبيق) ===== */
+.top-app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, rgba(10, 6, 0, 0.95) 0%, rgba(20, 13, 0, 0.98) 100%);
+    border-bottom: 1px solid rgba(255, 122, 31, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.top-bar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-bar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1.5px solid rgba(255, 122, 31, 0.4);
+    box-shadow: 0 0 12px rgba(255, 122, 31, 0.25);
+}
+
+.top-bar-brand {
+    font-size: 20px;
+    font-weight: 900;
+    background: var(--gold-metallic);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+    filter: drop-shadow(0 1px 4px rgba(212, 175, 55, 0.3));
+}
+
+.top-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.top-bar-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 15px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    position: relative;
+}
+
+.top-bar-btn:hover {
+    background: rgba(255, 122, 31, 0.1);
+    border-color: rgba(255, 122, 31, 0.3);
+    color: var(--gold-text);
+}
+
+.notif-dot {
+    position: absolute;
+    top: 7px;
+    left: 8px;
+    width: 7px;
+    height: 7px;
+    background: #ff3b30;
+    border-radius: 50%;
+    border: 1.5px solid #0a0600;
+    animation: pulse 1.5s infinite;
+}
+
+/* Adjust app-container padding for top bar */
+.app-container {
+    padding-top: 0;
+}
+
+/* ===== EXTRA MOBILE POLISH ===== */
+.vip-header {
+    margin: 10px 12px;
+    padding: 14px 16px;
+}
+
+.avatar-container {
+    width: 52px;
+    height: 52px;
+}
+
+@media (max-width: 420px) {
+    .top-bar-brand {
+        font-size: 18px;
+    }
+    .player-name {
+        font-size: 14px;
+    }
+    .balance-amount {
+        font-size: 18px;
+    }
+}
 

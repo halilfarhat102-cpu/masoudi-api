@@ -22,17 +22,18 @@
 
     <!-- Splash Screen Start Page -->
     <div class="splash-screen" id="splashScreen">
-        <div class="splash-content glass-card">
-            <div class="splash-logo">
-                <i class="fa-solid fa-gem splash-crown"></i>
+        <div class="splash-content">
+            <div class="splash-logo-wrap">
+                <img src="images/app_icon.png" alt="مسعودي" class="splash-app-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="splash-icon-fallback"><i class="fa-solid fa-gem"></i></div>
             </div>
             <h1 class="splash-title">مسعودي</h1>
-            <p class="splash-subtitle">بوابة الألعاب الفاخرة والمتميزة</p>
+            <p class="splash-subtitle">منصة الألعاب الفاخرة</p>
             <div class="splash-loader" id="splashLoader">
                 <div class="loader-bar" id="loaderBar"></div>
             </div>
             <button class="btn-enter-app" id="btnEnterApp" onclick="enterApp()">
-                دخول المنصة الفاخرة <i class="fa-solid fa-gem text-gold"></i>
+                <i class="fa-solid fa-play"></i> ابدأ الآن
             </button>
         </div>
     </div>
@@ -42,6 +43,23 @@
     <div class="glow-bg-gold"></div>
 
     <div class="app-container">
+
+        <!-- Top App Bar (like the APK) -->
+        <div class="top-app-bar">
+            <div class="top-bar-logo">
+                <img src="images/app_icon.png" alt="مسعودي" class="top-bar-icon" onerror="this.style.display='none'">
+                <span class="top-bar-brand">مسعودي</span>
+            </div>
+            <div class="top-bar-actions">
+                <button class="top-bar-btn" onclick="showToast('لا توجد إشعارات جديدة', 'info')">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notif-dot"></span>
+                </button>
+                <button class="top-bar-btn" onclick="showToast('قريباً: الدعم الفوري', 'info')">
+                    <i class="fa-regular fa-message"></i>
+                </button>
+            </div>
+        </div>
 
         <!-- Top Profile & Wallet Header -->
         <header class="vip-header glass-card">
