@@ -370,6 +370,76 @@
             outline: none;
         }
         .form-field input:focus { border-color: var(--orange); }
+
+        /* ─── Mobile Responsiveness Overrides ─── */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 600px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .control-grid, .form-grid-2 {
+                grid-template-columns: 1fr !important;
+            }
+            .vip-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 15px;
+                padding: 18px 14px;
+            }
+            .vip-header .profile-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 8px;
+            }
+            .admin-tabs {
+                padding: 0 10px 10px;
+                gap: 6px;
+            }
+            .admin-tab {
+                padding: 7px 14px;
+                font-size: 12px;
+            }
+            .tab-panel {
+                padding: 0 10px 20px;
+            }
+            .wallet-action-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .wallet-action-row input {
+                width: 100%;
+            }
+            .player-card-header {
+                padding: 12px 10px;
+                gap: 8px;
+            }
+            .player-avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
+            }
+            .player-name-admin {
+                font-size: 13px;
+            }
+            .player-balance-badge {
+                padding: 3px 8px;
+                font-size: 11px;
+            }
+            /* Table formatting on mobile */
+            table th, table td {
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>

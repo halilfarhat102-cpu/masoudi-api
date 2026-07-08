@@ -174,8 +174,15 @@ function updateStats() {
 function switchTab(id) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.currentTarget.classList.add('active');
+    
+    const targetPanel = document.getElementById(id);
+    if (targetPanel) targetPanel.classList.add('active');
+    
+    const clickedTab = Array.from(document.querySelectorAll('.admin-tab')).find(t => {
+        const onclickAttr = t.getAttribute('onclick') || '';
+        return onclickAttr.includes(`'${id}'`) || onclickAttr.includes(`"${id}"`);
+    });
+    if (clickedTab) clickedTab.classList.add('active');
 }
 
 // ─── Toggle Add Player Form ──────────────────
