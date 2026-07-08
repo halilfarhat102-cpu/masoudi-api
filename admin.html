@@ -166,6 +166,8 @@
             color: var(--orange);
             white-space: nowrap;
         }
+        .mobile-balance-block { display: none; }
+        .mobile-only-meta { display: none; }
         .status-dot {
             width: 8px;
             height: 8px;
@@ -448,7 +450,36 @@
             }
             
             .desktop-only-meta {
-                display: none;
+                display: none !important;
+            }
+            .mobile-only-meta {
+                display: flex !important;
+            }
+            .mobile-balance-block {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                background: rgba(0,0,0,0.25);
+                padding: 10px 12px;
+                border-radius: 12px;
+                border: 1px solid rgba(255,122,31,0.1);
+                margin: 4px 10px 10px;
+                cursor: pointer;
+            }
+            .balance-sub-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+            .balance-sub-card .label {
+                font-size: 10px;
+                color: #888;
+            }
+            .balance-sub-card .value {
+                font-size: 12px;
+                font-weight: 900;
+                color: var(--orange);
             }
         }
     </style>

@@ -237,24 +237,37 @@ function buildPlayerCard(p) {
                     <span class="desktop-only-meta"> &nbsp;·&nbsp; ${p.email || '—'}</span>
                 </div>
             </div>
-            <div class="player-balance-badge">🪙 ${formatNum(p.balance || 0)} كوين</div>
-            <i class="fa-solid fa-chevron-down" id="chev-${p.id}" style="color:#666;margin-right:4px;transition:transform 0.25s;"></i>
+            <div class="player-balance-badge desktop-only-meta">🪙 ${formatNum(p.balance || 0)} كوين</div>
+            <i class="fa-solid fa-chevron-down" id="chev-${p.id}" style="color:#666;margin-right:8px;transition:transform 0.25s;"></i>
         </div>
+        
+        <!-- Mobile Dedicated Balance block (shown only on mobile via CSS) -->
+        <div class="mobile-balance-block" onclick="toggleCard('${p.id}')">
+            <div class="balance-sub-card">
+                <span class="label">🪙 الرصيد الرئيسي</span>
+                <span class="value">${formatNum(p.balance || 0)} كوين</span>
+            </div>
+            <div class="balance-sub-card" style="border-right: 1px solid rgba(255,255,255,0.08);">
+                <span class="label">🎁 رصيد المكافآت</span>
+                <span class="value" style="color:#00E676;">${formatNum(p.bonus || 0)} كوين</span>
+            </div>
+        </div>
+
         <div class="player-controls" id="ctrl-${p.id}">
             <!-- Info rows -->
-            <div class="control-info-row">
+            <div class="control-info-row mobile-only-meta">
                 <span class="lbl"><i class="fa-solid fa-hashtag"></i> معرف اللاعب (ID)</span>
                 <span class="val">#${p.id}</span>
             </div>
-            <div class="control-info-row">
+            <div class="control-info-row mobile-only-meta">
                 <span class="lbl"><i class="fa-solid fa-envelope"></i> البريد الإلكتروني</span>
                 <span class="val" style="font-family:monospace;font-size:11px;color:#fff;">${p.email || '—'}</span>
             </div>
-            <div class="control-info-row">
+            <div class="control-info-row desktop-only-meta">
                 <span class="lbl"><i class="fa-solid fa-wallet"></i> الرصيد الرئيسي</span>
                 <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} كوين</span>
             </div>
-            <div class="control-info-row">
+            <div class="control-info-row desktop-only-meta">
                 <span class="lbl"><i class="fa-solid fa-gift"></i> رصيد المكافآت</span>
                 <span class="val" style="color:#00E676;" id="bon-${p.id}">${formatNum(p.bonus || 0)} كوين</span>
             </div>
