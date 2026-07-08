@@ -64,29 +64,33 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadGamesFromStorage() {
-    // Built-in games hosted on our server
+    // Detect base URL (works in APK WebView and browser)
+    const BASE = (typeof window !== 'undefined' && window.location && window.location.origin)
+        ? window.location.origin
+        : 'https://masoudi-api.onrender.com';
+
+    // Built-in games hosted on our server — use full URL so APK WebView loads them correctly
     const builtInGames = [
         {
             id: "fortune-gems",
             title: "Fortune Gems 3 — سلوتس الجواهر",
             category: "slots",
             provider: "مسعودي Games",
-            launchUrl: "/public/games/fortune_gems.html",
-            image: "/public/games/fortune_gems_icon.png"
+            launchUrl: BASE + "/public/games/fortune_gems.html",
+            image: BASE + "/public/games/fortune_gems_icon.png"
         },
         {
             id: "fruit-slots",
             title: "Fruit Slots — سلوت الفواكه الكلاسيكية",
             category: "slots",
             provider: "مسعودي Games",
-            launchUrl: "/public/games/fruit_slots.html",
-            image: "/public/games/fruit_slots_icon.png"
+            launchUrl: BASE + "/public/games/fruit_slots.html",
+            image: BASE + "/public/games/fruit_slots_icon.png"
         }
     ];
 
     const savedGames = JSON.parse(localStorage.getItem("masoudi_games")) || [];
     // Merge: built-in games first, then admin-added games (avoid duplicates by id)
-    const savedIds = savedGames.map(g => g.id);
     const extras = savedGames.filter(g => !['fortune-gems', 'fruit-slots'].includes(g.id));
     dynamicGames = [...builtInGames, ...extras];
 }
