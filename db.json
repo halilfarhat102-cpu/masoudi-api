@@ -58,6 +58,14 @@
       "provider": "",
       "launchUrl": "https://demoplay.pragmaticplay.com/play/vs20olympgate",
       "image": "images/uploaded_1783263718442.png"
+    },
+    {
+      "id": "game-3",
+      "title": "مزرعة الحيوانات الكبيرة (Big Farm)",
+      "category": "slots",
+      "provider": "مسعودي Games",
+      "launchUrl": "assets/game/game.html",
+      "image": "assets/game/big_farm_icon.png"
     }
   ],
   "players": [
