@@ -283,7 +283,7 @@ function buildPlayerCard(p) {
 }
 
 function buildMiniTx(txs) {
-    if (!txs || txs.length === 0) return '';
+    if (!Array.isArray(txs) || txs.length === 0) return '';
     const rows = txs.slice(-5).reverse().map(tx => {
         const isPos = tx.amount > 0;
         return `<div class="mini-tx-row">
