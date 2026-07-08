@@ -215,22 +215,26 @@ function renderPlayers() {
     container.innerHTML = filtered.map(p => buildPlayerCard(p)).join('');
 }
 
-// ─── Build Player Card HTML ───────────────────
 function buildPlayerCard(p) {
     const initial  = (p.name || '?')[0];
     const isActive = p.status === 'active';
     const dotClass = isActive ? 'active' : 'suspended';
     const txHtml   = buildMiniTx(p.transactions || []);
+    
+    const avatarContent = p.photoUrl 
+        ? `<img src="${p.photoUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerText='${initial}';">`
+        : initial;
 
     return `
     <div class="player-card" id="card-${p.id}">
         <div class="player-card-header" onclick="toggleCard('${p.id}')">
-            <div class="player-avatar">${initial}</div>
+            <div class="player-avatar">${avatarContent}</div>
             <div class="player-info-main">
                 <div class="player-name-admin">${p.name}</div>
                 <div class="player-meta">
                     <span class="status-dot ${dotClass}"></span>
-                    ${isActive ? 'نشط' : 'موقوف'} &nbsp;·&nbsp; #${p.id} &nbsp;·&nbsp; ${p.email || '—'}
+                    ${isActive ? 'نشط' : 'موقوف'} &nbsp;·&nbsp; #${p.id}
+                    <span class="desktop-only-meta"> &nbsp;·&nbsp; ${p.email || '—'}</span>
                 </div>
             </div>
             <div class="player-balance-badge">🪙 ${formatNum(p.balance || 0)} كوين</div>
@@ -238,6 +242,14 @@ function buildPlayerCard(p) {
         </div>
         <div class="player-controls" id="ctrl-${p.id}">
             <!-- Info rows -->
+            <div class="control-info-row">
+                <span class="lbl"><i class="fa-solid fa-hashtag"></i> معرف اللاعب (ID)</span>
+                <span class="val">#${p.id}</span>
+            </div>
+            <div class="control-info-row">
+                <span class="lbl"><i class="fa-solid fa-envelope"></i> البريد الإلكتروني</span>
+                <span class="val" style="font-family:monospace;font-size:11px;color:#fff;">${p.email || '—'}</span>
+            </div>
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-wallet"></i> الرصيد الرئيسي</span>
                 <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} كوين</span>

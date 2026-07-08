@@ -137,17 +137,24 @@
             font-weight: 900;
             color: #fff;
             flex-shrink: 0;
+            overflow: hidden;
         }
         .player-info-main { flex: 1; min-width: 0; }
         .player-name-admin {
             font-size: 14px;
             font-weight: 800;
             color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .player-meta {
             font-size: 11px;
             color: #888;
             margin-top: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .player-balance-badge {
             background: rgba(255,122,31,0.12);
@@ -438,6 +445,10 @@
             table th, table td {
                 padding: 8px 6px;
                 font-size: 11px;
+            }
+            
+            .desktop-only-meta {
+                display: none;
             }
         }
     </style>
