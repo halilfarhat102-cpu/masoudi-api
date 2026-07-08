@@ -166,7 +166,7 @@ function updateStats() {
     const total   = players.reduce((s, p) => s + (p.balance || 0), 0);
     document.getElementById('statTotalPlayers').textContent = players.length;
     document.getElementById('statActivePlayers').textContent = active;
-    document.getElementById('statTotalBalance').textContent  = formatNum(total) + '$';
+    document.getElementById('statTotalBalance').textContent  = formatNum(total) + ' كوين';
     document.getElementById('playerCountBadge').textContent  = `${players.length} لاعب`;
 }
 
@@ -233,18 +233,18 @@ function buildPlayerCard(p) {
                     ${isActive ? 'نشط' : 'موقوف'} &nbsp;·&nbsp; #${p.id} &nbsp;·&nbsp; ${p.email || '—'}
                 </div>
             </div>
-            <div class="player-balance-badge">🪙 ${formatNum(p.balance || 0)} $</div>
+            <div class="player-balance-badge">🪙 ${formatNum(p.balance || 0)} كوين</div>
             <i class="fa-solid fa-chevron-down" id="chev-${p.id}" style="color:#666;margin-right:4px;transition:transform 0.25s;"></i>
         </div>
         <div class="player-controls" id="ctrl-${p.id}">
             <!-- Info rows -->
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-wallet"></i> الرصيد الرئيسي</span>
-                <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} $</span>
+                <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} كوين</span>
             </div>
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-gift"></i> رصيد المكافآت</span>
-                <span class="val" style="color:#00E676;" id="bon-${p.id}">${formatNum(p.bonus || 0)} $</span>
+                <span class="val" style="color:#00E676;" id="bon-${p.id}">${formatNum(p.bonus || 0)} كوين</span>
             </div>
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-calendar"></i> تاريخ الانضمام</span>
@@ -295,7 +295,7 @@ function buildMiniTx(txs) {
         const isPos = tx.amount > 0;
         return `<div class="mini-tx-row">
             <span style="color:#aaa;">${tx.type} — ${tx.date}</span>
-            <span class="tx-amt ${isPos?'pos':'neg'}">${isPos?'+':''}${formatNum(tx.amount)} $</span>
+            <span class="tx-amt ${isPos?'pos':'neg'}">${isPos?'+':''}${formatNum(tx.amount)} كوين</span>
         </div>`;
     }).join('');
     return `
@@ -320,8 +320,8 @@ function openWalletModal(id) {
     currentWalletPlayerId = id;
     document.getElementById('modalPlayerName').textContent = p.name;
     document.getElementById('modalPlayerId').textContent   = p.id;
-    document.getElementById('modalBalance').textContent    = `${formatNum(p.balance || 0)} $`;
-    document.getElementById('modalBonus').textContent      = `${formatNum(p.bonus || 0)} $`;
+    document.getElementById('modalBalance').textContent    = `${formatNum(p.balance || 0)} كوين`;
+    document.getElementById('modalBonus').textContent      = `${formatNum(p.bonus || 0)} كوين`;
     document.getElementById('modalAmount').value = '';
     document.getElementById('walletModal').classList.add('open');
 }
