@@ -229,12 +229,12 @@ function updateQuests() {
 function updateUI() {
     // Sync balance with shared portal wallet
     localStorage.setItem('masoudi_wallet_balance', balance);
-    
-    // Send updated balance to Flutter channel in real-time
-    if (window.FlutterChannel && typeof window.FlutterChannel.postMessage === 'function') {
-        window.FlutterChannel.postMessage(JSON.stringify({
-            action: 'updateBalance',
-            balance: balance
+
+    // Notify Flutter app of balance changes
+    if (window.MasoudiChannel) {
+        window.MasoudiChannel.postMessage(JSON.stringify({
+            'action': 'updateBalance',
+            'balance': balance
         }));
     }
     
@@ -1005,3 +1005,9 @@ window.addEventListener('DOMContentLoaded', () => {
     initGrid();
     updateUI();
 });
+
+// Expose balance setter for Flutter webview integration
+window.setMasoudiBalance = function(newBalance) {
+    balance = parseInt(newBalance) || 0;
+    updateUI();
+};

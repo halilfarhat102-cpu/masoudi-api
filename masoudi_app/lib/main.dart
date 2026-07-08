@@ -91,21 +91,23 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
     });
   }
 
-  void _playGame(Game game) {
-    Navigator.of(context).push(
+  void _playGame(Game game) async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => GamePlayScreen(
           game: game,
           balance: _playerBalance,
           playerId: _playerId,
-          onBalanceChanged: (newBalance) {
-            setState(() {
-              _playerBalance = newBalance;
-            });
-          },
+          serverUrl: _serverUrl,
         ),
       ),
     );
+
+    if (result != null && result is double) {
+      setState(() {
+        _playerBalance = result;
+      });
+    }
   }
 
   @override

@@ -45,6 +45,15 @@ class _HomeScreenState extends State<HomeScreen> {
       _isLoading = true;
     });
 
+    final localBigFarm = Game(
+      id: "local-big-farm",
+      title: "Big Farm — مزرعة الحظ السعيدة",
+      category: "slots",
+      provider: "ألعاب محلية",
+      launchUrl: "assets/game/game.html",
+      image: "assets/game/big_farm_icon.png"
+    );
+
     try {
       final response = await http.get(Uri.parse('${widget.serverUrl}/api/data')).timeout(
         const Duration(seconds: 4),
@@ -53,8 +62,14 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode == 200) {
         final decoded = json.decode(response.body);
         final List<dynamic> gamesList = decoded['games'] ?? [];
+        List<Game> parsedGames = gamesList.map((g) => Game.fromJson(g)).toList();
+        
+        // Exclude the ID if it matches
+        parsedGames = parsedGames.where((g) => g.id != 'local-big-farm').toList();
+        parsedGames.insert(0, localBigFarm);
+
         setState(() {
-          _games = gamesList.map((g) => Game.fromJson(g)).toList();
+          _games = parsedGames;
           _isLoading = false;
         });
       } else {
@@ -64,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Error fetching games from API: $e. Falling back to default static games.");
       setState(() {
         _games = [
+          localBigFarm,
           Game(
             id: "game-1",
             title: "روليت البرق (Lightning Roulette)",
@@ -79,14 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
             provider: "Pragmatic Play",
             launchUrl: "https://demoplay.pragmaticplay.com/play/vs20olympgate",
             image: "images/slots.png"
-          ),
-          Game(
-            id: "game-3",
-            title: "مزرعة الحيوانات الكبيرة (Big Farm)",
-            category: "slots",
-            provider: "مسعودي Games",
-            launchUrl: "assets/game/game.html",
-            image: "assets/game/big_farm_icon.png"
           )
         ];
         _isLoading = false;
@@ -334,17 +342,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              color: const Color(0xFF131A26),
-                              child: const Center(
-                                child: Icon(Icons.broken_image, color: Colors.white24, size: 40),
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF16222F),
+                                    Color(0xFF0F1722),
+                                  ],
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  game.title.isNotEmpty ? game.title.substring(0, 1) : "?",
+                                  style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
+                                ),
                               ),
                             );
                           },
                         )
                       : Image.network(
-                          game.image.startsWith('http')
-                              ? game.image
-                              : '${widget.serverUrl}/${game.image}',
+                          game.image.startsWith('http') ? game.image : '${widget.serverUrl}/${game.image}',
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             // fallback to a nice color block
@@ -361,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: Center(
                                 child: Text(
-                                  game.title.isNotEmpty ? game.title.substring(0, 1) : 'G',
+                                  game.title.isNotEmpty ? game.title.substring(0, 1) : "?",
                                   style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFFD4AF37)),
                                 ),
                               ),
