@@ -41,10 +41,13 @@ export async function apiMiddleware(req, res, next) {
         try {
           const incoming = JSON.parse(body);
           const existing = await readDb();
-          incoming.admins = existing.admins || incoming.admins || [];
-          incoming.agents = incoming.agents || existing.agents || [];
-          // ✔️ PRESERVE PLAYERS DATABASE (Never overwrite from admin panel settings updates!)
+          
+          incoming.admins = (existing.admins && existing.admins.length > 0) ? existing.admins : (incoming.admins || []);
+          incoming.agents = (incoming.agents && incoming.agents.length > 0) ? incoming.agents : (existing.agents || []);
+          incoming.games = (incoming.games && incoming.games.length > 0) ? incoming.games : (existing.games || []);
+          incoming.banners = (incoming.banners && incoming.banners.length > 0) ? incoming.banners : (existing.banners || []);
           incoming.players = existing.players || [];
+          
           await writeDb(incoming);
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ success: true }));
