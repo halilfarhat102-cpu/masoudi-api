@@ -5,13 +5,31 @@ let processedTxCache = new Set();
 
 export async function readDb() {
   try {
-    const { data: settingsData } = await supabase.from('settings').select('*').eq('key', 'global').maybeSingle();
-    const { data: banners } = await supabase.from('banners').select('*');
-    const { data: agents } = await supabase.from('agents').select('*');
-    const { data: games } = await supabase.from('games').select('*');
-    const { data: players } = await supabase.from('players').select('*');
-    const { data: transactions } = await supabase.from('transactions').select('*');
-    const { data: admins } = await supabase.from('admins').select('*');
+    const [
+      settingsRes,
+      bannersRes,
+      agentsRes,
+      gamesRes,
+      playersRes,
+      transactionsRes,
+      adminsRes
+    ] = await Promise.all([
+      supabase.from('settings').select('*').eq('key', 'global').maybeSingle(),
+      supabase.from('banners').select('*'),
+      supabase.from('agents').select('*'),
+      supabase.from('games').select('*'),
+      supabase.from('players').select('*'),
+      supabase.from('transactions').select('*'),
+      supabase.from('admins').select('*')
+    ]);
+
+    const settingsData = settingsRes.data;
+    const banners = bannersRes.data;
+    const agents = agentsRes.data;
+    const games = gamesRes.data;
+    const players = playersRes.data;
+    const transactions = transactionsRes.data;
+    const admins = adminsRes.data;
 
     // 1. Map Settings
     const settings = settingsData ? {
