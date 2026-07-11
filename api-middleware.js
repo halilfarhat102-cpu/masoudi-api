@@ -26,7 +26,7 @@ export async function apiMiddleware(req, res, next) {
   if (req.url === '/api/version' && req.method === 'GET') {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ version: '1.0.3' }));
+    res.end(JSON.stringify({ version: '1.0.4' }));
     return;
   }
 
