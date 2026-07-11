@@ -105,11 +105,21 @@ export async function readDb() {
       createdAt: a.created_at
     }));
 
+    // 4. Map Games
+    const mappedGames = (games || []).map(g => ({
+      id: g.id,
+      title: g.title,
+      category: g.category,
+      provider: g.provider || null,
+      launchUrl: g.launch_url,
+      image: g.image
+    }));
+
     return {
       settings,
       banners: banners || [],
       agents: mappedAgents,
-      games: games || [],
+      games: mappedGames,
       players: mappedPlayers,
       admins: mappedAdmins,
       processedTxIds: Array.from(processedTxCache)
