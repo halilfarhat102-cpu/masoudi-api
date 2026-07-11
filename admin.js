@@ -226,7 +226,7 @@ function buildPlayerCard(p) {
     const txHtml   = buildMiniTx(p.transactions || []);
     
     const avatarContent = p.photoUrl 
-        ? `<img src="${p.photoUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerText='${initial}';">`
+        ? `<img src="${p.photoUrl}" referrerpolicy="no-referrer" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerText='${initial}';">`
         : initial;
 
     return `
