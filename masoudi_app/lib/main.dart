@@ -1,4 +1,4 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
@@ -145,7 +145,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
             ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.between,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Profile Section
               Row(
@@ -292,3 +292,5 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
     );
   }
 }
+
+

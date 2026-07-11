@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -106,7 +106,7 @@ class _WalletScreenState extends State<WalletScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.between,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'رتبة مسعودي 1',
@@ -213,7 +213,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 controller: _depositController,
                 presets: [1000, 5000, 10000],
                 buttonLabel: 'إيداع الآن',
-                buttonColor: Colors.emerald,
+                buttonColor: Colors.green,
                 onExecute: _handleDeposit,
               ),
               const SizedBox(height: 16),
@@ -274,7 +274,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.between,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +304,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                       style: GoogleFonts.cairo(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
-                                        color: isPlus ? Colors.emerald : const Color(0xFFD32F2F),
+                                        color: isPlus ? Colors.green : const Color(0xFFD32F2F),
                                       ),
                                     ),
                                     Text(
@@ -437,7 +437,7 @@ class _WalletScreenState extends State<WalletScreen> {
               onPressed: onExecute,
               style: ElevatedButton.styleFrom(
                 backgroundColor: buttonColor,
-                foregroundColor: buttonColor == Colors.emerald ? Colors.white : const Color(0xFF030508),
+                foregroundColor: buttonColor == Colors.green ? Colors.white : const Color(0xFF030508),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -472,3 +472,5 @@ extension CurrencyFormatting on double {
     return '$formattedInt.${parts[1]}';
   }
 }
+
+

@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/material';
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../models/game.dart';
@@ -25,6 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedCategory = 'all';
+  
+  final PageController _tickerController = PageController();
+  Timer? _tickerTimer;
 
   final List<Map<String, String>> _winners = [
     { "name": "خالد المري", "prize": "15,000 ر.س", "game": "روليت البرق" },
@@ -37,6 +41,24 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchGames();
+    
+    _tickerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (_tickerController.hasClients) {
+        final int nextPage = (_tickerController.page?.toInt() ?? 0) + 1;
+        _tickerController.animateToPage(
+          nextPage % _winners.length,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tickerTimer?.cancel();
+    _tickerController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchGames() async {
@@ -178,18 +200,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFF0C121E).withOpacity(0.4),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.emerald.withOpacity(0.15)),
+                      border: Border.all(color: Colors.green.withOpacity(0.15)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.campaign, color: Colors.emerald, size: 20),
+                        const Icon(Icons.campaign, color: Colors.green, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: SizedBox(
                             height: 20,
                             child: PageView.builder(
+                              controller: _tickerController,
                               scrollDirection: Axis.vertical,
-                              autoplay: true,
                               itemCount: _winners.length,
                               itemBuilder: (context, idx) {
                                 final w = _winners[idx];
@@ -480,7 +502,4 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Simulated PageView autoplay extension
-extension PageViewAutoplay on PageView {
-  // simple helper to avoid external controller dependencies
-}
+

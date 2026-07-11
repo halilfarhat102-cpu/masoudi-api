@@ -1,4 +1,4 @@
-import 'package:flutter/material';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -112,7 +112,7 @@ class ProfileScreen extends StatelessWidget {
                 Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.between,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'التقدم للمستوى الثاني',
@@ -201,7 +201,7 @@ class ProfileScreen extends StatelessWidget {
                   Icons.verified_user_outlined,
                   'توثيق الحساب',
                   'موثق بالكامل',
-                  textColor: Colors.emerald,
+                  textColor: Colors.green,
                 ),
               ],
             ),
@@ -254,7 +254,7 @@ class ProfileScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.between,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
@@ -304,3 +304,5 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
+
