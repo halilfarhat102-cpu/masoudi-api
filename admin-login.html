@@ -329,10 +329,12 @@
     </div>
 
     <script>
+        const API_BASE = window.location.origin.includes('masoudi-api.onrender.com') ? '' : 'https://masoudi-api.onrender.com';
+
         // ─── Check if already logged in ───
         const existingToken = sessionStorage.getItem('adminToken');
         if (existingToken) {
-            window.location.replace('/admin.html');
+            window.location.replace('admin.html');
         }
 
         // ─── Enter key support ───
@@ -375,7 +377,7 @@
             errorMsg.classList.remove('show');
 
             try {
-                const res = await fetch('/api/admin-login', {
+                const res = await fetch(API_BASE + '/api/admin-login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
@@ -393,7 +395,7 @@
                     btnText.innerHTML = '<i class="fa-solid fa-check" style="margin-left:8px;"></i>جاري الدخول...';
                     btnText.style.display = 'block';
                     spinner.style.display = 'none';
-                    setTimeout(() => window.location.replace('/admin.html'), 800);
+                    setTimeout(() => window.location.replace('admin.html'), 800);
                 } else {
                     showError(data.error || 'فشل تسجيل الدخول');
                     btn.disabled = false;
