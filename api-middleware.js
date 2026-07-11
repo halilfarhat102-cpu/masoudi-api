@@ -23,6 +23,13 @@ export async function apiMiddleware(req, res, next) {
     return;
   }
 
+  if (req.url === '/api/version' && req.method === 'GET') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ version: '1.0.3' }));
+    return;
+  }
+
   if (req.url === '/api/data') {
     const dbPath = resolve(__dirname, 'db.json');
     if (req.method === 'GET') {
