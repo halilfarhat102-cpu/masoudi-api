@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final decoded = ApiCache.data!;
       final List<dynamic> gamesList = decoded['games'] ?? [];
       final List<dynamic> bannersList = decoded['banners'] ?? [];
-      _games = gamesList.map((g) => Game.fromJson(g)).toList();
+      _games = gamesList.map((g) => Game.fromJson(Map<String, dynamic>.from(g))).toList();
       if (bannersList.isNotEmpty) {
         _banners = bannersList.map((b) => _mapBanner(Map<String, dynamic>.from(b))).toList();
       }
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final List<dynamic> bannersList = decoded['banners'] ?? [];
         if (!mounted) return;
         setState(() {
-          _games = gamesList.map((g) => Game.fromJson(g)).toList();
+          _games = gamesList.map((g) => Game.fromJson(Map<String, dynamic>.from(g))).toList();
           if (bannersList.isNotEmpty) {
             _banners = bannersList.map((b) => _mapBanner(Map<String, dynamic>.from(b))).toList();
           }
