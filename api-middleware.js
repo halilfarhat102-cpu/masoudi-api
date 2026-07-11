@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { readDb, writeDb } from './db-adapter.js';
+import { supabase } from './supabase.js';
 import crypto from 'crypto';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -26,7 +27,7 @@ export async function apiMiddleware(req, res, next) {
   if (req.url === '/api/version' && req.method === 'GET') {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ version: '1.0.4' }));
+    res.end(JSON.stringify({ version: '1.0.5' }));
     return;
   }
 
@@ -97,7 +98,6 @@ export async function apiMiddleware(req, res, next) {
         if (separatorIndex === -1) throw new Error('Invalid part structure');
 
         const headersText = part.subarray(0, separatorIndex).toString('utf-8');
-        // The body data ends before \r\n boundary start (part ends with \r\n)
         const fileData = part.subarray(separatorIndex + separator.length, part.length - 2);
 
         // Extract filename
@@ -107,14 +107,44 @@ export async function apiMiddleware(req, res, next) {
         const ext = originalName.split('.').pop() || 'png';
         const safeName = `uploaded_${Date.now()}.${ext}`;
 
-        const imagesDir = resolve(__dirname, 'images');
-        if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
+        // Get MIME type
+        let mimeType = 'image/png';
+        if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
+        else if (ext === 'gif') mimeType = 'image/gif';
+        else if (ext === 'webp') mimeType = 'image/webp';
 
-        const savePath = resolve(imagesDir, safeName);
-        fs.writeFileSync(savePath, fileData);
+        let uploadUrl = '';
+        try {
+          // 1. Ensure the bucket exists
+          await supabase.storage.createBucket('images', { public: true }).catch(() => {});
+          
+          // 2. Upload file to Supabase Storage
+          const { data: storageData, error: storageErr } = await supabase.storage
+            .from('images')
+            .upload(safeName, fileData, {
+              contentType: mimeType,
+              upsert: true
+            });
+            
+          if (storageErr) throw storageErr;
+          
+          // 3. Get Public URL
+          const { data: urlData } = supabase.storage.from('images').getPublicUrl(safeName);
+          uploadUrl = urlData.publicUrl;
+          console.log("Successfully uploaded image to Supabase Storage:", uploadUrl);
+        } catch (storageError) {
+          console.warn("Supabase Storage upload failed, falling back to local filesystem:", storageError);
+          // Fallback to local
+          const imagesDir = resolve(__dirname, 'images');
+          if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
+
+          const savePath = resolve(imagesDir, safeName);
+          fs.writeFileSync(savePath, fileData);
+          uploadUrl = `images/${safeName}`;
+        }
 
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ success: true, url: `images/${safeName}` }));
+        res.end(JSON.stringify({ success: true, url: uploadUrl }));
       } catch (e) {
         res.statusCode = 500;
         res.end(JSON.stringify({ error: e.message }));
