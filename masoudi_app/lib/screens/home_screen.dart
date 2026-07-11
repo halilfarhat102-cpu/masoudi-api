@@ -208,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ApiCache.data = decoded; // Update Cache
         final List<dynamic> gamesList = decoded['games'] ?? [];
         final List<dynamic> bannersList = decoded['banners'] ?? [];
+        if (!mounted) return;
         setState(() {
           _games = gamesList.map((g) => Game.fromJson(g)).toList();
           if (bannersList.isNotEmpty) {
@@ -220,56 +221,57 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print("Error fetching games from API: $e. Falling back to defaults.");
-      setState(() {
-        _games = [
-          Game(
-            id: "game-1",
-            title: "روليت البرق (Lightning Roulette)",
-            category: "live",
-            provider: "Evolution Gaming",
-            launchUrl: "https://v1.evolution.com/lightning-roulette-demo",
-            image: "images/roulette.png"
-          ),
-          Game(
-            id: "game-2",
-            title: "فتحات بوابات أوليمبوس (Gates of Olympus)",
-            category: "slots",
-            provider: "Pragmatic Play",
-            launchUrl: "https://demoplay.pragmaticplay.com/play/vs20olympgate",
-            image: "images/slots.png"
-          )
-        ];
-        _banners = [
-          {
-            'title': 'مكافأة الترحيب 150%',
-            'subtitle': 'أودع الآن واحصل على ضعف رصيدك فوراً',
-            'badge': 'حصري',
-            'icon': '🎁',
-            'accentR': 0, 'accentG': 230, 'accentB': 118,
-            'gradStartR': 13, 'gradStartG': 43, 'gradStartB': 26,
-            'gradEndR': 10, 'gradEndG': 61, 'gradEndB': 32,
-          },
-          {
-            'title': 'جاكبوت روليت البرق',
-            'subtitle': 'الجائزة الكبرى تصل إلى 500,000 \$',
-            'badge': 'مباشر',
-            'icon': '🎰',
-            'accentR': 124, 'accentG': 77, 'accentB': 255,
-            'gradStartR': 21, 'gradStartG': 13, 'gradStartB': 46,
-            'gradEndR': 27, 'gradEndG': 16, 'gradEndB': 64,
-          },
-          {
-            'title': 'بطولة الأسبوع VIP',
-            'subtitle': 'المركز الأول يربح 25,000 \$ نقداً',
-            'badge': 'جديد',
-            'icon': '🏆',
-            'accentR': 245, 'accentG': 194, 'accentB': 49,
-            'gradStartR': 42, 'gradStartG': 28, 'gradStartB': 0,
-            'gradEndR': 61, 'gradEndG': 40, 'gradEndB': 0,
-          }
-        ];
-        _isLoading = false;
-      });
+        if (!mounted) return;
+        setState(() {
+          _games = [
+            Game(
+              id: "game-1",
+              title: "روليت البرق (Lightning Roulette)",
+              category: "live",
+              provider: "Evolution Gaming",
+              launchUrl: "https://v1.evolution.com/lightning-roulette-demo",
+              image: "images/roulette.png"
+            ),
+            Game(
+              id: "game-2",
+              title: "فتحات بوابات أوليمبوس (Gates of Olympus)",
+              category: "slots",
+              provider: "Pragmatic Play",
+              launchUrl: "https://demoplay.pragmaticplay.com/play/vs20olympgate",
+              image: "images/slots.png"
+            )
+          ];
+          _banners = [
+            {
+              'title': 'مكافأة الترحيب 150%',
+              'subtitle': 'أودع الآن واحصل على ضعف رصيدك فوراً',
+              'badge': 'حصري',
+              'icon': '🎁',
+              'accentR': 0, 'accentG': 230, 'accentB': 118,
+              'gradStartR': 13, 'gradStartG': 43, 'gradStartB': 26,
+              'gradEndR': 10, 'gradEndG': 61, 'gradEndB': 32,
+            },
+            {
+              'title': 'جاكبوت روليت البرق',
+              'subtitle': 'الجائزة الكبرى تصل إلى 500,000 \$',
+              'badge': 'مباشر',
+              'icon': '🎰',
+              'accentR': 124, 'accentG': 77, 'accentB': 255,
+              'gradStartR': 21, 'gradStartG': 13, 'gradStartB': 46,
+              'gradEndR': 27, 'gradEndG': 16, 'gradEndB': 64,
+            },
+            {
+              'title': 'بطولة الأسبوع VIP',
+              'subtitle': 'المركز الأول يربح 25,000 \$ نقداً',
+              'badge': 'جديد',
+              'icon': '🏆',
+              'accentR': 245, 'accentG': 194, 'accentB': 49,
+              'gradStartR': 42, 'gradStartG': 28, 'gradStartB': 0,
+              'gradEndR': 61, 'gradEndG': 40, 'gradEndB': 0,
+            }
+          ];
+          _isLoading = false;
+        });
     }
   }
 

@@ -348,6 +348,7 @@ class _WalletScreenState extends State<WalletScreen> {
         final playersList = decoded['players'] as List<dynamic>? ?? [];
         final p2pList = playersList.where((p) => p['isAgent'] == true && p['id'] != widget.playerId).toList();
 
+        if (!mounted) return;
         setState(() {
           _settings = Map<String, dynamic>.from(decoded['settings'] ?? {});
           _agents = agentsList;
@@ -364,12 +365,14 @@ class _WalletScreenState extends State<WalletScreen> {
           _isLoadingAgents = false;
         });
       } else {
+        if (!mounted) return;
         setState(() {
           _isLoadingAgents = false;
         });
       }
     } catch (e) {
       debugPrint("Error fetching agents: $e");
+      if (!mounted) return;
       setState(() {
         _isLoadingAgents = false;
       });
