@@ -788,7 +788,6 @@ function deleteBanner(i) {
     showToast(`تم حذف البنّر "${title}"`, 'error');
 }
 
-// ─── Local Image Upload ──────────────────────
 async function uploadLocalImage(fileInputId, textInputId, statusId) {
     const fileInput = document.getElementById(fileInputId);
     const textInput = document.getElementById(textInputId);
@@ -800,30 +799,38 @@ async function uploadLocalImage(fileInputId, textInputId, statusId) {
     statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:var(--orange);"></i> جاري رفع الصورة...`;
     statusEl.style.color = 'var(--orange)';
 
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-        const res = await fetch(API_BASE + '/api/upload', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await res.json();
-        if (data.success && data.url) {
-            textInput.value = data.url;
-            statusEl.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00E676;"></i> تم الرفع بنجاح: ${data.url}`;
-            statusEl.style.color = '#00E676';
-            showToast('تم رفع الصورة بنجاح ✅');
-        } else {
-            statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> فشل الرفع: ${data.error || 'خطأ غير معروف'}`;
-            statusEl.style.color = '#ff5252';
-            showToast(data.error || 'فشل رفع الصورة', 'error');
-        }
-    } catch (e) {
-        statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> تعذّر الاتصال بالخادم`;
+    const reader = new FileReader();
+    reader.onerror = () => {
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> فشل قراءة الملف`;
         statusEl.style.color = '#ff5252';
-        showToast('تعذر الاتصال بالخادم لرفع الصورة', 'error');
-    }
+        showToast('فشل قراءة ملف الصورة', 'error');
+    };
+    reader.onload = async function(e) {
+        const base64Data = e.target.result;
+        try {
+            const res = await fetch(API_BASE + '/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileName: file.name, fileData: base64Data })
+            });
+            const data = await res.json();
+            if (data.success && data.url) {
+                textInput.value = data.url;
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00E676;"></i> تم الرفع بنجاح: ${data.url}`;
+                statusEl.style.color = '#00E676';
+                showToast('تم رفع الصورة بنجاح ✅');
+            } else {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> فشل الرفع: ${data.error || 'خطأ غير معروف'}`;
+                statusEl.style.color = '#ff5252';
+                showToast(data.error || 'فشل رفع الصورة', 'error');
+            }
+        } catch (err) {
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> تعذّر الاتصال بالخادم`;
+            statusEl.style.color = '#ff5252';
+            showToast('تعذر الاتصال بالخادم لرفع الصورة', 'error');
+        }
+    };
+    reader.readAsDataURL(file);
 }
 
 // ─── Recharging Agents Helper Functions ───────

@@ -27,7 +27,7 @@ export async function apiMiddleware(req, res, next) {
   if (req.url === '/api/version' && req.method === 'GET') {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ version: '1.0.5' }));
+    res.end(JSON.stringify({ version: '1.0.6' }));
     return;
   }
 
@@ -70,41 +70,16 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', chunk => chunks.push(chunk));
     req.on('end', async () => {
       try {
-        const buffer = Buffer.concat(chunks);
-        const contentType = req.headers['content-type'];
-        const boundaryMatch = contentType.match(/boundary=(.+)/);
-        if (!boundaryMatch) throw new Error('No boundary found');
-        const boundary = '--' + boundaryMatch[1];
-        
-        // Find boundary indices in the buffer
-        const boundaryBuffer = Buffer.from(boundary);
-        const boundaryIndices = [];
-        let index = buffer.indexOf(boundaryBuffer);
-        while (index !== -1) {
-          boundaryIndices.push(index);
-          index = buffer.indexOf(boundaryBuffer, index + boundaryBuffer.length);
-        }
+        const jsonText = Buffer.concat(chunks).toString('utf-8');
+        const { fileName, fileData } = JSON.parse(jsonText);
+        if (!fileName || !fileData) throw new Error('Missing fileName or fileData');
 
-        if (boundaryIndices.length < 2) throw new Error('Invalid multipart body');
+        // Extract raw Base64 data and extension
+        const commaIndex = fileData.indexOf(',');
+        const base64Content = commaIndex !== -1 ? fileData.slice(commaIndex + 1) : fileData;
+        const fileBuffer = Buffer.from(base64Content, 'base64');
 
-        // Extract first part (the file)
-        const partStart = boundaryIndices[0] + boundaryBuffer.length;
-        const partEnd = boundaryIndices[1];
-        const part = buffer.subarray(partStart, partEnd);
-
-        // Find header and body separator (\r\n\r\n)
-        const separator = Buffer.from('\r\n\r\n');
-        const separatorIndex = part.indexOf(separator);
-        if (separatorIndex === -1) throw new Error('Invalid part structure');
-
-        const headersText = part.subarray(0, separatorIndex).toString('utf-8');
-        const fileData = part.subarray(separatorIndex + separator.length, part.length - 2);
-
-        // Extract filename
-        const filenameMatch = headersText.match(/filename="([^"]+)"/);
-        if (!filenameMatch) throw new Error('No filename found');
-        const originalName = filenameMatch[1];
-        const ext = originalName.split('.').pop() || 'png';
+        const ext = fileName.split('.').pop() || 'png';
         const safeName = `uploaded_${Date.now()}.${ext}`;
 
         // Get MIME type
@@ -121,7 +96,7 @@ export async function apiMiddleware(req, res, next) {
           // 2. Upload file to Supabase Storage
           const { data: storageData, error: storageErr } = await supabase.storage
             .from('images')
-            .upload(safeName, fileData, {
+            .upload(safeName, fileBuffer, {
               contentType: mimeType,
               upsert: true
             });
@@ -139,7 +114,7 @@ export async function apiMiddleware(req, res, next) {
           if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
 
           const savePath = resolve(imagesDir, safeName);
-          fs.writeFileSync(savePath, fileData);
+          fs.writeFileSync(savePath, fileBuffer);
           uploadUrl = `images/${safeName}`;
         }
 

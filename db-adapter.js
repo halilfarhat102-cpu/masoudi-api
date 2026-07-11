@@ -59,23 +59,26 @@ export async function readDb() {
       playerId: a.player_id
     }));
 
-    // 3. Map Players & Transactions
-    const mappedPlayers = (players || []).map(p => {
-      const playerTxs = (transactions || [])
-        .filter(t => t.player_id === p.id)
-        .map(t => {
-          // If transaction has a tx_id, cache it
-          if (t.tx_id) processedTxCache.add(t.tx_id);
-          
-          return {
-            type: t.type,
-            amount: parseFloat(t.amount) || 0,
-            txId: t.tx_id || undefined,
-            ref: t.ref || undefined,
-            date: t.date ? new Date(t.date).toLocaleTimeString('ar') : 'الآن'
-          };
-        });
+    // 3. Group Transactions by Player ID
+    const txMap = {};
+    for (const t of (transactions || [])) {
+      if (t.tx_id) processedTxCache.add(t.tx_id);
+      
+      if (!txMap[t.player_id]) {
+        txMap[t.player_id] = [];
+      }
+      
+      txMap[t.player_id].push({
+        type: t.type,
+        amount: parseFloat(t.amount) || 0,
+        txId: t.tx_id || undefined,
+        ref: t.ref || undefined,
+        date: t.date ? new Date(t.date).toLocaleTimeString('ar') : 'الآن'
+      });
+    }
 
+    // 4. Map Players & Attach Transactions
+    const mappedPlayers = (players || []).map(p => {
       return {
         id: p.id,
         name: p.name,
@@ -91,7 +94,7 @@ export async function readDb() {
         isAdmin: p.is_admin || false,
         joinDate: p.join_date ? new Date(p.join_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         lastLogin: p.last_login ? new Date(p.last_login).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        transactions: playerTxs
+        transactions: txMap[p.id] || []
       };
     });
 
