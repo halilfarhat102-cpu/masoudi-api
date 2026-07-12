@@ -1,8 +1,8 @@
 {
   "settings": {
-    "enablePreview": false,
-    "showBalance": false,
-    "showLiveBadge": false,
+    "enablePreview": true,
+    "showBalance": true,
+    "showLiveBadge": true,
     "playButtonText": "العب الآن",
     "coinBuyRate": 10000,
     "coinSellRate": 20000
@@ -10,19 +10,19 @@
   "banners": [
     {
       "id": "banner-1783249648300",
-      "title": "",
-      "subtitle": "",
-      "badge": "",
-      "icon": "",
+      "title": "مرحباً بك في عالم الألعاب",
+      "subtitle": "اكتشف أفضل الألعاب واستمتع بتجربة لا تنتهي من المرح والإثارة",
+      "badge": "جديد",
+      "icon": "🎮",
       "image": "images/uploaded_1783249646987.png",
       "theme": "orange"
     },
     {
       "id": "banner-1783251638276",
-      "title": "",
-      "subtitle": "",
-      "badge": "",
-      "icon": "",
+      "title": "سياسة التطبيق",
+      "subtitle": "نلتزم بحماية بياناتك وخصوصيتك وتقديم تجربة آمنة وموثوقة لك في مسعودي",
+      "badge": "تنبيه",
+      "icon": "🔒",
       "image": "images/uploaded_1783251631980.png",
       "theme": "emerald"
     }
@@ -47,7 +47,7 @@
       "id": "game-1",
       "title": "روليت البرق (Lightning Roulette)",
       "category": "live",
-      "provider": "",
+      "provider": "Evolution Gaming",
       "launchUrl": "https://v1.evolution.com/lightning-roulette-demo",
       "image": "images/uploaded_1783263729640.png"
     },
@@ -55,9 +55,17 @@
       "id": "game-2",
       "title": "فتحات بوابات أوليمبوس (Gates of Olympus)",
       "category": "slots",
-      "provider": "",
+      "provider": "Pragmatic Play",
       "launchUrl": "https://demoplay.pragmaticplay.com/play/vs20olympgate",
       "image": "images/uploaded_1783263718442.png"
+    },
+    {
+      "id": "game-3",
+      "title": "مزرعة الحيوانات الكبيرة (Big Farm)",
+      "category": "slots",
+      "provider": "مسعودي Games",
+      "launchUrl": "assets/game/game.html",
+      "image": "assets/game/big_farm_icon.png"
     }
   ],
   "players": [
@@ -68,7 +76,7 @@
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
       "balance": 7424,
       "bonus": 0,
-      "status": "suspended",
+      "status": "active",
       "joinDate": "2026-07-05",
       "lastLogin": "2026-07-05",
       "transactions": [

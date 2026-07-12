@@ -16,7 +16,7 @@ let settings = {
     showLiveBadge: true
 };
 
-const API_BASE = window.location.origin.includes('masoudi-api.onrender.com') ? '' : 'https://masoudi-api.onrender.com';
+const API_BASE = window.location.origin.startsWith('http') ? '' : 'https://masoudi-api.onrender.com';
 
 // ─── Bootstrap ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
