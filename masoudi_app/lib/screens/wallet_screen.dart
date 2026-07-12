@@ -47,7 +47,7 @@ class _WalletScreenState extends State<WalletScreen> {
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            final double currentBalance = widget.balance;
+            final double currentBalance = widget.agentBalance;
             return AlertDialog(
               backgroundColor: const Color(0xFF291B15),
               shape: RoundedRectangleBorder(
