@@ -944,13 +944,14 @@ function addNewAgent() {
     const payments = document.getElementById('newAgentPayments')?.value?.trim();
     const rate     = document.getElementById('newAgentRate')?.value?.trim();
     const playerId = document.getElementById('newAgentPlayerId')?.value?.trim() || null;
-    const countries = _agentSelectedCountries.slice(); // array copy
+    // Read from the simple single dropdown
+    const country  = document.getElementById('newAgentCountry')?.value?.trim();
 
     if (!name) {
         return showToast('يرجى إدخال اسم الوكيل ⚠️', 'error');
     }
-    if (countries.length === 0) {
-        return showToast('يرجى اختيار دولة واحدة على الأقل من القائمة المنسدلة! ⚠️', 'error');
+    if (!country) {
+        return showToast('يرجى اختيار الدولة من القائمة ⚠️', 'error');
     }
     if (!phone) {
         return showToast('يرجى إدخال رقم هاتف الوكيل ⚠️', 'error');
@@ -963,14 +964,15 @@ function addNewAgent() {
     }
 
     const id = `agent-${Date.now()}`;
-    // Save countries as array; keep first as `country` for backward compat
-    agents.push({ id, name, countries, country: countries[0], phone, paymentMethods: payments, rate, playerId });
+    // Save as both country string and countries array for backward compat
+    agents.push({ id, name, country, countries: [country], phone, paymentMethods: payments, rate, playerId });
 
     // Clear form
     ['newAgentName', 'newAgentPhone', 'newAgentPayments', 'newAgentRate', 'newAgentPlayerId'].forEach(fid => {
         const el = document.getElementById(fid); if (el) el.value = '';
     });
-    resetAgentCountryTags();
+    const sel = document.getElementById('newAgentCountry');
+    if (sel) sel.value = '';
 
     saveData();
     renderAll();

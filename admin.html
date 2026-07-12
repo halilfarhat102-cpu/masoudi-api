@@ -916,14 +916,9 @@
                             <input type="text" id="newAgentName" placeholder="مثال: مكتب الرافدين">
                         </div>
                         <div class="form-field" style="grid-column:1/-1;">
-                            <label>الدول التي يغطيها الوكيل <small style="color:#8B909E;">(يمكن اختيار أكثر من دولة)</small></label>
-                            <!-- Selected countries tags -->
-                            <div id="agentCountriesTags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:36px;padding:6px 8px;background:rgba(0,0,0,0.2);border:1.5px solid var(--border);border-radius:10px 10px 0 0;border-bottom:none;">
-                                <span style="color:#555;font-size:12px;align-self:center;" id="agentCountriesPlaceholder">اختر دولة أو أكثر من القائمة...</span>
-                            </div>
-                            <!-- Country dropdown -->
-                            <select id="newAgentCountrySelector" onchange="addAgentCountryTag(this.value)" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:0 0 10px 10px;padding:10px 12px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;height:42px;">
-                                <option value="">— اختر دولة لإضافتها —</option>
+                            <label>الدولة التي يغطيها الوكيل 🌍</label>
+                            <select id="newAgentCountry" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;height:42px;">
+                                <option value="">— اختر الدولة —</option>
                                 <option value="🇮🇶 العراق">🇮🇶 العراق</option>
                                 <option value="🇪🇬 مصر">🇪🇬 مصر</option>
                                 <option value="🇾🇪 اليمن">🇾🇪 اليمن</option>
@@ -943,7 +938,6 @@
                                 <option value="🇸🇾 سوريا">🇸🇾 سوريا</option>
                                 <option value="🇱🇧 لبنان">🇱🇧 لبنان</option>
                             </select>
-                            <input type="hidden" id="newAgentCountriesHidden" value="">
                         </div>
                         <div class="form-field">
                             <label>رقم الواتساب أو الهاتف (مع رمز الدولة)</label>
