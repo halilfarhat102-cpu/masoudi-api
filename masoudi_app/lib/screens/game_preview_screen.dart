@@ -13,6 +13,7 @@ class GamePreviewScreen extends StatefulWidget {
   final bool showBalance;
   final bool showLiveBadge;
   final String playButtonText;
+  final String serverUrl;
 
   const GamePreviewScreen({
     Key? key,
@@ -20,6 +21,7 @@ class GamePreviewScreen extends StatefulWidget {
     required this.balance,
     required this.playerId,
     required this.playerName,
+    required this.serverUrl,
     this.showBalance = true,
     this.showLiveBadge = true,
     this.playButtonText = 'العب الآن',
@@ -115,6 +117,7 @@ class _GamePreviewScreenState extends State<GamePreviewScreen>
           game: widget.game,
           balance: widget.balance,
           playerId: widget.playerId,
+          serverUrl: widget.serverUrl,
         ),
         transitionsBuilder: (_, anim, __, child) {
           return FadeTransition(
