@@ -771,7 +771,7 @@
                             <label>صورة غلاف اللعبة</label>
                             <div style="display:flex;gap:6px;align-items:center;">
                                 <input type="file" id="gameImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('gameImageUpload', 'gameImageInputVal', 'gameUploadStatus')">
-                                <button class="btn-action btn-add-funds" onclick="document.getElementById('gameImageUpload').click()" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                                <button class="btn-action btn-add-funds" onclick="triggerImageUpload('gameImageUpload', 'gameImageInputVal', 'gameUploadStatus')" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
                                     <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة
                                 </button>
                                 <input type="text" id="gameImageInputVal" placeholder="مثال: images/slots.png" style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
@@ -874,7 +874,7 @@
                         <label>صورة البنر (الخلفية الممتدة)</label>
                         <div style="display:flex;gap:6px;align-items:center;">
                             <input type="file" id="bannerImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('bannerImageUpload', 'newBannerImage', 'bannerUploadStatus')">
-                            <button class="btn-action btn-add-funds" onclick="document.getElementById('bannerImageUpload').click()" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                            <button class="btn-action btn-add-funds" onclick="triggerImageUpload('bannerImageUpload', 'newBannerImage', 'bannerUploadStatus')" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
                                 <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة
                             </button>
                             <input type="text" id="newBannerImage" placeholder="مثال: images/slots.png" style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
@@ -1109,7 +1109,7 @@
                 <label>صورة غلاف اللعبة</label>
                 <div style="display:flex;gap:6px;align-items:center;">
                     <input type="file" id="editGameImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('editGameImageUpload', 'editGameImageInputVal', 'editGameUploadStatus')">
-                    <button class="btn-action btn-add-funds" onclick="document.getElementById('editGameImageUpload').click()" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                    <button class="btn-action btn-add-funds" onclick="triggerImageUpload('editGameImageUpload', 'editGameImageInputVal', 'editGameUploadStatus')" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
                         <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة جديدة
                     </button>
                     <input type="text" id="editGameImageInputVal" placeholder="مسار الصورة..." style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">

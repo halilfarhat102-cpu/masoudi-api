@@ -25,6 +25,16 @@ function resolveImageUrl(url) {
     return API_BASE + '/' + cleanUrl;
 }
 
+function triggerImageUpload(fileInputId, textInputId, statusId) {
+    if (window.MasoudiApp) {
+        window.MasoudiApp.postMessage(`pickImage|${textInputId}|${statusId}`);
+    } else {
+        const el = document.getElementById(fileInputId);
+        if (el) el.click();
+    }
+}
+window.triggerImageUpload = triggerImageUpload;
+
 // ─── Bootstrap ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initAdminHeader();
