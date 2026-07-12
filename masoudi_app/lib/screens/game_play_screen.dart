@@ -28,10 +28,11 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
   void initState() {
     super.initState();
 
-    // Construct the secure launch URL matching the desktop launcher signature
+    final bool isLocal = !widget.game.launchUrl.startsWith('http');
     final String separator = widget.game.launchUrl.contains('?') ? '&' : '?';
-    final String secureUrl =
-        '${widget.game.launchUrl}${separator}player_id=${widget.playerId}&balance=${widget.balance}&token=secure_session_masoudi&provider=${Uri.encodeComponent(widget.game.provider)}';
+    final String secureUrl = isLocal
+        ? ''
+        : '${widget.game.launchUrl}${separator}player_id=${widget.playerId}&balance=${widget.balance}&token=secure_session_masoudi&provider=${Uri.encodeComponent(widget.game.provider)}';
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -50,14 +51,28 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
               setState(() {
                 _isLoading = false;
               });
+              if (isLocal) {
+                _controller.runJavaScript('''
+                  localStorage.setItem('masoudi_wallet_balance', '${widget.balance}');
+                  localStorage.setItem('masoudi_player_id', '${widget.playerId}');
+                  if (window.setMasoudiBalance) {
+                    window.setMasoudiBalance('${widget.balance}');
+                  }
+                ''');
+              }
             }
           },
           onWebResourceError: (WebResourceError error) {
             print("WebView error: ${error.description}");
           },
         ),
-      )
-      ..loadRequest(Uri.parse(secureUrl));
+      );
+
+    if (isLocal) {
+      _controller.loadFlutterAsset(widget.game.launchUrl);
+    } else {
+      _controller.loadRequest(Uri.parse(secureUrl));
+    }
   }
 
   @override
