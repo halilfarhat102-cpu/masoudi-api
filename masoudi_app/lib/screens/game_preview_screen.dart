@@ -319,12 +319,30 @@ class _GamePreviewScreenState extends State<GamePreviewScreen>
 
           Positioned.fill(
             child: widget.game.image.isNotEmpty
-                ? Image.network(
-                    widget.game.image.startsWith('http')
-                        ? widget.game.image
-                        : '${widget.serverUrl}/${widget.game.image}',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _emojiCover(_gameEmoji, catColor),
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Blurred background copy of the image to fill the card beautifully
+                      Image.network(
+                        widget.game.image.startsWith('http')
+                            ? widget.game.image
+                            : '${widget.serverUrl}/${widget.game.image}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const SizedBox(),
+                      ),
+                      // Dark/blur overlay
+                      Container(
+                        color: Colors.black.withOpacity(0.65),
+                      ),
+                      // Sharp full image in front
+                      Image.network(
+                        widget.game.image.startsWith('http')
+                            ? widget.game.image
+                            : '${widget.serverUrl}/${widget.game.image}',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => _emojiCover(_gameEmoji, catColor),
+                      ),
+                    ],
                   )
                 : _emojiCover(_gameEmoji, catColor),
           ),

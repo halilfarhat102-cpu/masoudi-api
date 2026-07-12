@@ -663,38 +663,51 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  CachedNetworkImage(
-                    imageUrl: game.image.startsWith('http') ? game.image : '${widget.serverUrl}/${game.image}',
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: const Color(0xFF221711),
-                      child: const Center(
-                        child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7A1F)),
-                          ),
-                        ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF302018), Color(0xFF1F1510)],
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          game.title.isNotEmpty ? game.title.substring(0, 1) : '?',
-                          style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFFFF7A1F)),
-                        ),
-                      ),
-                    ),
-                  ),
+                   if (game.image.isNotEmpty) ...[
+                     // Blurred background copy of the image to fill the card beautifully
+                     CachedNetworkImage(
+                       imageUrl: game.image.startsWith('http') ? game.image : '${widget.serverUrl}/${game.image}',
+                       fit: BoxFit.cover,
+                       placeholder: (context, url) => const SizedBox(),
+                       errorWidget: (context, url, error) => const SizedBox(),
+                     ),
+                     // Dark overlay
+                     Container(
+                       color: Colors.black.withOpacity(0.65),
+                     ),
+                   ],
+                   CachedNetworkImage(
+                     imageUrl: game.image.startsWith('http') ? game.image : '${widget.serverUrl}/${game.image}',
+                     fit: game.image.isNotEmpty ? BoxFit.contain : BoxFit.cover,
+                     placeholder: (context, url) => Container(
+                       color: const Color(0xFF221711),
+                       child: const Center(
+                         child: SizedBox(
+                           width: 24,
+                           height: 24,
+                           child: CircularProgressIndicator(
+                             strokeWidth: 2,
+                             valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF7A1F)),
+                           ),
+                         ),
+                       ),
+                     ),
+                     errorWidget: (context, url, error) => Container(
+                       decoration: const BoxDecoration(
+                         gradient: LinearGradient(
+                           begin: Alignment.topLeft,
+                           end: Alignment.bottomRight,
+                           colors: [Color(0xFF302018), Color(0xFF1F1510)],
+                         ),
+                       ),
+                       child: Center(
+                         child: Text(
+                           game.title.isNotEmpty ? game.title.substring(0, 1) : '?',
+                           style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFFFF7A1F)),
+                         ),
+                       ),
+                     ),
+                   ),
                   // Provider tag
                   Positioned(
                     top: 10,
