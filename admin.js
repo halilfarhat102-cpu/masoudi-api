@@ -175,7 +175,145 @@ function renderAll() {
     renderAdminBannersTable();
     renderAdminAgentsTable();
     renderAdminP2pAgentsTable();
+    loadPaymentGateways();
 }
+
+// ─── Payment Gateways ─────────────────────────
+let paymentGateways = {
+    vodafone: { number: '', name: '', active: false },
+    instapay: { number: '', name: '', active: false },
+    orange:   { number: '', name: '', active: false },
+    etisalat: { number: '', name: '', active: false },
+    bank:     { account: '', bankName: '', holder: '', active: false },
+    pricing:  []
+};
+
+function loadPaymentGateways() {
+    // Load from settings object if present
+    const gw = (settings.paymentGateways) ? settings.paymentGateways : null;
+    if (!gw) return;
+
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+    const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+    const setStat = (id, val) => { const el = document.getElementById(id); if (el) el.style.display = val ? 'block' : 'none'; };
+
+    if (gw.vodafone) {
+        setVal('gw-vodafone-number', gw.vodafone.number);
+        setVal('gw-vodafone-name', gw.vodafone.name);
+        setChk('gw-vodafone-active', gw.vodafone.active);
+        setStat('vodafone-status', gw.vodafone.active);
+    }
+    if (gw.instapay) {
+        setVal('gw-instapay-number', gw.instapay.number);
+        setVal('gw-instapay-name', gw.instapay.name);
+        setChk('gw-instapay-active', gw.instapay.active);
+        setStat('instapay-status', gw.instapay.active);
+    }
+    if (gw.orange) {
+        setVal('gw-orange-number', gw.orange.number);
+        setVal('gw-orange-name', gw.orange.name);
+        setChk('gw-orange-active', gw.orange.active);
+        setStat('orange-status', gw.orange.active);
+    }
+    if (gw.etisalat) {
+        setVal('gw-etisalat-number', gw.etisalat.number);
+        setVal('gw-etisalat-name', gw.etisalat.name);
+        setChk('gw-etisalat-active', gw.etisalat.active);
+        setStat('etisalat-status', gw.etisalat.active);
+    }
+    if (gw.bank) {
+        setVal('gw-bank-account', gw.bank.account);
+        setVal('gw-bank-name', gw.bank.bankName);
+        setVal('gw-bank-holder', gw.bank.holder);
+        setChk('gw-bank-active', gw.bank.active);
+        setStat('bank-status', gw.bank.active);
+    }
+    // Load pricing rows
+    if (Array.isArray(gw.pricing) && gw.pricing.length > 0) {
+        const container = document.getElementById('pricingTableInputs');
+        if (container) {
+            container.innerHTML = '';
+            gw.pricing.forEach(p => {
+                const row = document.createElement('div');
+                row.className = 'pricing-row';
+                row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+                row.innerHTML = `
+                    <input type="number" class="price-coins" value="${p.coins || ''}" placeholder="كوينز" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                    <input type="number" class="price-egp" value="${p.egp || ''}" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                    <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>`;
+                container.appendChild(row);
+            });
+        }
+    }
+    paymentGateways = { ...paymentGateways, ...gw };
+}
+
+function addPricingRow() {
+    const container = document.getElementById('pricingTableInputs');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.className = 'pricing-row';
+    row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+    row.innerHTML = `
+        <input type="number" class="price-coins" placeholder="كوينز" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+        <input type="number" class="price-egp" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+        <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>`;
+    container.appendChild(row);
+}
+
+function removePricingRow(btn) {
+    btn.closest('.pricing-row')?.remove();
+}
+
+function savePaymentGateways() {
+    const getVal = (id) => document.getElementById(id)?.value?.trim() || '';
+    const getChk = (id) => document.getElementById(id)?.checked || false;
+
+    // Collect pricing rows
+    const pricing = [];
+    document.querySelectorAll('#pricingTableInputs .pricing-row').forEach(row => {
+        const coins = parseFloat(row.querySelector('.price-coins')?.value) || 0;
+        const egp   = parseFloat(row.querySelector('.price-egp')?.value) || 0;
+        if (coins > 0 && egp > 0) pricing.push({ coins, egp });
+    });
+
+    settings.paymentGateways = {
+        vodafone: {
+            number: getVal('gw-vodafone-number'),
+            name:   getVal('gw-vodafone-name'),
+            active: getChk('gw-vodafone-active')
+        },
+        instapay: {
+            number: getVal('gw-instapay-number'),
+            name:   getVal('gw-instapay-name'),
+            active: getChk('gw-instapay-active')
+        },
+        orange: {
+            number: getVal('gw-orange-number'),
+            name:   getVal('gw-orange-name'),
+            active: getChk('gw-orange-active')
+        },
+        etisalat: {
+            number: getVal('gw-etisalat-number'),
+            name:   getVal('gw-etisalat-name'),
+            active: getChk('gw-etisalat-active')
+        },
+        bank: {
+            account:  getVal('gw-bank-account'),
+            bankName: getVal('gw-bank-name'),
+            holder:   getVal('gw-bank-holder'),
+            active:   getChk('gw-bank-active')
+        },
+        pricing
+    };
+
+    saveData();
+    showToast('تم حفظ إعدادات بوابات الشحن بنجاح ✅');
+    loadPaymentGateways(); // Refresh status indicators
+}
+window.savePaymentGateways = savePaymentGateways;
+window.addPricingRow = addPricingRow;
+window.removePricingRow = removePricingRow;
 
 // ─── Stats ───────────────────────────────────
 function updateStats() {

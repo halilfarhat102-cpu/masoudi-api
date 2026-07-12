@@ -641,6 +641,9 @@
             <button class="admin-tab" onclick="switchTab('tab-p2p')">
                 <i class="fa-solid fa-user-shield"></i> وكلاء التطبيق (P2P)
             </button>
+            <button class="admin-tab" onclick="switchTab('tab-payment')">
+                <i class="fa-solid fa-credit-card"></i> بوابات الشحن 🇪🇬
+            </button>
         </div>
 
         <main>
@@ -1023,6 +1026,161 @@
                             <tbody id="adminP2pAgentsTableBody"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB: PAYMENT GATEWAYS ═══════════════ -->
+            <div id="tab-payment" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-credit-card" style="color:var(--orange);margin-left:6px;"></i>إدارة بوابات الشحن من التطبيق 🇪🇬</h3>
+                </div>
+
+                <div class="glass-card" style="padding:22px;margin-bottom:18px;border-radius:16px;">
+                    <p style="font-size:12px;color:#aaa;margin-bottom:20px;line-height:1.7;">اضبط أرقام/أسماء حساباتك لكل بوابة دفع مصرية. ستظهر هذه المعلومات للمستخدمين في قسم <strong style="color:var(--orange);">شحن من التطبيق</strong> داخل تطبيق مسعودي.</p>
+                    
+                    <!-- Vodafone Cash -->
+                    <div style="background:rgba(220,0,0,0.07);border:1.5px solid rgba(220,0,0,0.25);border-radius:14px;padding:16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:38px;height:38px;background:linear-gradient(135deg,#E60000,#990000);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">📱</div>
+                            <div>
+                                <div style="font-size:14px;font-weight:700;color:#fff;">فودافون كاش</div>
+                                <div style="font-size:10px;color:#aaa;">Vodafone Cash</div>
+                            </div>
+                            <div id="vodafone-status" style="margin-right:auto;font-size:10px;color:#00E676;display:none;">✅ مفعّل</div>
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>رقم فودافون كاش</label>
+                            <input type="tel" id="gw-vodafone-number" placeholder="مثال: 01001234567" style="direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>اسم صاحب الحساب (اختياري)</label>
+                            <input type="text" id="gw-vodafone-name" placeholder="مثال: أحمد محمد">
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <label style="font-size:12px;color:#aaa;">تفعيل البوابة</label>
+                            <input type="checkbox" id="gw-vodafone-active" style="width:18px;height:18px;accent-color:var(--orange);">
+                        </div>
+                    </div>
+
+                    <!-- InstaPay -->
+                    <div style="background:rgba(0,150,136,0.07);border:1.5px solid rgba(0,150,136,0.25);border-radius:14px;padding:16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:38px;height:38px;background:linear-gradient(135deg,#009688,#00695C);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">🏦</div>
+                            <div>
+                                <div style="font-size:14px;font-weight:700;color:#fff;">انستاباي</div>
+                                <div style="font-size:10px;color:#aaa;">InstaPay - البنوك المصرية</div>
+                            </div>
+                            <div id="instapay-status" style="margin-right:auto;font-size:10px;color:#00E676;display:none;">✅ مفعّل</div>
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>رقم الهاتف أو اسم المستخدم InstaPay</label>
+                            <input type="text" id="gw-instapay-number" placeholder="مثال: 01001234567 أو اسم المستخدم" style="direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>اسم صاحب الحساب (اختياري)</label>
+                            <input type="text" id="gw-instapay-name" placeholder="مثال: أحمد محمد">
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <label style="font-size:12px;color:#aaa;">تفعيل البوابة</label>
+                            <input type="checkbox" id="gw-instapay-active" style="width:18px;height:18px;accent-color:var(--orange);">
+                        </div>
+                    </div>
+
+                    <!-- Orange Cash -->
+                    <div style="background:rgba(255,102,0,0.07);border:1.5px solid rgba(255,102,0,0.25);border-radius:14px;padding:16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:38px;height:38px;background:linear-gradient(135deg,#FF6600,#CC4400);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">🟠</div>
+                            <div>
+                                <div style="font-size:14px;font-weight:700;color:#fff;">أورنج كاش</div>
+                                <div style="font-size:10px;color:#aaa;">Orange Cash</div>
+                            </div>
+                            <div id="orange-status" style="margin-right:auto;font-size:10px;color:#00E676;display:none;">✅ مفعّل</div>
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>رقم أورنج كاش</label>
+                            <input type="tel" id="gw-orange-number" placeholder="مثال: 01201234567" style="direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>اسم صاحب الحساب (اختياري)</label>
+                            <input type="text" id="gw-orange-name" placeholder="مثال: أحمد محمد">
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <label style="font-size:12px;color:#aaa;">تفعيل البوابة</label>
+                            <input type="checkbox" id="gw-orange-active" style="width:18px;height:18px;accent-color:var(--orange);">
+                        </div>
+                    </div>
+
+                    <!-- Etisalat Cash -->
+                    <div style="background:rgba(0,100,200,0.07);border:1.5px solid rgba(0,100,200,0.25);border-radius:14px;padding:16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:38px;height:38px;background:linear-gradient(135deg,#0064C8,#003E8C);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">📶</div>
+                            <div>
+                                <div style="font-size:14px;font-weight:700;color:#fff;">اتصالات كاش (WE)</div>
+                                <div style="font-size:10px;color:#aaa;">Etisalat Cash / WE Pay</div>
+                            </div>
+                            <div id="etisalat-status" style="margin-right:auto;font-size:10px;color:#00E676;display:none;">✅ مفعّل</div>
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>رقم اتصالات كاش</label>
+                            <input type="tel" id="gw-etisalat-number" placeholder="مثال: 01101234567" style="direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>اسم صاحب الحساب (اختياري)</label>
+                            <input type="text" id="gw-etisalat-name" placeholder="مثال: أحمد محمد">
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <label style="font-size:12px;color:#aaa;">تفعيل البوابة</label>
+                            <input type="checkbox" id="gw-etisalat-active" style="width:18px;height:18px;accent-color:var(--orange);">
+                        </div>
+                    </div>
+
+                    <!-- Bank Transfer -->
+                    <div style="background:rgba(255,193,7,0.07);border:1.5px solid rgba(255,193,7,0.25);border-radius:14px;padding:16px;margin-bottom:14px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:38px;height:38px;background:linear-gradient(135deg,#FFC107,#FF8F00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">🏛️</div>
+                            <div>
+                                <div style="font-size:14px;font-weight:700;color:#fff;">تحويل بنكي</div>
+                                <div style="font-size:10px;color:#aaa;">بنك مصر / CIB / QNB وغيرها</div>
+                            </div>
+                            <div id="bank-status" style="margin-right:auto;font-size:10px;color:#00E676;display:none;">✅ مفعّل</div>
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>رقم الحساب / IBAN</label>
+                            <input type="text" id="gw-bank-account" placeholder="مثال: EG380011000001234567891234" style="direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>اسم البنك</label>
+                            <input type="text" id="gw-bank-name" placeholder="مثال: بنك مصر - فرع الزمالك">
+                        </div>
+                        <div class="form-field" style="margin-bottom:10px;">
+                            <label>اسم صاحب الحساب</label>
+                            <input type="text" id="gw-bank-holder" placeholder="مثال: أحمد محمد علي">
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <label style="font-size:12px;color:#aaa;">تفعيل البوابة</label>
+                            <input type="checkbox" id="gw-bank-active" style="width:18px;height:18px;accent-color:var(--orange);">
+                        </div>
+                    </div>
+
+                    <!-- Pricing Table -->
+                    <div style="background:rgba(255,122,31,0.07);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;">
+                        <h4 style="font-size:13px;color:var(--orange);margin-bottom:12px;"><i class="fa-solid fa-tags"></i> جدول أسعار الشحن (اختياري)</h4>
+                        <p style="font-size:11px;color:#888;margin-bottom:12px;">حدد عروض الشحن التي ستظهر للمستخدمين عند اختيار الشحن من التطبيق.</p>
+                        <div id="pricingTableInputs">
+                            <div class="pricing-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                                <input type="number" class="price-coins" placeholder="كوينز" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                                <input type="number" class="price-egp" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                                <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>
+                            </div>
+                        </div>
+                        <button onclick="addPricingRow()" style="background:rgba(255,122,31,0.15);border:1.5px dashed var(--border);color:var(--orange);border-radius:10px;padding:10px 16px;cursor:pointer;font-size:13px;font-family:'Cairo';width:100%;margin-top:4px;">
+                            <i class="fa-solid fa-plus"></i> إضافة خيار شحن جديد
+                        </button>
+                    </div>
+
+                    <button onclick="savePaymentGateways()" style="width:100%;background:var(--orange);border:none;color:#fff;border-radius:14px;padding:14px;font-family:'Cairo';font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px var(--orange-glow);">
+                        <i class="fa-solid fa-floppy-disk" style="margin-left:8px;"></i> حفظ إعدادات بوابات الشحن
+                    </button>
                 </div>
             </div>
 
