@@ -50,10 +50,10 @@ export async function apiMiddleware(req, res, next) {
           const existing = await readDb();
           
           incoming.admins = (existing.admins && existing.admins.length > 0) ? existing.admins : (incoming.admins || []);
-          incoming.agents = (incoming.agents && incoming.agents.length > 0) ? incoming.agents : (existing.agents || []);
-          incoming.games = (incoming.games && incoming.games.length > 0) ? incoming.games : (existing.games || []);
-          incoming.banners = (incoming.banners && incoming.banners.length > 0) ? incoming.banners : (existing.banners || []);
           incoming.players = existing.players || [];
+          if (incoming.agents === undefined) incoming.agents = existing.agents || [];
+          if (incoming.games === undefined) incoming.games = existing.games || [];
+          if (incoming.banners === undefined) incoming.banners = existing.banners || [];
           
           await writeDb(incoming);
           res.setHeader('Content-Type', 'application/json');

@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { apiMiddleware } from './api-middleware.js';
 
 export default defineConfig({
+  base: './',
   build: {
     rollupOptions: {
       input: {
