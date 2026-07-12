@@ -694,6 +694,7 @@ function showToast(message, type = 'success') {
     toast.classList.add('active');
     setTimeout(() => toast.classList.remove('active'), 3000);
 }
+window.showToast = showToast;
 
 // ─── Utilities ───────────────────────────────
 function formatNum(n) {

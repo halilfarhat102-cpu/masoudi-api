@@ -103,7 +103,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             document.getElementById('$targetInputId').value = '$imageUrl';
             document.getElementById('$statusId').innerHTML = '<i class="fa-solid fa-circle-check" style="color:#00E676;"></i> تم الرفع بنجاح';
             document.getElementById('$statusId').style.color = '#00E676';
-            showToast('تم رفع الصورة بنجاح ✅');
+            if (window.showToast) { window.showToast('تم رفع الصورة بنجاح ✅'); }
           """);
         } else {
           throw Exception(data['error'] ?? 'Server error');
@@ -116,7 +116,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       await _controller.runJavaScript("""
         document.getElementById('$statusId').innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> فشل الرفع: $e';
         document.getElementById('$statusId').style.color = '#ff5252';
-        showToast('فشل رفع الصورة', 'error');
+        if (window.showToast) { window.showToast('فشل رفع الصورة', 'error'); }
       """);
     }
   }
