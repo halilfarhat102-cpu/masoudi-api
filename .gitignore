@@ -3,4 +3,3 @@ dist
 masoudi_app
 .DS_Store
 .env
-db.json

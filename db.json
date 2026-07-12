@@ -1,0 +1,255 @@
+{
+  "settings": {
+    "enablePreview": true,
+    "showBalance": true,
+    "showLiveBadge": true,
+    "playButtonText": "العب الآن",
+    "coinBuyRate": 10000,
+    "coinSellRate": 20000
+  },
+  "banners": [
+    {
+      "id": "banner-1783249648300",
+      "title": "مرحباً بك في عالم الألعاب",
+      "subtitle": "اكتشف أفضل الألعاب واستمتع بتجربة لا تنتهي من المرح والإثارة",
+      "badge": "جديد",
+      "icon": "🎮",
+      "image": "images/uploaded_1783249646987.png",
+      "theme": "orange"
+    },
+    {
+      "id": "banner-1783251638276",
+      "title": "سياسة التطبيق",
+      "subtitle": "نلتزم بحماية بياناتك وخصوصيتك وتقديم تجربة آمنة وموثوقة لك في مسعودي",
+      "badge": "تنبيه",
+      "icon": "🔒",
+      "image": "images/uploaded_1783251631980.png",
+      "theme": "emerald"
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent-1783265344524",
+      "name": "خالد",
+      "countries": [
+        "🇪🇬 مصر"
+      ],
+      "country": "🇪🇬 مصر",
+      "phone": "+201008827375",
+      "paymentMethods": "فودافون كاش",
+      "rate": "1$=10,000 كوينز",
+      "playerId": "519997"
+    }
+  ],
+  "providers": [],
+  "games": [
+    {
+      "id": "game-1",
+      "title": "روليت البرق (Lightning Roulette)",
+      "category": "live",
+      "provider": "Evolution Gaming",
+      "launchUrl": "https://v1.evolution.com/lightning-roulette-demo",
+      "image": "images/uploaded_1783263729640.png"
+    },
+    {
+      "id": "game-2",
+      "title": "فتحات بوابات أوليمبوس (Gates of Olympus)",
+      "category": "slots",
+      "provider": "Pragmatic Play",
+      "launchUrl": "https://demoplay.pragmaticplay.com/play/vs20olympgate",
+      "image": "images/uploaded_1783263718442.png"
+    },
+    {
+      "id": "game-3",
+      "title": "مزرعة الحيوانات الكبيرة (Big Farm)",
+      "category": "slots",
+      "provider": "مسعودي Games",
+      "launchUrl": "assets/game/game.html",
+      "image": "assets/game/big_farm_icon.png"
+    }
+  ],
+  "players": [
+    {
+      "id": "519997",
+      "name": "Halil Farhat",
+      "email": "halilfarhat102@gmail.com",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
+      "balance": 7424,
+      "bonus": 0,
+      "status": "active",
+      "joinDate": "2026-07-05",
+      "lastLogin": "2026-07-05",
+      "transactions": [
+        {
+          "type": "هدية التسجيل",
+          "amount": 5000,
+          "date": "6:46:29 ص"
+        },
+        {
+          "type": "إضافة رصيد",
+          "amount": 555555,
+          "date": "7:09:03 ص"
+        },
+        {
+          "type": "تصفير الرصيد",
+          "amount": 0,
+          "date": "7:20:41 ص"
+        },
+        {
+          "type": "إضافة رصيد",
+          "amount": 52424,
+          "date": "7:35:08 ص"
+        },
+        {
+          "type": "شحن كوينز وكيل (من الإدارة)",
+          "amount": 5000,
+          "date": "2:31:40 م"
+        },
+        {
+          "type": "شحن كوينز وكيل (من الإدارة)",
+          "amount": 50000,
+          "date": "2:31:47 م"
+        },
+        {
+          "type": "شحن رصيد وكالة (من الإدارة)",
+          "amount": 5000,
+          "date": "2:45:48 م"
+        },
+        {
+          "type": "شحن رصيد وكالة (من الإدارة)",
+          "amount": 500000,
+          "date": "2:46:09 م"
+        },
+        {
+          "type": "تحويل كوينز إلى لاعب (Master Msuodi)",
+          "amount": -50000,
+          "date": "2:46:56 م"
+        },
+        {
+          "type": "سحب سريع",
+          "amount": -50000,
+          "date": "2:46:57 م"
+        },
+        {
+          "type": "شحن رصيد وكالة (من الإدارة)",
+          "amount": 50000,
+          "date": "2:51:54 م"
+        },
+        {
+          "type": "خصم رصيد",
+          "amount": -50000,
+          "date": "2:55:00 م"
+        },
+        {
+          "type": "شراء كوينز من لاعب (Master Msuodi)",
+          "amount": 5000,
+          "date": "3:33:35 م"
+        },
+        {
+          "type": "شراء كوينز من لاعب (Master Msuodi)",
+          "amount": 50000,
+          "date": "3:34:51 م"
+        },
+        {
+          "type": "شراء كوينز من لاعب (Master Msuodi)",
+          "amount": 50000,
+          "date": "3:42:12 م"
+        }
+      ],
+      "isAgent": true,
+      "agentBalance": 610000
+    },
+    {
+      "id": "303725",
+      "name": "Master Msuodi",
+      "email": "engyhamid860@gmail.com",
+      "balance": 5000,
+      "bonus": 500,
+      "status": "active",
+      "joinDate": "2026-07-05",
+      "lastLogin": "2026-07-05",
+      "transactions": [
+        {
+          "type": "هدية التسجيل",
+          "amount": 5000,
+          "date": "2:44:11 م"
+        },
+        {
+          "type": "شحن من الوكيل (Halil Farhat)",
+          "amount": 50000,
+          "date": "2:46:56 م"
+        },
+        {
+          "type": "بيع كوينز للوكيل (خالد)",
+          "amount": -5000,
+          "date": "3:33:35 م"
+        },
+        {
+          "type": "سحب سريع",
+          "amount": 5000,
+          "date": "3:33:35 م"
+        },
+        {
+          "type": "بيع كوينز للوكيل (خالد)",
+          "amount": -50000,
+          "date": "3:34:51 م"
+        },
+        {
+          "type": "سحب سريع",
+          "amount": 50000,
+          "date": "3:34:51 م"
+        },
+        {
+          "type": "بيع كوينز للوكيل (خالد)",
+          "amount": -50000,
+          "date": "3:42:12 م"
+        }
+      ]
+    },
+    {
+      "id": "127761",
+      "name": "PartyU customers service",
+      "email": "management135790@gmail.com",
+      "balance": 5000,
+      "bonus": 500,
+      "status": "active",
+      "joinDate": "2026-07-05",
+      "lastLogin": "2026-07-05",
+      "transactions": [
+        {
+          "type": "هدية التسجيل",
+          "amount": 5000,
+          "date": "3:56:07 م"
+        }
+      ]
+    },
+    {
+      "id": "840624",
+      "name": "الامبرا طور",
+      "email": "hyhyfarhad12369@gmail.com",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocKd6RA_rxaHYSoeAvtWz0V3KoF_awiP8huPcKR9GPoWTvHUKWw=s96-c",
+      "balance": 5000,
+      "bonus": 500,
+      "status": "active",
+      "joinDate": "2026-07-05",
+      "lastLogin": "2026-07-05",
+      "transactions": [
+        {
+          "type": "هدية التسجيل",
+          "amount": 5000,
+          "date": "5:55:02 م"
+        }
+      ]
+    }
+  ],
+  "admins": [
+    {
+      "id": "admin-1",
+      "username": "admin",
+      "displayName": "المشرف العام",
+      "passwordHash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+      "role": "superadmin",
+      "createdAt": "2026-07-05"
+    }
+  ]
+}
