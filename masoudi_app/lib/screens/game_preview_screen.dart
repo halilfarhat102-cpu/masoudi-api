@@ -317,11 +317,12 @@ class _GamePreviewScreenState extends State<GamePreviewScreen>
             ),
           ),
 
-          // Game image
           Positioned.fill(
             child: widget.game.image.isNotEmpty
                 ? Image.network(
-                    widget.game.image,
+                    widget.game.image.startsWith('http')
+                        ? widget.game.image
+                        : '${widget.serverUrl}/${widget.game.image}',
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => _emojiCover(_gameEmoji, catColor),
                   )
