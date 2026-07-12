@@ -36,53 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentPage = 0;
   int _currentBanner = 0;
 
-  List<Map<String, dynamic>> _banners = [
-    {
-      'title': 'مكافأة الترحيب 150%',
-      'subtitle': 'أودع الآن واحصل على ضعف رصيدك فوراً',
-      'badge': 'حصري',
-      'icon': '🎁',
-      'accentR': 0,
-      'accentG': 230,
-      'accentB': 118,
-      'gradStartR': 13,
-      'gradStartG': 43,
-      'gradStartB': 26,
-      'gradEndR': 10,
-      'gradEndG': 61,
-      'gradEndB': 32,
-    },
-    {
-      'title': 'جاكبوت روليت البرق',
-      'subtitle': 'الجائزة الكبرى تصل إلى 500,000 كوين 🪙',
-      'badge': 'مباشر',
-      'icon': '🎰',
-      'accentR': 124,
-      'accentG': 77,
-      'accentB': 255,
-      'gradStartR': 21,
-      'gradStartG': 13,
-      'gradStartB': 46,
-      'gradEndR': 27,
-      'gradEndG': 16,
-      'gradEndB': 64,
-    },
-    {
-      'title': 'بطولة الأسبوع VIP',
-      'subtitle': 'المركز الأول يربح 25,000 كوين 🪙',
-      'badge': 'جديد',
-      'icon': '🏆',
-      'accentR': 245,
-      'accentG': 194,
-      'accentB': 49,
-      'gradStartR': 42,
-      'gradStartG': 28,
-      'gradStartB': 0,
-      'gradEndR': 61,
-      'gradEndG': 40,
-      'gradEndB': 0,
-    },
-  ];
+  List<Map<String, dynamic>> _banners = [];
 
   final List<Map<String, String>> _winners = [
     {"name": "خالد المري", "prize": "15,000 كوين 🪙", "game": "روليت البرق"},
