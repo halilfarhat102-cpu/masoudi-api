@@ -18,6 +18,13 @@ let settings = {
 
 const API_BASE = window.location.origin.startsWith('http') ? '' : 'https://masoudi-api.onrender.com';
 
+function resolveImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+    return API_BASE + '/' + cleanUrl;
+}
+
 // ─── Bootstrap ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initAdminHeader();
@@ -560,7 +567,7 @@ function renderAdminGamesTable() {
         return;
     }
     tbody.innerHTML = dynamicGames.map((g, i) => {
-        const imgUrl = g.image ? g.image : 'images/slots.png';
+        const imgUrl = g.image ? resolveImageUrl(g.image) : 'images/slots.png';
         return `
         <tr>
             <td style="text-align:center; vertical-align:middle; padding:8px;">
@@ -752,7 +759,7 @@ function renderAdminBannersTable() {
     }
     tbody.innerHTML = banners.map((b, i) => {
         const previewHtml = b.image 
-            ? `<img src="${b.image.startsWith('http') ? b.image : '/' + b.image}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;border:1px solid var(--border);">` 
+            ? `<img src="${resolveImageUrl(b.image)}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;border:1px solid var(--border);">` 
             : `<span style="font-size:12px;color:#888;padding:6px;border:1px dashed var(--border);border-radius:6px;">بدون صورة (${b.theme})</span>`;
 
         return `
