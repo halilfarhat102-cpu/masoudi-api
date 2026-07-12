@@ -242,8 +242,11 @@ function buildPlayerCard(p) {
     const statusIcon = isActive ? 'fa-solid fa-circle' : 'fa-solid fa-circle-minus';
     const txHtml   = buildMiniTx(p.transactions || []);
     
-    const avatarContent = p.photoUrl 
-        ? `<img src="${p.photoUrl}" referrerpolicy="no-referrer" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerText='${initial}';">`
+    // Use wsrv.nl proxy to bypass Google photo CORS/referrer restrictions in WebView
+    const rawPhoto = p.photoUrl || '';
+    const proxyPhoto = rawPhoto ? `https://wsrv.nl/?url=${encodeURIComponent(rawPhoto)}&w=80&h=80&fit=cover&mask=circle` : '';
+    const avatarContent = proxyPhoto
+        ? `<img src="${proxyPhoto}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.src=''; this.style.display='none'; this.parentElement.innerText='${initial}'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center';">`
         : initial;
 
     return `
