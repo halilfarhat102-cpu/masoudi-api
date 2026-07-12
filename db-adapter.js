@@ -42,3 +42,22 @@ export async function writeDb(db) {
     throw error;
   }
 }
+
+let dbPromise = Promise.resolve();
+
+export async function runTransaction(fn) {
+  const current = dbPromise;
+  let resolveLock;
+  dbPromise = new Promise(resolve => { resolveLock = resolve; });
+  await current;
+  try {
+    const db = await readDb();
+    const updatedDb = await fn(db);
+    if (updatedDb) {
+      await writeDb(updatedDb);
+    }
+    return updatedDb;
+  } finally {
+    resolveLock();
+  }
+}

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { readDb, writeDb } from './db-adapter.js';
+import { readDb, writeDb, runTransaction } from './db-adapter.js';
 import crypto from 'crypto';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -160,20 +160,22 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
-        const payload = JSON.parse(body); // { id, amount, type }
+        const payload = JSON.parse(body);
+        let resultPlayer = null;
+        let errorMsg = null;
 
-        if (!db.players) db.players = [];
-        let player = db.players.find(p => p.id === payload.id);
-        if (player) {
-          // ✔️ Enforce deduction check: only allow negative balance change if type is gameplay related
+        await runTransaction(async (db) => {
+          if (!db.players) db.players = [];
+          let player = db.players.find(p => p.id === payload.id);
+          if (!player) {
+            errorMsg = 'Player not found';
+            return db;
+          }
           if (payload.amount < 0) {
             const isGameplay = /لعب|game|play|slots|roulette|spin|wheel|blackjack|bet/i.test(payload.type || '');
             if (!isGameplay) {
-              res.statusCode = 400;
-              res.end(JSON.stringify({ error: 'لا يمكن خصم عملات من الحساب إلا في حالة لعب الألعاب فقط' }));
-              return;
+              errorMsg = 'لا يمكن خصم عملات من الحساب إلا في حالة لعب الألعاب فقط';
+              return db;
             }
           }
           player.balance = (player.balance || 0) + payload.amount;
@@ -183,13 +185,18 @@ export async function apiMiddleware(req, res, next) {
             amount: payload.amount,
             date: new Date().toLocaleTimeString('ar')
           });
-          await writeDb(db);
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify(player));
-        } else {
-          res.statusCode = 404;
-          res.end(JSON.stringify({ error: 'Player not found' }));
+          resultPlayer = player;
+          return db;
+        });
+
+        if (errorMsg) {
+          res.statusCode = errorMsg.includes('not found') ? 404 : 400;
+          res.end(JSON.stringify({ error: errorMsg }));
+          return;
         }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(resultPlayer));
       } catch (e) {
         res.statusCode = 500;
         res.end(JSON.stringify({ error: e.message }));
@@ -791,8 +798,6 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken;
@@ -803,66 +808,73 @@ export async function apiMiddleware(req, res, next) {
         const txId = payload.transaction_id || payload.txid || payload.bet_id || ('TX-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
 
-        if (!db.players) db.players = [];
+        let resultBalance = 0;
+        let resultPlayerId = '';
+        let errorMsg = null;
+        let isDuplicate = false;
 
-        let player = null;
-        if (token) player = db.players.find(p => p.sessionToken === token);
-        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+        await runTransaction(async (db) => {
+          if (!db.players) db.players = [];
+          let player = null;
+          if (token) player = db.players.find(p => p.sessionToken === token);
+          if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
 
-        if (!player) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
-        }
+          if (!player) {
+            errorMsg = 'Player not found';
+            return db;
+          }
 
-        // Convert to internal coin units (multiply by 100)
-        const amountCoins = Math.round(amountRaw * 100);
+          if (!db.processedTxIds) db.processedTxIds = [];
+          if (db.processedTxIds.includes(txId)) {
+            isDuplicate = true;
+            resultBalance = player.balance || 0;
+            resultPlayerId = player.id;
+            return db;
+          }
 
-        // Check for duplicate transaction
-        if (!db.processedTxIds) db.processedTxIds = [];
-        if (db.processedTxIds.includes(txId)) {
-          // Idempotent: return current balance without re-processing
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({
-            code: 1,
-            msg: 'duplicate_ignored',
-            balance: ((player.balance || 0) / 100).toFixed(2),
-            transaction_id: txId
-          }));
-        }
+          // Convert to internal coin units (multiply by 100)
+          const amountCoins = Math.round(amountRaw * 100);
+          const isDebit = amountCoins < 0;
+          const absAmount = Math.abs(amountCoins);
 
-        // Determine debit or credit
-        // Negative amount = deduct (bet), positive = add (win/refund)
-        const isDebit = amountCoins < 0;
-        const absAmount = Math.abs(amountCoins);
+          if (isDebit && (player.balance || 0) < absAmount) {
+            errorMsg = 'Insufficient balance';
+            resultBalance = player.balance || 0;
+            return db;
+          }
 
-        if (isDebit && (player.balance || 0) < absAmount) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Insufficient balance', balance: ((player.balance || 0) / 100).toFixed(2) }));
-        }
+          player.balance = (player.balance || 0) + amountCoins;
+          if (player.balance < 0) player.balance = 0;
 
-        player.balance = (player.balance || 0) + amountCoins;
-        if (player.balance < 0) player.balance = 0;
+          if (!player.transactions) player.transactions = [];
+          player.transactions.push({
+            type: amountCoins < 0 ? `رهان — ${gameName}` : `فوز — ${gameName}`,
+            amount: amountCoins,
+            txId: txId,
+            date: new Date().toLocaleTimeString('ar')
+          });
 
-        if (!player.transactions) player.transactions = [];
-        player.transactions.push({
-          type: amountCoins < 0 ? `رهان — ${gameName}` : `فوز — ${gameName}`,
-          amount: amountCoins,
-          txId: txId,
-          date: new Date().toLocaleTimeString('ar')
+          // Mark transaction as processed
+          db.processedTxIds.push(txId);
+          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+
+          resultBalance = player.balance;
+          resultPlayerId = player.id;
+          return db;
         });
 
-        // Mark transaction as processed
-        db.processedTxIds.push(txId);
-        if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+        if (errorMsg) {
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: (resultBalance / 100).toFixed(2) }));
+        }
 
-        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           code: 1,
-          msg: 'success',
-          balance: ((player.balance || 0) / 100).toFixed(2),
+          msg: isDuplicate ? 'duplicate_ignored' : 'success',
+          balance: (resultBalance / 100).toFixed(2),
           transaction_id: txId,
-          player_id: player.id
+          player_id: resultPlayerId
         }));
       } catch (e) {
         res.statusCode = 500;
