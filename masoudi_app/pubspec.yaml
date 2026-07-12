@@ -37,7 +37,13 @@ dependencies:
   http: ^1.6.0
   webview_flutter: ^4.14.0
   google_fonts: ^8.1.0
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  google_sign_in: ^6.2.1
   url_launcher: ^6.3.2
+  font_awesome_flutter: ^10.8.0
+  cached_network_image: ^3.3.1
+
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +69,12 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/images/nav_home.png
+    - assets/images/nav_wallet.png
+    - assets/images/nav_profile.png
+    - assets/images/fox_mascot.png
+    - assets/images/fox_fab.png
+    - assets/images/fox_login.png
     - assets/game/
 
   # An image asset can refer to one or more resolution-specific "variants", see

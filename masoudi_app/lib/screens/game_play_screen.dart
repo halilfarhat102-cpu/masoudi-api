@@ -73,6 +73,15 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
     } else {
       _controller.loadRequest(Uri.parse(secureUrl));
     }
+
+    // Failsafe: force hide the loading overlay after 1.5 seconds if it gets stuck
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted && _isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   @override
