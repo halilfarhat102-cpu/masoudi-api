@@ -946,8 +946,20 @@ function addNewAgent() {
     const playerId = document.getElementById('newAgentPlayerId')?.value?.trim() || null;
     const countries = _agentSelectedCountries.slice(); // array copy
 
-    if (!name || countries.length === 0 || !phone || !payments || !rate) {
-        return showToast('يرجى ملء جميع حقول وكيل الشحن (واختيار دولة واحدة على الأقل)', 'error');
+    if (!name) {
+        return showToast('يرجى إدخال اسم الوكيل ⚠️', 'error');
+    }
+    if (countries.length === 0) {
+        return showToast('يرجى اختيار دولة واحدة على الأقل من القائمة المنسدلة! ⚠️', 'error');
+    }
+    if (!phone) {
+        return showToast('يرجى إدخال رقم هاتف الوكيل ⚠️', 'error');
+    }
+    if (!payments) {
+        return showToast('يرجى إدخال طرق الدفع المقبولة ⚠️', 'error');
+    }
+    if (!rate) {
+        return showToast('يرجى إدخال سعر الصرف للوكيل ⚠️', 'error');
     }
 
     const id = `agent-${Date.now()}`;
