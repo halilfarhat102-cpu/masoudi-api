@@ -38,6 +38,18 @@ window.triggerImageUpload = triggerImageUpload;
 
 // ─── Bootstrap ───────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize language-specific direction
+    const lang = localStorage.getItem('admin_lang') || 'ar';
+    document.body.style.direction = (lang === 'en') ? 'ltr' : 'rtl';
+    const toggleBtn = document.getElementById('langToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.innerHTML = (lang === 'en') ? '🌐 العربية' : '🌐 English';
+    }
+    
+    // 2. Start MutationObserver for translating dynamically rendered templates
+    initTranslationObserver();
+
+    // 3. Initialize header and load data
     initAdminHeader();
     loadData();
 });
@@ -1373,6 +1385,229 @@ async function handleReceiptAction(receiptId, action) {
     }
 }
 window.handleReceiptAction = handleReceiptAction;
+
+// ─── Translations (Arabic <-> English) ───────────────────
+const adminTranslations = {
+    en: {
+        "بوابة التحكم الإدارية": "Admin Control Portal",
+        "منصة مسعودي للألعاب — الإصدار 2.0": "Masoudi Gaming Platform — v2.0",
+        "كلمة المرور": "Password",
+        "مشرف جديد": "New Admin",
+        "خروج": "Logout",
+        "إجمالي اللاعبين": "Total Players",
+        "نشطون": "Active Players",
+        "إجمالي الأرصدة": "Total Balances",
+        "إدارة اللاعبين": "Players",
+        "مزودات الـ API": "API Providers",
+        "ألعاب المنصة": "Games List",
+        "إعدادات التطبيق": "App Settings",
+        "وكلاء الشحن": "Recharge Agents",
+        "وكلاء التطبيق (P2P)": "P2P Agents",
+        "بوابات الشحن 🇪🇬": "Gateways 🇪🇬",
+        "إيصالات الشحن 🧾": "Receipts 🧾",
+        "قائمة اللاعبين المسجلين في التطبيق": "Registered Players",
+        "إضافة لاعب جديد": "Add New Player",
+        "بحث عن لاعب بالاسم أو البريد أو المعرف...": "Search players by name, email or ID...",
+        "كل الحالات": "All Statuses",
+        "نشط": "Active",
+        "محظور": "Blocked",
+        "موثق": "Verified",
+        "غير موثق": "Unverified",
+        "تعديل الرصيد": "Edit Balance",
+        "تصفير": "Reset",
+        "حظر": "Block",
+        "تنشيط": "Activate",
+        "حذف": "Delete",
+        "شحن وكيل": "Agent Recharge",
+        "ترقية لوكيل": "Promote to Agent",
+        "تخفيض لاعب": "Demote to Player",
+        "إدارة مزودات الـ API": "API Providers Management",
+        "إضافة مزود جديد": "Add New Provider",
+        "إدارة ألعاب المنصة": "Platform Games Management",
+        "إضافة لعبة جديدة": "Add New Game",
+        "إعدادات التطبيق العامة": "General App Settings",
+        "تحديث خيارات العرض والوضع التجريبي": "Update Display & Demo Options",
+        "تفعيل الوضع التجريبي": "Enable Demo/Preview Mode",
+        "نص زر التشغيل": "Play Button Text",
+        "إظهار الرصيد للاعبين": "Show Player Balance",
+        "إظهار شارة البث المباشر": "Show Live Badge",
+        "حفظ الإعدادات": "Save Settings",
+        "إدارة البنرات الإعلانية": "Promotional Banners Management",
+        "إضافة بنر جديد": "Add New Banner",
+        "إدارة وكلاء الشحن": "Recharge Agents Management",
+        "إضافة وكيل شحن جديد": "Add New Recharge Agent",
+        "إدارة وكلاء التطبيق (P2P)": "P2P Agents Management",
+        "طلبات شحن وتفعيل وكلاء P2P": "P2P Agent Requests & Activation",
+        "إدارة بوابات الشحن المباشر": "Direct Payment Gateways Management",
+        "إضافة بوابة دفع جديدة": "Add New Gateway",
+        "مراجعة إيصالات شحن اللاعبين": "Review Player Recharge Receipts",
+        "الإيصال": "Receipt",
+        "اللاعب": "Player",
+        "القيمة": "Amount",
+        "تفاصيل التحويل": "Details",
+        "تاريخ الطلب": "Request Date",
+        "تغيير كلمة المرور": "Change Password",
+        "إضافة مشرف جديد": "Add New Admin",
+        "التبويبات المسموحة للمشرف العادي": "Allowed Tabs for Normal Admin",
+        "الاسم الظاهر": "Display Name",
+        "اسم المستخدم": "Username",
+        "معرف حساب اللاعب للربط (اختياري)": "Link Player Account ID (Optional)",
+        "تأكيد حذف اللعبة": "Confirm Game Deletion",
+        "تأكيد حذف البنر": "Confirm Banner Deletion",
+        "تأكيد حذف الوكيل": "Confirm Agent Deletion",
+        "الاسم": "Name",
+        "معرف الحساب (ID)": "Account ID",
+        "البريد الإلكتروني": "Email Address",
+        "الرصيد الرئيسي": "Main Balance",
+        "رصيد الوكيل": "Agent Balance",
+        "تاريخ الانضمام": "Join Date",
+        "الإجراءات": "Actions",
+        "تصفير الرصيد": "Reset Balance",
+        "حذف الحساب": "Delete Account",
+        "إيقاف الحساب": "Block Account",
+        "تفعيل الحساب": "Activate Account",
+        "إضافة رصيد": "Add Balance",
+        "خصم رصيد": "Deduct Balance",
+        "المبلغ": "Amount",
+        "ترقية لوكيل شحن": "Promote to Agent",
+        "تخفيض لوضع لاعب": "Demote to Player",
+        "شحن رصيد وكالة": "Recharge Agent Balance",
+        "سجل معاملات اللاعب (آخر 10 عمليات)": "Player Transaction History (Last 10)",
+        "نوع العملية": "Transaction Type",
+        "التاريخ والوقت": "Date & Time",
+        "لا توجد معاملات مسجلة": "No transactions registered",
+        "اسم الشركة": "Provider Name",
+        "رابط الـ Endpoint (سيرفر الـ API)": "API Server Endpoint URL",
+        "رمز الشريك (Partner Code)": "Partner Code",
+        "مفتاح المرور (Secret Key)": "Secret Key",
+        "عنوان اللعبة": "Game Title",
+        "فئة اللعبة": "Category",
+        "الشركة المزودة": "Provider",
+        "رابط تشغيل اللعبة (Launch URL)": "Launch URL",
+        "صورة اللعبة": "Game Cover Image",
+        "تفعيل الوضع التجريبي (Preview Mode)": "Enable Demo/Preview Mode",
+        "إظهار شارة البث المباشر (Live Badge)": "Show Live Badge",
+        "نص زر التشغيل الافتراضي": "Default Play Button Text",
+        "سعر شراء الكوينز (مثال: 10000 = 10000 كوينز لكل 1 دولار)": "Coin Buy Rate (e.g. 10000 = 10000 coins per 1 USD)",
+        "سعر بيع الكوينز (مثال: 20000 = 20000 كوينز لكل 1 دولار)": "Coin Sell Rate (e.g. 20000 = 20000 coins per 1 USD)",
+        "عنوان البنر": "Banner Title",
+        "العنوان الفرعي": "Subtitle",
+        "الشارة (Badge)": "Badge Label",
+        "أيقونة البنر": "Banner Icon (Emoji)",
+        "خلفية البنر (صورة)": "Banner Background Image",
+        "إدارة وكلاء الشحن المباشر": "Recharge Agents Management",
+        "اسم الوكيل": "Agent Name",
+        "الدولة والرمز": "Country & Code",
+        "رقم هاتف الوكيل (WhatsApp)": "Agent Phone Number (WhatsApp)",
+        "طرق الدفع المدعومة": "Supported Payment Methods",
+        "سعر الصرف الخاص بالوكيل": "Agent Exchange Rate",
+        "ربط الوكيل بحساب لاعب (ID)": "Link Agent to Player ID",
+        "اسم اللاعب": "Player Name",
+        "رصيد الوكالة (P2P)": "Agency Balance (P2P)",
+        "شحن كوينز الوكالة": "Recharge Agency Coins",
+        "إرسال كوينز": "Send Coins",
+        "إلغاء التفعيل": "Deactivate",
+        "تفعيل وكيل P2P جديد": "Activate New P2P Agent",
+        "تكوين بوابات الدفع الإلكتروني في مصر": "Configure Electronic Payment Gateways (Egypt)",
+        "رقم المحفظة": "Wallet Number",
+        "الاسم الكامل": "Full Name",
+        "معرف حساب إنستا باي": "Instapay Account Address",
+        "رقم الحساب البنكي": "Bank Account Number",
+        "اسم البنك": "Bank Name",
+        "اسم المستفيد": "Beneficiary Name",
+        "تحديث البوابات": "Update Gateways",
+        "خيارات أسعار الشحن السريع": "Quick Pricing Packages Settings",
+        "إضافة باقة شحن": "Add Recharge Package",
+        "المبلغ بالجنيه المصري": "Amount in EGP",
+        "الكوينز المقابلة": "Equivalent Coins",
+        "شارة الباقة": "Package Badge",
+        "القيمة (جنيه مصري)": "Amount (EGP)",
+        "مقبول": "Approved",
+        "مرفوض": "Rejected",
+        "قيد الانتظار": "Pending",
+        "قبول": "Approve",
+        "رفض": "Reject",
+        "إجراء سريع على المحفظة (شحن)": "Quick Wallet Action (Recharge)",
+        "كلمة المرور الحالية": "Current Password",
+        "كلمة المرور الجديدة": "New Password",
+        "تأكيد كلمة المرور الجديدة": "Confirm New Password",
+        "تغيير": "Change",
+        "مشرف عادي": "Normal Admin",
+        "مشرف عام": "Super Admin",
+        "لا يوجد لاعبون مطابقون": "No matching players found",
+        "لا توجد شركات مزودة": "No API providers found",
+        "لا توجد ألعاب مضافة": "No games added",
+        "لا توجد بنرات إعلانية نشطة حالياً": "No active banners found",
+        "لا يوجد وكلاء شحن مضافين حالياً": "No recharge agents added",
+        "لا يوجد لاعبون مفعلون كوكلاء شحن حالياً": "No P2P agents active",
+        "لا توجد إيصال شحن مرسلة حالياً": "No recharge receipts received"
+    }
+};
+
+function translateDOM(root = document.body) {
+    const lang = localStorage.getItem('admin_lang') || 'ar';
+    if (lang === 'ar') return;
+
+    const dict = adminTranslations.en;
+    
+    function walk(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const trimmed = node.nodeValue.trim();
+            if (trimmed && dict[trimmed]) {
+                const startSpace = node.nodeValue.match(/^\s*/)[0];
+                const endSpace = node.nodeValue.match(/\s*$/)[0];
+                node.nodeValue = startSpace + dict[trimmed] + endSpace;
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.placeholder) {
+                const trimmedPlaceholder = node.placeholder.trim();
+                if (dict[trimmedPlaceholder]) {
+                    node.placeholder = dict[trimmedPlaceholder];
+                }
+            }
+            if (node.tagName === 'INPUT' && (node.type === 'button' || node.type === 'submit')) {
+                const trimmedValue = node.value.trim();
+                if (dict[trimmedValue]) {
+                    node.value = dict[trimmedValue];
+                }
+            }
+            for (let child of node.childNodes) {
+                walk(child);
+            }
+        }
+    }
+    walk(root);
+}
+
+function initTranslationObserver() {
+    const lang = localStorage.getItem('admin_lang') || 'ar';
+    if (lang === 'ar') return;
+
+    translateDOM(document.body);
+
+    const observer = new MutationObserver((mutations) => {
+        for (let mutation of mutations) {
+            for (let node of mutation.addedNodes) {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    translateDOM(node);
+                }
+            }
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+function toggleLanguage() {
+    const current = localStorage.getItem('admin_lang') || 'ar';
+    const next = (current === 'en') ? 'ar' : 'en';
+    localStorage.setItem('admin_lang', next);
+    window.location.reload();
+}
+window.toggleLanguage = toggleLanguage;
 
 // Expose functions globally for inline HTML onclick handlers
 Object.assign(window, {
