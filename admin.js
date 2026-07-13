@@ -182,6 +182,7 @@ async function doAddAdmin() {
                 if (el) el.value = ''; 
             });
             showToast(`تم إنشاء حساب المشرف "${username}" بنجاح`);
+            await loadData(); // Refresh table immediately
         } else {
             showToast(data.error || 'فشل إنشاء الحساب', 'error');
         }
@@ -1714,7 +1715,7 @@ function renderAdminsTable() {
 }
 
 async function deleteAdmin(adminId) {
-    if (!confirm(t('تأكيد حذف المشرف'))) return;
+    if (!confirm('هل تريد حذف هذا المشرف؟ لا يمكن التراجع عن هذا الإجراء.')) return;
     try {
         const res = await fetch(API_BASE + '/api/admin-delete', {
             method: 'POST',
@@ -1724,9 +1725,9 @@ async function deleteAdmin(adminId) {
         const data = await res.json();
         if (data.success) {
             showToast('تم حذف المشرف بنجاح ✅');
-            loadData();
+            await loadData(); // Refresh table
         } else {
-            showToast(data.error || 'فشل حذف المشرف', 'error');
+            showToast(data.error || 'فشل حذف المشرف — تأكد من أن لديك صلاحية مشرف عام', 'error');
         }
     } catch (e) {
         showToast('خطأ في الاتصال بالخادم', 'error');
