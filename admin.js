@@ -424,6 +424,11 @@ function switchTab(id) {
         return onclickAttr.includes(`'${id}'`) || onclickAttr.includes(`"${id}"`);
     });
     if (clickedTab) clickedTab.classList.add('active');
+
+    // Close mobile sidebar drawer if open
+    if (typeof window.toggleSidebar === 'function') {
+        window.toggleSidebar(false);
+    }
 }
 
 // ─── Toggle Add Player Form ──────────────────
