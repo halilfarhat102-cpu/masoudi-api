@@ -1453,6 +1453,14 @@
                         <h4 class="menu-card-title">إدارة المشرفين</h4>
                         <p class="menu-card-desc">إضافة وتعديل صلاحيات المشرفين</p>
                     </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-game-config')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #E040FB, #651FFF);">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <h4 class="menu-card-title">تعديل محرك الألعاب</h4>
+                        <p class="menu-card-desc">نسب الربح والرهان والتحكم</p>
+                    </div>
                 </div>
             </div>
 
@@ -1543,6 +1551,135 @@
                     </div>
                     <p>مرحباً بك في لوحة تحكم منصة مسعودي للألعاب. تم تحسين اللوحة بالكامل لتكون مرنة وسريعة وسهلة الاستخدام عبر الهواتف المحمولة والكمبيوتر لمتابعة إحصائيات النظام وإدارة الألعاب والمشرفين.</p>
                 </div>
+            </div>
+
+            <!-- ═══════════════ TAB: GAME CONFIG ═══════════════ -->
+            <div id="tab-game-config" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
+                <div class="section-header-row" style="margin-bottom:20px;">
+                    <h3><i class="fa-solid fa-screwdriver-wrench" style="color:var(--orange);margin-left:8px;"></i>تعديل محرك الألعاب</h3>
+                </div>
+
+                <div class="glass-card" style="padding:20px; border-radius:16px; margin-bottom:20px;">
+                    <label style="font-size:12px; color:#888; display:block; margin-bottom:8px;">اختر اللعبة المراد تعديل إعداداتها</label>
+                    <select id="gameConfigSelector" onchange="window.switchGameConfigView(this.value)" style="width:100%; background:rgba(0,0,0,0.4); border:1.5px solid var(--border); border-radius:12px; padding:11px 14px; color:#fff; font-family:'Cairo',sans-serif; font-size:14px; outline:none; margin-bottom:15px;">
+                        <option value="bigfarm">لعبة مزرعة الحيوانات (Big Farm)</option>
+                        <option value="fruit_slots">سلوت الفواكه (Fruit Slots)</option>
+                        <option value="fortune_gems">سلوت الجواهر (Fortune Gems)</option>
+                    </select>
+
+                    <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:15px 0;">
+
+                    <!-- Configuration Form for Big Farm -->
+                    <div id="cfg-section-bigfarm" class="game-cfg-section">
+                        <h4 style="font-size:15px; font-weight:800; color:#fff; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                            <span style="width:8px; height:8px; border-radius:50%; background: #FF7A1F;"></span> إعدادات لعبة Big Farm
+                        </h4>
+                        
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:12px; color:#aaa; display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span>نسبة ربح اللاعب (RTP %)</span>
+                                <span id="lblWinRateBigFarm" style="color:var(--orange); font-weight:800;">70%</span>
+                            </label>
+                            <input type="range" id="winRateBigFarm" min="10" max="98" value="70" oninput="document.getElementById('lblWinRateBigFarm').textContent = this.value + '%'" style="width:100%; accent-color:var(--orange); height:6px; background:rgba(255,255,255,0.1); border-radius:10px; cursor:pointer;">
+                            <span style="font-size:10px; color:#666; display:block; margin-top:4px;">النسب المرتفعة تزيد من احتمالية فوز اللاعب في كل لفة.</span>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <div>
+                                <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">الحد الأدنى للرهان (Min Bet)</label>
+                                <input type="number" id="minBetBigFarm" value="500" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; color:#fff;">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">الحد الأقصى للرهان (Max Bet)</label>
+                                <input type="number" id="maxBetBigFarm" value="10000" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; color:#fff;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:15px;">
+                            <label style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none;">
+                                <input type="checkbox" id="activeBigFarm" checked style="accent-color:var(--orange); width:16px; height:16px;">
+                                <span>اللعبة نشطة ومتاحة للاعبين</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Configuration Form for Fruit Slots -->
+                    <div id="cfg-section-fruit_slots" class="game-cfg-section" style="display:none;">
+                        <h4 style="font-size:15px; font-weight:800; color:#fff; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                            <span style="width:8px; height:8px; border-radius:50%; background: #FFD700;"></span> إعدادات لعبة Fruit Slots
+                        </h4>
+                        
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:12px; color:#aaa; display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span>نسبة ربح اللاعب (RTP %)</span>
+                                <span id="lblWinRateFruitSlots" style="color:var(--orange); font-weight:800;">70%</span>
+                            </label>
+                            <input type="range" id="winRateFruitSlots" min="10" max="98" value="70" oninput="document.getElementById('lblWinRateFruitSlots').textContent = this.value + '%'" style="width:100%; accent-color:var(--orange); height:6px; background:rgba(255,255,255,0.1); border-radius:10px; cursor:pointer;">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <div>
+                                <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">الحد الأدنى للرهان</label>
+                                <input type="number" id="minBetFruitSlots" value="100" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; color:#fff;">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">الحد الأقصى للرهان</label>
+                                <input type="number" id="maxBetFruitSlots" value="5000" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; color:#fff;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:15px;">
+                            <label style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none;">
+                                <input type="checkbox" id="activeFruitSlots" checked style="accent-color:var(--orange); width:16px; height:16px;">
+                                <span>اللعبة نشطة ومتاحة للاعبين</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Configuration Form for Fortune Gems -->
+                    <div id="cfg-section-fortune_gems" class="game-cfg-section" style="display:none;">
+                        <h4 style="font-size:15px; font-weight:800; color:#fff; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                            <span style="width:8px; height:8px; border-radius:50%; background: #10B981;"></span> إعدادات لعبة Fortune Gems
+                        </h4>
+                        
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:12px; color:#aaa; display:flex; justify-content:space-between; margin-bottom:8px;">
+                                <span>نسبة ربح اللاعب (RTP %)</span>
+                                <span id="lblWinRateFortuneGems" style="color:var(--orange); font-weight:800;">70%</span>
+                            </label>
+                            <input type="range" id="winRateFortuneGems" min="10" max="98" value="70" oninput="document.getElementById('lblWinRateFortuneGems').textContent = this.value + '%'" style="width:100%; accent-color:var(--orange); height:6px; background:rgba(255,255,255,0.1); border-radius:10px; cursor:pointer;">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                            <div>
+                                <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">الحد الأدنى للرهان</label>
+                                <input type="number" id="minBetFortuneGems" value="100" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; color:#fff;">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; color:#888; display:block; margin-bottom:6px;">الحد الأقصى للرهان</label>
+                                <input type="number" id="maxBetFortuneGems" value="5000" style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; color:#fff;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:15px;">
+                            <label style="font-size:12px; color:#aaa; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none;">
+                                <input type="checkbox" id="activeFortuneGems" checked style="accent-color:var(--orange); width:16px; height:16px;">
+                                <span>اللعبة نشطة ومتاحة للاعبين</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn-action" onclick="window.saveGameConfigs()" style="width:100%; padding:12px; font-size:14px; font-weight:800; margin-top:10px;">
+                        <i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات وحفظ محرك الألعاب
+                    </button>
+                </div>
+            </div>
+
             </div>
 
             <!-- ═══════════════ TAB: PLAYERS ═══════════════ -->

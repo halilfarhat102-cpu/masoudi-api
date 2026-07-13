@@ -360,12 +360,40 @@ function spin() {
     document.getElementById('decor-pizza')?.classList.remove('winner-flash-bubble');
     document.getElementById('decor-salad')?.classList.remove('winner-flash-bubble');
 
-    // Winning index calculation: every 50 rounds, give pizza (8) or salad (9)
+    // Read win rate config from localStorage (default to 70% if not found)
+    let winRate = 70;
+    try {
+        const localCfg = JSON.parse(localStorage.getItem('masoudi_game_config_bigfarm'));
+        if (localCfg && localCfg.winRate !== undefined) {
+            winRate = parseInt(localCfg.winRate, 10);
+        }
+    } catch(e) {}
+
+    // Decide if this spin should be a WIN or LOSS based on the winRate probability
+    const shouldWin = (Math.random() * 100) < winRate;
+
+    // Filter available indexes (0-9)
+    const bettedIndexes = Object.keys(selectedBets).map(Number); // indexes the player betted on
+    const allIndexes = [0,1,2,3,4,5,6,7,8,9];
+    const nonBettedIndexes = allIndexes.filter(i => !bettedIndexes.includes(i));
+
     let winningIndex;
-    if (roundNumber % 50 === 0) {
-        winningIndex = Math.random() < 0.5 ? 8 : 9;
+    if (bettedIndexes.length > 0) {
+        if (shouldWin) {
+            // Player should win: select one of the betted indexes
+            winningIndex = bettedIndexes[Math.floor(Math.random() * bettedIndexes.length)];
+        } else {
+            // Player should lose: select one of the non-betted indexes
+            if (nonBettedIndexes.length > 0) {
+                winningIndex = nonBettedIndexes[Math.floor(Math.random() * nonBettedIndexes.length)];
+            } else {
+                // If they bet on everything, select a random one
+                winningIndex = Math.floor(Math.random() * 10);
+            }
+        }
     } else {
-        winningIndex = Math.floor(Math.random() * 8); // only standard slots 0 to 7
+        // No bets placed: random spin
+        winningIndex = Math.floor(Math.random() * 10);
     }
     
     const winningSlot = animalSlots[winningIndex];
@@ -997,3 +1025,21 @@ window.addEventListener('DOMContentLoaded', () => {
     initGrid();
     updateUI();
 });
+
+
+// ─── Auto Sync Game Config from Server on Game Load ───
+async function loadGameConfigFromServer() {
+    try {
+        const res = await fetch('/api/data');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.settings && data.settings.gameConfigs && data.settings.gameConfigs.bigfarm) {
+                const config = data.settings.gameConfigs.bigfarm;
+                localStorage.setItem('masoudi_game_config_bigfarm', JSON.stringify(config));
+            }
+        }
+    } catch(e) {
+        console.warn("Failed to fetch game config from server, falling back to local storage:", e);
+    }
+}
+loadGameConfigFromServer();

@@ -247,6 +247,7 @@ async function loadData() {
         admins       = JSON.parse(localStorage.getItem('masoudi_admins'))       || [];
     }
     initSettingsUI();
+    initGameConfigsUI();
     renderAll();
 }
 
@@ -1930,3 +1931,97 @@ export {
     deactivateP2pAgent,
     deleteAdmin
 };
+
+// ─── Game Engine Configurations Management ───
+function initGameConfigsUI() {
+    const configs = settings.gameConfigs || {};
+
+    // Big Farm
+    const bf = configs.bigfarm || { winRate: 70, minBet: 500, maxBet: 10000, active: true };
+    const winRateBf = document.getElementById('winRateBigFarm');
+    if (winRateBf) {
+        winRateBf.value = bf.winRate;
+        document.getElementById('lblWinRateBigFarm').textContent = bf.winRate + '%';
+    }
+    const minBf = document.getElementById('minBetBigFarm');
+    if (minBf) minBf.value = bf.minBet;
+    const maxBf = document.getElementById('maxBetBigFarm');
+    if (maxBf) maxBf.value = bf.maxBet;
+    const actBf = document.getElementById('activeBigFarm');
+    if (actBf) actBf.checked = bf.active;
+
+    // Fruit Slots
+    const fs = configs.fruit_slots || { winRate: 70, minBet: 100, maxBet: 5000, active: true };
+    const winRateFs = document.getElementById('winRateFruitSlots');
+    if (winRateFs) {
+        winRateFs.value = fs.winRate;
+        document.getElementById('lblWinRateFruitSlots').textContent = fs.winRate + '%';
+    }
+    const minFs = document.getElementById('minBetFruitSlots');
+    if (minFs) minFs.value = fs.minBet;
+    const maxFs = document.getElementById('maxBetFruitSlots');
+    if (maxFs) maxFs.value = fs.maxBet;
+    const actFs = document.getElementById('activeFruitSlots');
+    if (actFs) actFs.checked = fs.active;
+
+    // Fortune Gems
+    const fg = configs.fortune_gems || { winRate: 70, minBet: 100, maxBet: 5000, active: true };
+    const winRateFg = document.getElementById('winRateFortuneGems');
+    if (winRateFg) {
+        winRateFg.value = fg.winRate;
+        document.getElementById('lblWinRateFortuneGems').textContent = fg.winRate + '%';
+    }
+    const minFg = document.getElementById('minBetFortuneGems');
+    if (minFg) minFg.value = fg.minBet;
+    const maxFg = document.getElementById('maxBetFortuneGems');
+    if (maxFg) maxFg.value = fg.maxBet;
+    const actFg = document.getElementById('activeFortuneGems');
+    if (actFg) actFg.checked = fg.active;
+}
+
+function switchGameConfigView(gameId) {
+    document.querySelectorAll('.game-cfg-section').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    const target = document.getElementById('cfg-section-' + gameId);
+    if (target) target.style.display = 'block';
+}
+window.switchGameConfigView = switchGameConfigView;
+
+async function saveGameConfigs() {
+    const configs = {
+        bigfarm: {
+            winRate: parseInt(document.getElementById('winRateBigFarm')?.value || '70', 10),
+            minBet: parseInt(document.getElementById('minBetBigFarm')?.value || '500', 10),
+            maxBet: parseInt(document.getElementById('maxBetBigFarm')?.value || '10000', 10),
+            active: document.getElementById('activeBigFarm')?.checked === true
+        },
+        fruit_slots: {
+            winRate: parseInt(document.getElementById('winRateFruitSlots')?.value || '70', 10),
+            minBet: parseInt(document.getElementById('minBetFruitSlots')?.value || '100', 10),
+            maxBet: parseInt(document.getElementById('maxBetFruitSlots')?.value || '5000', 10),
+            active: document.getElementById('activeFruitSlots')?.checked === true
+        },
+        fortune_gems: {
+            winRate: parseInt(document.getElementById('winRateFortuneGems')?.value || '70', 10),
+            minBet: parseInt(document.getElementById('minBetFortuneGems')?.value || '100', 10),
+            maxBet: parseInt(document.getElementById('maxBetFortuneGems')?.value || '5000', 10),
+            active: document.getElementById('activeFortuneGems')?.checked === true
+        }
+    };
+
+    settings.gameConfigs = configs;
+
+    try {
+        await saveData();
+        showToast('تم حفظ تعديلات محرك الألعاب بنجاح');
+        
+        // Write to local storage for instant sync in current browser window
+        Object.keys(configs).forEach(gameId => {
+            localStorage.setItem('masoudi_game_config_' + gameId, JSON.stringify(configs[gameId]));
+        });
+    } catch(e) {
+        showToast('فشل حفظ التعديلات', 'error');
+    }
+}
+window.saveGameConfigs = saveGameConfigs;
