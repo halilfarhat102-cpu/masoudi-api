@@ -20,6 +20,9 @@
             --border: rgba(255,122,31,0.18);
         }
 
+        html {
+            scrollbar-gutter: stable;
+        }
         body {
             margin: 0;
             padding: 0;
@@ -405,10 +408,10 @@
 
         /* ─── Premium Stats Grid ─── */
         .premium-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
         }
 
         .premium-stat-card {
@@ -521,17 +524,7 @@
         }
 
         /* Responsive Breakpoints for Stats Grid */
-        @media (max-width: 991px) {
-            .premium-stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
         @media (max-width: 576px) {
-            .premium-stats-grid {
-                grid-template-columns: 1fr; /* Stack vertically on phones */
-                gap: 12px;
-            }
             .admin-hub-actions {
                 flex-direction: column;
                 gap: 8px;
@@ -548,29 +541,27 @@
             }
         }
 
-        /* ─── Grid Menu on Home Page ─── */
+        /* ─── Menu on Home Page (Vertical List) ─── */
         .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */
-            gap: 20px;
-            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
         }
 
         .menu-card {
             background: linear-gradient(135deg, rgba(41,27,21,0.90) 0%, rgba(26,17,13,0.95) 100%);
             border: 1.5px solid var(--border);
-            border-radius: 20px;
-            padding: 24px 16px;
-            text-align: center;
+            border-radius: 16px;
+            padding: 14px 16px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
             position: relative;
             overflow: hidden;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .menu-card::before {
@@ -580,15 +571,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(255,122,31,0.08) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(255,122,31,0.06) 0%, transparent 100%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
         .menu-card:hover {
-            transform: translateY(-6px);
             border-color: var(--orange);
-            box-shadow: 0 10px 25px rgba(255, 122, 31, 0.15);
+            box-shadow: 0 4px 16px rgba(255, 122, 31, 0.15);
+            transform: translateX(-3px);
         }
 
         .menu-card:hover::before {
@@ -596,20 +587,29 @@
         }
 
         .menu-card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             color: #fff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            flex-shrink: 0;
             transition: transform 0.3s ease;
         }
 
         .menu-card:hover .menu-card-icon {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.1);
+        }
+
+        .menu-card-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+            min-width: 0;
         }
 
         .menu-card-title {
@@ -628,36 +628,15 @@
             font-family: 'Cairo', sans-serif;
         }
 
-        @media (max-width: 1200px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(3, 1fr); /* 3 columns on tablet/laptops */
-                gap: 16px;
-            }
+        .menu-card-arrow {
+            color: #555;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: color 0.2s, transform 0.2s;
         }
-
-        /* Responsive Mobile Columns (2 Columns just like user's screenshot) */
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile devices */
-                gap: 12px;
-            }
-            .menu-card {
-                padding: 16px 10px;
-                border-radius: 16px;
-                gap: 8px;
-            }
-            .menu-card-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-                border-radius: 14px;
-            }
-            .menu-card-title {
-                font-size: 13px;
-            }
-            .menu-card-desc {
-                font-size: 10px;
-            }
+        .menu-card:hover .menu-card-arrow {
+            color: var(--orange);
+            transform: translateX(-4px);
         }
 
         /* Responsive Layout Rules */
@@ -730,15 +709,15 @@
             box-shadow: 0 0 14px var(--orange-glow);
         }
 
-        .tab-panel { display: none; padding: 0 15px 30px; }
-        .tab-panel.active { display: block; }
+        .tab-panel { display: none; padding: 0 10px 20px; width: 100%; box-sizing: border-box; }
+        .tab-panel.active { display: flex; flex-direction: column; gap: 12px; }
 
         /* Stats Row */
         .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         .stat-card {
             background: var(--card-bg);
@@ -1139,49 +1118,42 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .control-grid, .form-grid-2 {
+            grid-template-columns: 1fr !important;
+        }
+
         @media (max-width: 600px) {
-            .stats-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            .control-grid, .form-grid-2 {
-                grid-template-columns: 1fr !important;
-            }
             .vip-header {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                gap: 15px;
-                padding: 18px 14px;
+                gap: 10px;
+                padding: 14px 12px;
             }
             .vip-header .profile-section {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                gap: 8px;
-            }
-            .admin-tabs {
-                padding: 0 10px 10px;
                 gap: 6px;
             }
+            .admin-tabs {
+                padding: 0 8px 8px;
+                gap: 5px;
+            }
             .admin-tab {
-                padding: 7px 14px;
+                padding: 6px 12px;
                 font-size: 12px;
             }
             .tab-panel {
-                padding: 0 10px 20px;
+                padding: 0 8px 16px;
             }
             .wallet-action-row {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 10px;
+                gap: 8px;
             }
             .wallet-action-row input {
                 width: 100%;
-            }
-            .player-card-header {
-                padding: 12px 10px;
-                gap: 8px;
             }
             .admin-player-avatar {
                 width: 34px;
@@ -1191,16 +1163,10 @@
             .player-name-admin {
                 font-size: 13px;
             }
-            .player-balance-badge {
-                padding: 3px 8px;
-                font-size: 11px;
-            }
-            /* Table formatting on mobile */
             table th, table td {
-                padding: 8px 6px;
+                padding: 7px 5px;
                 font-size: 11px;
             }
-            
             .desktop-only-meta {
                 display: none !important;
             }
@@ -1215,7 +1181,7 @@
                 padding: 10px 12px;
                 border-radius: 12px;
                 border: 1px solid rgba(255,122,31,0.1);
-                margin: 4px 10px 10px;
+                margin: 4px 8px 10px;
                 cursor: pointer;
             }
             .balance-sub-card {
@@ -1367,102 +1333,137 @@
                 </button>
             </div>
 
+
             <!-- ═══════════════ MAIN GRID NAVIGATION SCREEN ═══════════════ -->
-            <div id="main-grid-screen" style="max-width: 1200px; margin: 0 auto; padding: 10px 0 30px 0;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h2 style="font-size: 24px; font-weight: 900; color: #fff; font-family: 'Cairo', sans-serif; margin: 0;">بوابة التحكم الإدارية</h2>
-                    <p style="font-size: 12px; color: #888; margin-top: 6px; font-family: 'Cairo', sans-serif;">اختر القسم المطلوب لإدارة المنصة</p>
+            <div id="main-grid-screen" style="padding: 10px 0 20px 0;">
+                <div style="margin-bottom: 16px; padding: 0 2px;">
+                    <h2 style="font-size: 20px; font-weight: 900; color: #fff; font-family: 'Cairo', sans-serif; margin: 0;">بوابة التحكم</h2>
+                    <p style="font-size: 11px; color: #666; margin-top: 4px; font-family: 'Cairo', sans-serif;">اختر القسم المطلوب</p>
                 </div>
                 <div class="dashboard-grid">
                     <div class="menu-card" onclick="switchTab('tab-dashboard')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #FF5722, #FF7043);">
                             <i class="fa-solid fa-chart-line"></i>
                         </div>
-                        <h4 class="menu-card-title">الرئيسية</h4>
-                        <p class="menu-card-desc">الإحصائيات والملف الشخصي</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">الرئيسية</h4>
+                            <p class="menu-card-desc">الإحصائيات والملف الشخصي</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-players')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #FF7A1F, #D45A00);">
                             <i class="fa-solid fa-users"></i>
                         </div>
-                        <h4 class="menu-card-title">إدارة اللاعبين</h4>
-                        <p class="menu-card-desc">تعديل الأرصدة والبيانات</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">إدارة اللاعبين</h4>
+                            <p class="menu-card-desc">تعديل الأرصدة والبيانات</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-games')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
                             <i class="fa-solid fa-gamepad"></i>
                         </div>
-                        <h4 class="menu-card-title">ألعاب المنصة</h4>
-                        <p class="menu-card-desc">إضافة وحذف وتعديل الألعاب</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">ألعاب المنصة</h4>
+                            <p class="menu-card-desc">إضافة وحذف وتعديل الألعاب</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-providers')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
                             <i class="fa-solid fa-plug"></i>
                         </div>
-                        <h4 class="menu-card-title">مزودات الـ API</h4>
-                        <p class="menu-card-desc">ربط وتفويض شركات الألعاب</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">مزودات الـ API</h4>
+                            <p class="menu-card-desc">ربط وتفويض شركات الألعاب</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-agents')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">
                             <i class="fa-solid fa-truck-fast"></i>
                         </div>
-                        <h4 class="menu-card-title">وكلاء الشحن</h4>
-                        <p class="menu-card-desc">إدارة وكلاء الشحن المعتمدين</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">وكلاء الشحن</h4>
+                            <p class="menu-card-desc">إدارة وكلاء الشحن المعتمدين</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-p2p')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">
                             <i class="fa-solid fa-user-shield"></i>
                         </div>
-                        <h4 class="menu-card-title">وكلاء التطبيق (P2P)</h4>
-                        <p class="menu-card-desc">تفعيل ومراقبة عملاء P2P</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">وكلاء التطبيق (P2P)</h4>
+                            <p class="menu-card-desc">تفعيل ومراقبة عملاء P2P</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-payment')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #EC4899, #BE185D);">
                             <i class="fa-solid fa-credit-card"></i>
                         </div>
-                        <h4 class="menu-card-title">بوابات الشحن</h4>
-                        <p class="menu-card-desc">تهيئة طرق الدفع والأسعار</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">بوابات الشحن</h4>
+                            <p class="menu-card-desc">تهيئة طرق الدفع والأسعار</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-receipts')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
                             <i class="fa-solid fa-receipt"></i>
                         </div>
-                        <h4 class="menu-card-title">إيصالات الشحن</h4>
-                        <p class="menu-card-desc">مراجعة واعتماد إيصالات الدفع</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">إيصالات الشحن</h4>
+                            <p class="menu-card-desc">مراجعة واعتماد إيصالات الدفع</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-settings')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #6B7280, #4B5563);">
                             <i class="fa-solid fa-gears"></i>
                         </div>
-                        <h4 class="menu-card-title">إعدادات التطبيق</h4>
-                        <p class="menu-card-desc">التحكم في الشاشات والبنرات</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">إعدادات التطبيق</h4>
+                            <p class="menu-card-desc">التحكم في الشاشات والبنرات</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-admins')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">
                             <i class="fa-solid fa-users-gear"></i>
                         </div>
-                        <h4 class="menu-card-title">إدارة المشرفين</h4>
-                        <p class="menu-card-desc">إضافة وتعديل صلاحيات المشرفين</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">إدارة المشرفين</h4>
+                            <p class="menu-card-desc">إضافة وتعديل صلاحيات المشرفين</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
                     <div class="menu-card" onclick="switchTab('tab-game-config')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #E040FB, #651FFF);">
                             <i class="fa-solid fa-screwdriver-wrench"></i>
                         </div>
-                        <h4 class="menu-card-title">تعديل محرك الألعاب</h4>
-                        <p class="menu-card-desc">نسب الربح والرهان والتحكم</p>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">تعديل محرك الألعاب</h4>
+                            <p class="menu-card-desc">نسب الربح والرهان والتحكم</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
                 </div>
             </div>
+
 
 
 
