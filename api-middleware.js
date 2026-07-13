@@ -3,6 +3,7 @@ import { readDb, writeDb, runTransaction } from './db-adapter.js';
 import crypto from 'crypto';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { supabase } from './supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -134,16 +135,41 @@ export async function apiMiddleware(req, res, next) {
         const ext = fileName.split('.').pop() || 'png';
         const safeName = `uploaded_${Date.now()}.${ext}`;
 
-        const imagesDir = resolve(__dirname, 'images');
-        if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
+        // 1. Upload to Supabase Storage images bucket
+        console.log(`Uploading ${safeName} to Supabase Storage...`);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(safeName, fileBuffer, {
+            contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+            upsert: true
+          });
 
-        const savePath = resolve(imagesDir, safeName);
-        fs.writeFileSync(savePath, fileBuffer);
-        const uploadUrl = `images/${safeName}`;
+        if (uploadError) {
+          throw new Error(`Supabase Storage upload failed: ${uploadError.message}`);
+        }
+
+        // Get the permanent public URL
+        const { data: urlData } = supabase.storage
+          .from('images')
+          .getPublicUrl(safeName);
+
+        const uploadUrl = urlData.publicUrl;
+        console.log("Successfully uploaded image to Supabase Storage. URL:", uploadUrl);
+
+        // 2. Save locally as fallback/cache (so local folder is also populated)
+        try {
+          const imagesDir = resolve(__dirname, 'images');
+          if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
+          const savePath = resolve(imagesDir, safeName);
+          fs.writeFileSync(savePath, fileBuffer);
+        } catch (localWriteError) {
+          console.warn("Could not save copy of uploaded image locally:", localWriteError.message);
+        }
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, url: uploadUrl }));
       } catch (e) {
+        console.error("Image upload endpoint error:", e.message);
         res.statusCode = 500;
         res.end(JSON.stringify({ error: e.message }));
       }
