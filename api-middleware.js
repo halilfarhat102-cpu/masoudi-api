@@ -222,7 +222,7 @@ export async function apiMiddleware(req, res, next) {
         await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         
-        const adminEmails = ['halilfarhat102@gmail.com', 'management135790@gmail.com'];
+        const adminEmails = ['halilfarhat102@gmail.com'];
         const isLinkedAdmin = (db.admins || []).some(a => String(a.playerId) === String(player.id));
         const isAdmin = player.isAdmin === true || adminEmails.includes(player.email) || isLinkedAdmin;
         

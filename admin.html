@@ -1729,6 +1729,15 @@
             <h3><i class="fa-solid fa-user-plus" style="margin-left:8px;"></i>إضافة مشرف جديد</h3>
             <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">معرف حساب اللاعب للربط (اختياري)</label>
             <input type="text" id="newAdminPlayerId" placeholder="مثال: 519997" oninput="window.autofillPlayerInfo(this.value)">
+            
+            <!-- Promoted Player Preview Card -->
+            <div id="promotedPlayerPreview" style="display:none; margin-bottom:14px; padding:10px; background:rgba(255,122,31,0.06); border:1px solid rgba(255,122,31,0.15); border-radius:12px; align-items:center; gap:10px;">
+                <img id="promotedPlayerAvatar" src="" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--orange);">
+                <div>
+                    <div id="promotedPlayerName" style="font-size:13px; font-weight:bold; color:#fff; font-family:'Cairo',sans-serif;">-</div>
+                    <div id="promotedPlayerEmail" style="font-size:11px; color:#aaa; font-family:'Cairo',sans-serif;">-</div>
+                </div>
+            </div>
             <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">اسم المستخدم</label>
             <input type="text" id="newAdminUsername" placeholder="مثال: manager1">
             <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">الاسم الظاهر</label>

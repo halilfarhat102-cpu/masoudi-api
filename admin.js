@@ -135,13 +135,31 @@ async function doChangePassword() {
 
 // ─── Autofill Player Info for Promotion ───
 function autofillPlayerInfo(playerId) {
-    if (!playerId) return;
+    const previewEl = document.getElementById('promotedPlayerPreview');
+    const nameEl = document.getElementById('promotedPlayerName');
+    const emailEl = document.getElementById('promotedPlayerEmail');
+    const avatarEl = document.getElementById('promotedPlayerAvatar');
+
+    if (!playerId) {
+        if (previewEl) previewEl.style.display = 'none';
+        return;
+    }
+    
     const player = (players || []).find(p => String(p.id) === String(playerId.trim()));
     if (player) {
         const usernameEl = document.getElementById('newAdminUsername');
         const displayEl = document.getElementById('newAdminDisplay');
         if (usernameEl) usernameEl.value = player.id;
         if (displayEl) displayEl.value = player.name || ('لاعب ' + player.id);
+        
+        if (previewEl && nameEl && emailEl && avatarEl) {
+            nameEl.textContent = player.name || ('لاعب ' + player.id);
+            emailEl.textContent = player.email || 'لا يوجد بريد إلكتروني';
+            avatarEl.src = player.photoUrl || 'assets/player_avatar.png';
+            previewEl.style.display = 'flex';
+        }
+    } else {
+        if (previewEl) previewEl.style.display = 'none';
     }
 }
 window.autofillPlayerInfo = autofillPlayerInfo;
@@ -181,6 +199,8 @@ async function doAddAdmin() {
                 const el = document.getElementById(id); 
                 if (el) el.value = ''; 
             });
+            const previewEl = document.getElementById('promotedPlayerPreview');
+            if (previewEl) previewEl.style.display = 'none';
             showToast(`تم إنشاء حساب المشرف "${username}" بنجاح`);
             await loadData(); // Refresh table immediately
         } else {
@@ -1645,7 +1665,7 @@ function getCombinedAdmins() {
     const seenUsernames = new Set();
 
     // 1. Add all hardcoded admin emails from players list
-    const adminEmails = ['halilfarhat102@gmail.com', 'management135790@gmail.com'];
+    const adminEmails = ['halilfarhat102@gmail.com'];
     players.forEach(p => {
         if (p.email && adminEmails.includes(p.email)) {
             list.push({
