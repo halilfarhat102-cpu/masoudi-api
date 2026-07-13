@@ -84,7 +84,7 @@ function initAdminHeader() {
             if (match) {
                 const tabId = match[1]; // e.g. "tab-players"
                 const tabKey = tabId.replace('tab-', ''); // e.g. "players"
-                if (allowed.includes(tabKey)) {
+                if (tabKey === 'dashboard' || allowed.includes(tabKey)) {
                     btn.style.display = 'flex';
                     if (!firstAllowedTabId) firstAllowedTabId = tabId;
                 } else {
