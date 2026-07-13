@@ -796,6 +796,42 @@ export async function apiMiddleware(req, res, next) {
         res.end(JSON.stringify({ error: e.message }));
       }
     });
+  } else if (req.url === '/api/admin-delete' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', async () => {
+      try {
+        const { token, adminId } = JSON.parse(body);
+        const session = (global._adminTokens || {})[token];
+        if (!session || session.role !== 'superadmin') {
+          res.statusCode = 403;
+          return res.end(JSON.stringify({ error: 'صلاحيات غير كافية' }));
+        }
+        const dbPath = resolve(__dirname, 'db.json');
+        const db = await readDb();
+        if (!db.admins) db.admins = [];
+        
+        const idx = db.admins.findIndex(a => a.id === adminId);
+        if (idx === -1) {
+          res.statusCode = 404;
+          return res.end(JSON.stringify({ error: 'المشرف غير موجود' }));
+        }
+        
+        // Prevent deleting the main admin
+        if (db.admins[idx].username === 'admin') {
+          res.statusCode = 400;
+          return res.end(JSON.stringify({ error: 'لا يمكن حذف المشرف الرئيسي' }));
+        }
+        
+        db.admins.splice(idx, 1);
+        await writeDb(db);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
 
   // ══════════════════════════════════════════════════════════════
   //  🎮 SEAMLESS WALLET API — Game Provider Integration Endpoints

@@ -350,6 +350,8 @@
             padding: 28px;
             max-width: 360px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 0 40px rgba(255,122,31,0.3);
         }
         .modal-box h3 { font-size: 16px; color: var(--orange); margin-bottom: 16px; }
@@ -903,6 +905,27 @@
                         <table>
                             <thead><tr><th>البنر</th><th>حذف</th></tr></thead>
                             <tbody id="adminBannersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Admins/Moderators List -->
+                <div class="section-header-row" style="margin-top: 30px;">
+                    <h3><i class="fa-solid fa-user-shield" style="color:var(--orange);margin-left:6px;"></i>إدارة المشرفين والنشطين بالمنصة</h3>
+                </div>
+                <div class="transaction-history glass-card" style="margin-bottom: 20px;">
+                    <h4 style="font-size:15px;"><i class="fa-solid fa-users-gear text-gold"></i> قائمة المشرفين وتراخيصهم</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>المشرف</th>
+                                    <th>الصلاحية</th>
+                                    <th>الصفحات المسموحة</th>
+                                    <th>إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminListTableBody"></tbody>
                         </table>
                     </div>
                 </div>

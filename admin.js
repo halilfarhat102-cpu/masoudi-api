@@ -8,6 +8,7 @@ let players = [];
 let banners = [];
 let agents = [];
 let receipts = [];
+let admins = [];
 let currentWalletPlayerId = null;
 let currentDeletePlayerId = null;
 let settings = {
@@ -197,6 +198,7 @@ async function loadData() {
         players      = Array.isArray(data.players) ? data.players : [];
         settings     = data.settings  || settings;
         banners      = Array.isArray(data.banners) ? data.banners : [];
+        admins       = Array.isArray(data.admins) ? data.admins : [];
         
         // Ensure agents is always an array (handling potential object conversion issues)
         if (Array.isArray(data.agents)) {
@@ -216,6 +218,7 @@ async function loadData() {
         banners      = JSON.parse(localStorage.getItem('masoudi_banners'))      || [];
         settings     = JSON.parse(localStorage.getItem('masoudi_settings'))     || settings;
         receipts     = JSON.parse(localStorage.getItem('masoudi_receipts'))     || [];
+        admins       = JSON.parse(localStorage.getItem('masoudi_admins'))       || [];
     }
     initSettingsUI();
     renderAll();
@@ -223,7 +226,7 @@ async function loadData() {
 
 // ─── Data: Save ──────────────────────────────
 async function saveData() {
-    const payload = { settings, banners, agents, providers, games: dynamicGames, players, receipts };
+    const payload = { settings, banners, agents, providers, games: dynamicGames, players, receipts, admins };
     localStorage.setItem('masoudi_providers', JSON.stringify(providers));
     localStorage.setItem('masoudi_games',     JSON.stringify(dynamicGames));
     localStorage.setItem('masoudi_players',   JSON.stringify(players));
@@ -231,6 +234,7 @@ async function saveData() {
     localStorage.setItem('masoudi_banners',   JSON.stringify(banners));
     localStorage.setItem('masoudi_settings',  JSON.stringify(settings));
     localStorage.setItem('masoudi_receipts',  JSON.stringify(receipts));
+    localStorage.setItem('masoudi_admins',    JSON.stringify(admins));
     try {
         await fetch(API_BASE + '/api/data', {
             method: 'POST',
@@ -254,6 +258,7 @@ function renderAll() {
     renderAdminP2pAgentsTable();
     loadPaymentGateways();
     renderReceiptsTable();
+    renderAdminsTable();
 }
 
 // ─── Payment Gateways ─────────────────────────
@@ -1540,7 +1545,17 @@ const adminTranslations = {
         "لا توجد بنرات إعلانية نشطة حالياً": "No active banners found",
         "لا يوجد وكلاء شحن مضافين حالياً": "No recharge agents added",
         "لا يوجد لاعبون مفعلون كوكلاء شحن حالياً": "No P2P agents active",
-        "لا توجد إيصال شحن مرسلة حالياً": "No recharge receipts received"
+        "لا توجد إيصال شحن مرسلة حالياً": "No recharge receipts received",
+        "إدارة المشرفين والنشطين بالمنصة": "Manage Board Moderators",
+        "قائمة المشرفين وتراخيصهم": "Moderators & Licenses List",
+        "المشرف": "Moderator",
+        "الصفحات المسموحة": "Allowed Pages",
+        "إجراء": "Action",
+        "الوصول لكافة الصفحات": "Access all pages",
+        "لا توجد صفحات مسموحة": "No pages allowed",
+        "مؤمن": "Protected",
+        "لا يوجد مشرفون مضافون حالياً": "No moderators added currently",
+        "تأكيد حذف المشرف": "Confirm Moderator Deletion"
     }
 };
 
@@ -1609,6 +1624,84 @@ function toggleLanguage() {
 }
 window.toggleLanguage = toggleLanguage;
 
+function renderAdminsTable() {
+    const tbody = document.getElementById('adminListTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    if (admins.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#666;padding:15px;">لا يوجد مشرفون مضافون حالياً</td></tr>`;
+        return;
+    }
+    
+    const tabNames = {
+        players: 'اللاعبين',
+        receipts: 'الإيصالات',
+        games: 'الألعاب',
+        providers: 'المزودين',
+        agents: 'الوكلاء',
+        p2p: 'تحويلات P2P',
+        payment: 'طرق الدفع',
+        settings: 'الإعدادات'
+    };
+
+    tbody.innerHTML = admins.map(ad => {
+        const isSuper = ad.role === 'superadmin';
+        const roleLabel = isSuper ? 'مشرف عام' : 'مشرف عادي';
+        const allowedLabel = isSuper 
+            ? 'الوصول لكافة الصفحات' 
+            : (ad.allowedTabs && ad.allowedTabs.length > 0 
+                ? ad.allowedTabs.map(tab => tabNames[tab] || tab).join('، ') 
+                : 'لا توجد صفحات مسموحة');
+                
+        // Prevent deleting the main superadmin
+        const deleteButton = isSuper && ad.username === 'admin'
+            ? `<span style="color:#666;font-size:12px;">مؤمن</span>`
+            : `<button class="btn-delete-row" onclick="deleteAdmin('${ad.id}')" style="background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.3);"><i class="fa-solid fa-trash"></i> حذف</button>`;
+            
+        return `
+            <tr>
+                <td>
+                    <div style="font-weight:bold;color:#fff;">${ad.displayName}</div>
+                    <div style="font-size:11px;color:#888;">ID: ${ad.username} ${ad.playerId ? `(لاعب: ${ad.playerId})` : ''}</div>
+                </td>
+                <td>
+                    <span class="vip-badge" style="background:${isSuper ? 'rgba(255,122,31,0.15)' : 'rgba(255,255,255,0.06)'};color:${isSuper ? 'var(--orange)' : '#eee'};border-color:${isSuper ? 'var(--orange)' : 'rgba(255,255,255,0.1)'};">
+                        ${roleLabel}
+                    </span>
+                </td>
+                <td style="font-size:12px;color:#ccc;max-width:250px;white-space:normal;word-break:break-word;">
+                    ${allowedLabel}
+                </td>
+                <td>
+                    ${deleteButton}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+async function deleteAdmin(adminId) {
+    if (!confirm(t('تأكيد حذف المشرف'))) return;
+    try {
+        const res = await fetch(API_BASE + '/api/admin-delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: window.ADMIN_TOKEN, adminId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('تم حذف المشرف بنجاح ✅');
+            loadData();
+        } else {
+            showToast(data.error || 'فشل حذف المشرف', 'error');
+        }
+    } catch (e) {
+        showToast('خطأ في الاتصال بالخادم', 'error');
+    }
+}
+window.deleteAdmin = deleteAdmin;
+
 // Expose functions globally for inline HTML onclick handlers
 Object.assign(window, {
     openModal,
@@ -1640,7 +1733,8 @@ Object.assign(window, {
     deleteBanner,
     deleteAgent,
     sendCoinsToP2pAgent,
-    deactivateP2pAgent
+    deactivateP2pAgent,
+    deleteAdmin
 });
 
 // ─── Export Object ──────────
@@ -1672,5 +1766,6 @@ export {
     deleteBanner,
     deleteAgent,
     sendCoinsToP2pAgent,
-    deactivateP2pAgent
+    deactivateP2pAgent,
+    deleteAdmin
 };
