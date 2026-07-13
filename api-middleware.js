@@ -177,6 +177,10 @@ export async function apiMiddleware(req, res, next) {
               errorMsg = 'لا يمكن خصم عملات من الحساب إلا في حالة لعب الألعاب فقط';
               return db;
             }
+            if ((player.balance || 0) + payload.amount < 0) {
+              errorMsg = 'الرصيد غير كافي للعب';
+              return db;
+            }
           }
           player.balance = (player.balance || 0) + payload.amount;
           if (!player.transactions) player.transactions = [];
@@ -709,9 +713,21 @@ export async function apiMiddleware(req, res, next) {
         if (admin) {
           const token = sha256(username + Date.now() + Math.random());
           if (!global._adminTokens) global._adminTokens = {};
-          global._adminTokens[token] = { adminId: admin.id, username: admin.username, displayName: admin.displayName, role: admin.role };
+          global._adminTokens[token] = { 
+            adminId: admin.id, 
+            username: admin.username, 
+            displayName: admin.displayName, 
+            role: admin.role,
+            allowedTabs: admin.allowedTabs || []
+          };
           res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ success: true, token, displayName: admin.displayName, role: admin.role }));
+          res.end(JSON.stringify({ 
+            success: true, 
+            token, 
+            displayName: admin.displayName, 
+            role: admin.role,
+            allowedTabs: admin.allowedTabs || []
+          }));
         } else {
           res.statusCode = 401;
           res.end(JSON.stringify({ success: false, error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }));
@@ -750,7 +766,7 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       try {
-        const { token, username, password, displayName, role } = JSON.parse(body);
+        const { token, username, password, displayName, role, allowedTabs, playerId } = JSON.parse(body);
         const session = (global._adminTokens || {})[token];
         if (!session || session.role !== 'superadmin') {
           res.statusCode = 403;
@@ -768,6 +784,8 @@ export async function apiMiddleware(req, res, next) {
           username, displayName: displayName || username,
           passwordHash: sha256(password),
           role: role || 'admin',
+          allowedTabs: allowedTabs || [],
+          playerId: playerId || null,
           createdAt: new Date().toISOString().split('T')[0]
         });
         await writeDb(db);

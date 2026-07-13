@@ -389,6 +389,7 @@
                     sessionStorage.setItem('adminToken', data.token);
                     sessionStorage.setItem('adminName', data.displayName);
                     sessionStorage.setItem('adminRole', data.role);
+                    sessionStorage.setItem('adminAllowedTabs', JSON.stringify(data.allowedTabs || []));
 
                     // Success animation then redirect
                     btn.style.background = 'linear-gradient(135deg, #00E676, #00b050)';

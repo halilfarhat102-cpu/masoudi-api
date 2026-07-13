@@ -52,6 +52,37 @@ function initAdminHeader() {
     if (nameEl) nameEl.textContent = name;
     if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-user-shield"></i> ${role === 'superadmin' ? 'مشرف عام' : 'مشرف'}`;
     if (addAdminBtn && role === 'superadmin') addAdminBtn.style.display = 'flex';
+
+    // Role-based tab visibility check
+    if (role !== 'superadmin') {
+        let allowed = [];
+        try {
+            allowed = JSON.parse(sessionStorage.getItem('adminAllowedTabs') || '[]');
+        } catch (e) {
+            console.error("Error parsing adminAllowedTabs", e);
+        }
+        
+        let firstAllowedTabId = null;
+        document.querySelectorAll('.admin-tab').forEach(btn => {
+            const onclickAttr = btn.getAttribute('onclick') || '';
+            const match = onclickAttr.match(/switchTab\(['"]([^'"]+)['"]\)/);
+            if (match) {
+                const tabId = match[1]; // e.g. "tab-players"
+                const tabKey = tabId.replace('tab-', ''); // e.g. "players"
+                if (allowed.includes(tabKey)) {
+                    btn.style.display = 'flex';
+                    if (!firstAllowedTabId) firstAllowedTabId = tabId;
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+        });
+        
+        // Auto-switch to the first allowed tab if players tab is hidden/unauthorized
+        if (firstAllowedTabId && !allowed.includes('players')) {
+            switchTab(firstAllowedTabId);
+        }
+    }
 }
 
 // ─── Admin Logout ─────────────────────────────
@@ -87,24 +118,54 @@ async function doChangePassword() {
     } catch (e) { showToast('تعذّر الاتصال بالخادم', 'error'); }
 }
 
+// ─── Autofill Player Info for Promotion ───
+function autofillPlayerInfo(playerId) {
+    if (!playerId) return;
+    const player = (players || []).find(p => String(p.id) === String(playerId.trim()));
+    if (player) {
+        const usernameEl = document.getElementById('newAdminUsername');
+        const displayEl = document.getElementById('newAdminDisplay');
+        if (usernameEl) usernameEl.value = player.id;
+        if (displayEl) displayEl.value = player.name || ('لاعب ' + player.id);
+    }
+}
+window.autofillPlayerInfo = autofillPlayerInfo;
+
 // ─── Add New Admin ────────────────────────────
 async function doAddAdmin() {
+    const playerId    = document.getElementById('newAdminPlayerId')?.value?.trim();
     const username    = document.getElementById('newAdminUsername')?.value?.trim();
     const displayName = document.getElementById('newAdminDisplay')?.value?.trim();
     const password    = document.getElementById('newAdminPw')?.value;
     const role        = document.getElementById('newAdminRole')?.value;
+    
+    // Gather checked permissions
+    const checkedBoxes = document.querySelectorAll('.admin-permission-cb:checked');
+    const allowedTabs = Array.from(checkedBoxes).map(cb => cb.value);
+
     if (!username || !password) return showToast('أدخل اسم المستخدم وكلمة المرور', 'error');
     if (password.length < 6) return showToast('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error');
     try {
         const res = await fetch(API_BASE + '/api/admin-add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: window.ADMIN_TOKEN, username, displayName: displayName || username, password, role })
+            body: JSON.stringify({ 
+                token: window.ADMIN_TOKEN, 
+                username, 
+                displayName: displayName || username, 
+                password, 
+                role,
+                allowedTabs,
+                playerId: playerId || null
+            })
         });
         const data = await res.json();
         if (data.success) {
             closeModal('addAdminModal');
-            ['newAdminUsername','newAdminDisplay','newAdminPw'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            ['newAdminPlayerId','newAdminUsername','newAdminDisplay','newAdminPw'].forEach(id => { 
+                const el = document.getElementById(id); 
+                if (el) el.value = ''; 
+            });
             showToast(`تم إنشاء حساب المشرف "${username}" بنجاح`);
         } else {
             showToast(data.error || 'فشل إنشاء الحساب', 'error');
