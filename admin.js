@@ -84,11 +84,17 @@ function initAdminHeader() {
             if (match) {
                 const tabId = match[1]; // e.g. "tab-players"
                 const tabKey = tabId.replace('tab-', ''); // e.g. "players"
-                if (tabKey === 'dashboard' || allowed.includes(tabKey)) {
-                    btn.style.display = 'flex';
-                    if (!firstAllowedTabId) firstAllowedTabId = tabId;
-                } else {
-                    btn.style.display = 'none';
+                const isAllowed = tabKey === 'dashboard' || allowed.includes(tabKey);
+                btn.style.display = isAllowed ? 'flex' : 'none';
+                if (isAllowed && !firstAllowedTabId) firstAllowedTabId = tabId;
+
+                // Sync corresponding menu card on the dashboard if it exists
+                const correspondingCard = Array.from(document.querySelectorAll('.menu-card')).find(card => {
+                    const clickAttr = card.getAttribute('onclick') || '';
+                    return clickAttr.includes(`'${tabId}'`) || clickAttr.includes(`"${tabId}"`);
+                });
+                if (correspondingCard) {
+                    correspondingCard.style.display = isAllowed ? 'flex' : 'none';
                 }
             }
         });

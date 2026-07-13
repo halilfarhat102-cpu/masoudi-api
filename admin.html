@@ -239,6 +239,111 @@
             }
         }
 
+        /* ─── Grid Menu on Home Page ─── */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .menu-card {
+            background: linear-gradient(135deg, rgba(41,27,21,0.90) 0%, rgba(26,17,13,0.95) 100%);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255,122,31,0.08) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--orange);
+            box-shadow: 0 10px 25px rgba(255, 122, 31, 0.15);
+        }
+
+        .menu-card:hover::before {
+            opacity: 1;
+        }
+
+        .menu-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-card:hover .menu-card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .menu-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .menu-card-desc {
+            font-size: 11px;
+            color: #8B909E;
+            margin: 0;
+            line-height: 1.4;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Responsive Mobile Columns (2 Columns just like user's screenshot) */
+        @media (max-width: 576px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .menu-card {
+                padding: 16px 10px;
+                border-radius: 16px;
+                gap: 8px;
+            }
+            .menu-card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                border-radius: 14px;
+            }
+            .menu-card-title {
+                font-size: 13px;
+            }
+            .menu-card-desc {
+                font-size: 10px;
+            }
+        }
+
         /* Responsive Layout Rules */
         @media (max-width: 991px) {
             .admin-sidebar {
@@ -1013,6 +1118,84 @@
                     <p style="font-size: 13px; color: #ccc; line-height: 1.6; margin: 0; font-family: 'Cairo', sans-serif;">
                         من هنا يمكنك إدارة اللاعبين وتعديل الأرصدة، شحن الأكواد والألعاب، تهيئة إعدادات التطبيق وبوابات الدفع، وإدارة المشرفين والوكلاء. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة.
                     </p>
+                </div>
+
+                <div class="section-header-row" style="margin-top:30px; margin-bottom:15px;">
+                    <h3><i class="fa-solid fa-cubes" style="color:var(--orange);margin-left:6px;"></i>أقسام لوحة التحكم</h3>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="menu-card" onclick="switchTab('tab-players')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #FF7A1F, #D45A00);">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h4 class="menu-card-title">إدارة اللاعبين</h4>
+                        <p class="menu-card-desc">تعديل الأرصدة والبيانات</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-games')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                        <h4 class="menu-card-title">ألعاب المنصة</h4>
+                        <p class="menu-card-desc">إضافة وحذف وتعديل الألعاب</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-providers')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+                            <i class="fa-solid fa-plug"></i>
+                        </div>
+                        <h4 class="menu-card-title">مزودات الـ API</h4>
+                        <p class="menu-card-desc">ربط وتفويض شركات الألعاب</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-agents')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8);">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <h4 class="menu-card-title">وكلاء الشحن</h4>
+                        <p class="menu-card-desc">إدارة وكلاء الشحن المعتمدين</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-p2p')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #8B5CF6, #6D28D9);">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h4 class="menu-card-title">وكلاء التطبيق (P2P)</h4>
+                        <p class="menu-card-desc">تفعيل ومراقبة عملاء P2P</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-payment')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #EC4899, #BE185D);">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <h4 class="menu-card-title">بوابات الشحن</h4>
+                        <p class="menu-card-desc">تهيئة طرق الدفع والأسعار</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-receipts')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <h4 class="menu-card-title">إيصالات الشحن</h4>
+                        <p class="menu-card-desc">مراجعة واعتماد إيصالات الدفع</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-settings')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #6B7280, #4B5563);">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+                        <h4 class="menu-card-title">إعدادات التطبيق</h4>
+                        <p class="menu-card-desc">التحكم في الشاشات والبنرات</p>
+                    </div>
+
+                    <div class="menu-card" onclick="switchTab('tab-admins')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                        <h4 class="menu-card-title">إدارة المشرفين</h4>
+                        <p class="menu-card-desc">إضافة وتعديل صلاحيات المشرفين</p>
+                    </div>
                 </div>
             </div>
 
