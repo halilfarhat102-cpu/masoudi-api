@@ -11,6 +11,57 @@ function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
 }
 
+// ─── Persistent Token Store (survives server restarts) ───────────────────────
+// Tokens are stored in db.json under db.sessions to persist across Render deploys
+async function getAdminSession(token) {
+  if (!token) return null;
+  try {
+    const db = await readDb();
+    const sessions = db.sessions || {};
+    const session = sessions[token];
+    if (!session) return null;
+    // Check expiry (24 hours)
+    if (Date.now() > session.expiresAt) {
+      // Expired — clean it up
+      delete sessions[token];
+      db.sessions = sessions;
+      await writeDb(db);
+      return null;
+    }
+    return session;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function saveAdminSession(token, sessionData) {
+  try {
+    const db = await readDb();
+    if (!db.sessions) db.sessions = {};
+    // Clean up expired sessions first
+    const now = Date.now();
+    for (const [k, v] of Object.entries(db.sessions)) {
+      if (v.expiresAt && now > v.expiresAt) delete db.sessions[k];
+    }
+    db.sessions[token] = { ...sessionData, expiresAt: now + 24 * 60 * 60 * 1000 };
+    await writeDb(db);
+  } catch (e) {
+    console.error('Failed to save session:', e);
+  }
+}
+
+async function deleteAdminSession(token) {
+  try {
+    const db = await readDb();
+    if (db.sessions && db.sessions[token]) {
+      delete db.sessions[token];
+      await writeDb(db);
+    }
+  } catch (e) {}
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+
 export async function apiMiddleware(req, res, next) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,9 +85,11 @@ export async function apiMiddleware(req, res, next) {
     const dbPath = resolve(__dirname, 'db.json');
     if (req.method === 'GET') {
       try {
-        const data = JSON.stringify(await readDb());
+        const db = await readDb();
+        // Exclude sessions (auth tokens) from public data response for security
+        const { sessions, ...publicData } = db;
         res.setHeader('Content-Type', 'application/json');
-        res.end(data);
+        res.end(JSON.stringify(publicData));
       } catch (e) {
         res.statusCode = 500;
         res.end(JSON.stringify({ error: 'Failed to read db.json' }));
@@ -713,14 +766,14 @@ export async function apiMiddleware(req, res, next) {
         const admin = admins.find(a => a.username === username && a.passwordHash === hash);
         if (admin) {
           const token = sha256(username + Date.now() + Math.random());
-          if (!global._adminTokens) global._adminTokens = {};
-          global._adminTokens[token] = { 
+          // Save session persistently in db.json (survives server restarts)
+          await saveAdminSession(token, { 
             adminId: admin.id, 
             username: admin.username, 
             displayName: admin.displayName, 
             role: admin.role,
             allowedTabs: admin.allowedTabs || []
-          };
+          });
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ 
             success: true, 
@@ -744,7 +797,7 @@ export async function apiMiddleware(req, res, next) {
     req.on('end', async () => {
       try {
         const { token, oldPassword, newPassword } = JSON.parse(body);
-        const session = (global._adminTokens || {})[token];
+        const session = await getAdminSession(token);
         if (!session) { res.statusCode = 401; return res.end(JSON.stringify({ error: 'غير مصرح' })); }
         const dbPath = resolve(__dirname, 'db.json');
         const db = await readDb();
@@ -768,10 +821,10 @@ export async function apiMiddleware(req, res, next) {
     req.on('end', async () => {
       try {
         const { token, username, password, displayName, role, allowedTabs, playerId } = JSON.parse(body);
-        const session = (global._adminTokens || {})[token];
+        const session = await getAdminSession(token);
         if (!session || session.role !== 'superadmin') {
           res.statusCode = 403;
-          return res.end(JSON.stringify({ error: 'صلاحيات غير كافية' }));
+          return res.end(JSON.stringify({ error: 'صلاحيات غير كافية — يجب تسجيل الدخول مجدداً كمشرف عام' }));
         }
         const dbPath = resolve(__dirname, 'db.json');
         const db = await readDb();
@@ -803,10 +856,10 @@ export async function apiMiddleware(req, res, next) {
     req.on('end', async () => {
       try {
         const { token, adminId } = JSON.parse(body);
-        const session = (global._adminTokens || {})[token];
+        const session = await getAdminSession(token);
         if (!session || session.role !== 'superadmin') {
           res.statusCode = 403;
-          return res.end(JSON.stringify({ error: 'صلاحيات غير كافية' }));
+          return res.end(JSON.stringify({ error: 'صلاحيات غير كافية — يجب تسجيل الدخول مجدداً كمشرف عام' }));
         }
         const dbPath = resolve(__dirname, 'db.json');
         const db = await readDb();
