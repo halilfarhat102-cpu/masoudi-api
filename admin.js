@@ -1243,10 +1243,6 @@ async function sendCoinsToP2pAgent(playerId, inputId) {
     }
 }
 
-// Expose functions globally for inline HTML onclick handlers
-Object.assign(window, {
-    openModal,
-    closeModal,
 // ─── Receipts Rendering & Management ──────────
 function renderReceiptsTable() {
     const tbody = document.getElementById('adminReceiptsTableBody');
@@ -1317,6 +1313,40 @@ async function handleReceiptAction(receiptId, action) {
 }
 window.handleReceiptAction = handleReceiptAction;
 
+// Expose functions globally for inline HTML onclick handlers
+Object.assign(window, {
+    openModal,
+    closeModal,
+    adminLogout,
+    switchTab,
+    toggleAddPlayerForm,
+    addNewPlayer,
+    addNewProvider,
+    addNewGame,
+    saveSettings,
+    addNewBanner,
+    addNewAgent,
+    activateP2pAgent,
+    executeWalletAction,
+    confirmDeletePlayer,
+    saveEditedGame,
+    doChangePassword,
+    doAddAdmin,
+    toggleCard,
+    openWalletModal,
+    toggleStatus,
+    resetBalance,
+    openDeleteModal,
+    quickWallet,
+    deleteProvider,
+    editGame,
+    deleteGame,
+    deleteBanner,
+    deleteAgent,
+    sendCoinsToP2pAgent,
+    deactivateP2pAgent
+});
+
 // ─── Export Object ──────────
 export {
     adminLogout,
@@ -1347,4 +1377,4 @@ export {
     deleteAgent,
     sendCoinsToP2pAgent,
     deactivateP2pAgent
-});
+};
