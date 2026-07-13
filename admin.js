@@ -99,10 +99,7 @@ function initAdminHeader() {
             }
         });
         
-        // Auto-switch to the first allowed tab if players tab is hidden/unauthorized
-        if (firstAllowedTabId && !allowed.includes('players')) {
-            switchTab(firstAllowedTabId);
-        }
+
     }
 }
 
@@ -439,11 +436,23 @@ function updateStats() {
 
 // ─── Tab Switch ──────────────────────────────
 function switchTab(id) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    // Hide main grid screen
+    const mainGrid = document.getElementById('main-grid-screen');
+    if (mainGrid) mainGrid.style.display = 'none';
+
+    // Hide all tab panels
+    document.querySelectorAll('.tab-panel').forEach(p => {
+        p.style.display = 'none';
+        p.classList.remove('active');
+    });
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
     
+    // Show target panel
     const targetPanel = document.getElementById(id);
-    if (targetPanel) targetPanel.classList.add('active');
+    if (targetPanel) {
+        targetPanel.style.display = 'block';
+        targetPanel.classList.add('active');
+    }
     
     const clickedTab = Array.from(document.querySelectorAll('.admin-tab')).find(t => {
         const onclickAttr = t.getAttribute('onclick') || '';
@@ -455,7 +464,26 @@ function switchTab(id) {
     if (typeof window.toggleSidebar === 'function') {
         window.toggleSidebar(false);
     }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function goBackToGrid() {
+    // Hide all tab panels
+    document.querySelectorAll('.tab-panel').forEach(p => {
+        p.style.display = 'none';
+        p.classList.remove('active');
+    });
+    
+    // Show main grid screen
+    const mainGrid = document.getElementById('main-grid-screen');
+    if (mainGrid) mainGrid.style.display = 'block';
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.goBackToGrid = goBackToGrid;
 
 // ─── Toggle Add Player Form ──────────────────
 function toggleAddPlayerForm() {

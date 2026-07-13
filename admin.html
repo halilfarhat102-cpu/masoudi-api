@@ -226,17 +226,45 @@
         }
 
         .mobile-header-bar {
-            display: none; /* Hidden on PC */
-            padding: 10px 15px 0 15px;
-            align-items: center;
-            justify-content: flex-start;
-            margin-bottom: 10px;
+            display: none !important; /* Hidden completely */
         }
 
-        @media (max-width: 991px) {
-            .mobile-header-bar {
-                display: flex; /* Visible on mobile */
-            }
+        .admin-sidebar {
+            display: none !important; /* Remove sidebar completely */
+        }
+
+        .main-content {
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding: 20px !important;
+        }
+
+        /* ─── Back Button Custom Styling ─── */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 20px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-back:hover {
+            background: var(--orange);
+            border-color: var(--orange);
+            box-shadow: 0 4px 15px var(--orange-glow);
+            transform: translateX(4px);
+        }
+        .btn-back i {
+            font-size: 16px;
         }
 
         /* ─── Grid Menu on Home Page ─── */
@@ -1051,80 +1079,21 @@
                 </button>
             </div>
 
-
-
-
-
-        <main>
-
-            <!-- ═══════════════ TAB: DASHBOARD ═══════════════ -->
-            <div id="tab-dashboard" class="tab-panel active">
-                <!-- Admin Profile Card -->
-                <div class="vip-header glass-card" style="border-top-color:var(--orange);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;width:100%;gap:15px;flex-wrap:wrap;padding: 16px;">
-                    <div class="profile-section" style="display:flex;align-items:center;gap:12px;">
-                        <div class="icon-circle gold-glow" style="width:48px;height:48px;font-size:18px;background:linear-gradient(135deg,#FF7A1F,#D45A00);display:flex;align-items:center;justify-content:center;">
-                            <i class="fa-solid fa-user-gear"></i>
-                        </div>
-                        <div class="player-info">
-                            <div class="player-name-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                                <h2 class="player-name" id="adminHeaderName" style="font-size:16px;font-weight:900;color:#fff;margin:0;">بوابة التحكم الإدارية</h2>
-                                <span class="vip-badge" style="background:rgba(255,122,31,0.15);color:var(--orange);border-color:var(--orange);padding:2px 8px;font-size:10px;border-radius:50px;border:1px solid;" id="adminRoleBadge">
-                                    <i class="fa-solid fa-user-shield"></i> المشرف العام
-                                </span>
-                            </div>
-                            <span class="player-id" style="font-size:11px;color:#888;">منصة مسعودي للألعاب — الإصدار 2.0</span>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                        <button class="btn-action" onclick="window.toggleLanguage()" style="font-size:11px;padding:6px 10px;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#fff;display:flex;align-items:center;gap:4px;" id="langToggleBtn">
-                            🌐 English
-                        </button>
-                        <button class="btn-action btn-reset-pw" onclick="openModal('changePwModal')" style="font-size:11px;padding:6px 10px;">
-                            <i class="fa-solid fa-key"></i> كلمة المرور
-                        </button>
-                        <button class="btn-action btn-add-funds" id="addAdminBtn" onclick="openModal('addAdminModal')" style="font-size:11px;padding:6px 10px;display:none;">
-                            <i class="fa-solid fa-user-plus"></i> مشرف جديد
-                        </button>
-                        <button class="btn-action btn-delete-player" onclick="adminLogout()" style="font-size:11px;padding:6px 10px;">
-                            <i class="fa-solid fa-right-from-bracket"></i> خروج
-                        </button>
-                    </div>
+            <!-- ═══════════════ MAIN GRID NAVIGATION SCREEN ═══════════════ -->
+            <div id="main-grid-screen" style="max-width: 1200px; margin: 0 auto; padding: 10px 0 30px 0;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 24px; font-weight: 900; color: #fff; font-family: 'Cairo', sans-serif; margin: 0;">بوابة التحكم الإدارية</h2>
+                    <p style="font-size: 12px; color: #888; margin-top: 6px; font-family: 'Cairo', sans-serif;">اختر القسم المطلوب لإدارة المنصة</p>
                 </div>
-
-                <div class="section-header-row" style="margin-bottom:20px;">
-                    <h3><i class="fa-solid fa-chart-line" style="color:var(--orange);margin-left:6px;"></i>لوحة الإحصائيات العامة</h3>
-                </div>
-                
-                <div class="stats-row" style="margin-bottom: 25px;">
-                    <div class="stat-card">
-                        <div class="stat-val" id="statTotalPlayers">—</div>
-                        <div class="stat-label">إجمالي اللاعبين</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-val" id="statActivePlayers">—</div>
-                        <div class="stat-label">نشطون</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-val" id="statTotalBalance">—</div>
-                        <div class="stat-label">إجمالي الأرصدة</div>
-                    </div>
-                </div>
-
-                <!-- Welcome & Platform Overview Card -->
-                <div class="glass-card" style="padding: 24px; border-radius: 16px; border: 1px solid var(--border); background: var(--card-bg);">
-                    <h4 style="font-size: 16px; font-weight: 800; color: #fff; margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-family: 'Cairo', sans-serif;">
-                        <i class="fa-solid fa-circle-info" style="color: var(--orange);"></i> مرحباً بك في لوحة تحكم منصة مسعودي
-                    </h4>
-                    <p style="font-size: 13px; color: #ccc; line-height: 1.6; margin: 0; font-family: 'Cairo', sans-serif;">
-                        من هنا يمكنك إدارة اللاعبين وتعديل الأرصدة، شحن الأكواد والألعاب، تهيئة إعدادات التطبيق وبوابات الدفع، وإدارة المشرفين والوكلاء. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة.
-                    </p>
-                </div>
-
-                <div class="section-header-row" style="margin-top:30px; margin-bottom:15px;">
-                    <h3><i class="fa-solid fa-cubes" style="color:var(--orange);margin-left:6px;"></i>أقسام لوحة التحكم</h3>
-                </div>
-
                 <div class="dashboard-grid">
+                    <div class="menu-card" onclick="switchTab('tab-dashboard')">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #FF5722, #FF7043);">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h4 class="menu-card-title">الرئيسية</h4>
+                        <p class="menu-card-desc">الإحصائيات والملف الشخصي</p>
+                    </div>
+
                     <div class="menu-card" onclick="switchTab('tab-players')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #FF7A1F, #D45A00);">
                             <i class="fa-solid fa-users"></i>
@@ -1199,8 +1168,85 @@
                 </div>
             </div>
 
+
+
+
+
+        <main>
+
+            <!-- ═══════════════ TAB: DASHBOARD ═══════════════ -->
+            <div id="tab-dashboard" class="tab-panel" style="display: none;" style="display: none;">
+                <!-- Admin Profile Card -->
+                <div class="vip-header glass-card" style="border-top-color:var(--orange);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;width:100%;gap:15px;flex-wrap:wrap;padding: 16px;">
+                    <div class="profile-section" style="display:flex;align-items:center;gap:12px;">
+                        <div class="icon-circle gold-glow" style="width:48px;height:48px;font-size:18px;background:linear-gradient(135deg,#FF7A1F,#D45A00);display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <div class="player-info">
+                            <div class="player-name-row" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <h2 class="player-name" id="adminHeaderName" style="font-size:16px;font-weight:900;color:#fff;margin:0;">بوابة التحكم الإدارية</h2>
+                                <span class="vip-badge" style="background:rgba(255,122,31,0.15);color:var(--orange);border-color:var(--orange);padding:2px 8px;font-size:10px;border-radius:50px;border:1px solid;" id="adminRoleBadge">
+                                    <i class="fa-solid fa-user-shield"></i> المشرف العام
+                                </span>
+                            </div>
+                            <span class="player-id" style="font-size:11px;color:#888;">منصة مسعودي للألعاب — الإصدار 2.0</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <button class="btn-action" onclick="window.toggleLanguage()" style="font-size:11px;padding:6px 10px;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#fff;display:flex;align-items:center;gap:4px;" id="langToggleBtn">
+                            🌐 English
+                        </button>
+                        <button class="btn-action btn-reset-pw" onclick="openModal('changePwModal')" style="font-size:11px;padding:6px 10px;">
+                            <i class="fa-solid fa-key"></i> كلمة المرور
+                        </button>
+                        <button class="btn-action btn-add-funds" id="addAdminBtn" onclick="openModal('addAdminModal')" style="font-size:11px;padding:6px 10px;display:none;">
+                            <i class="fa-solid fa-user-plus"></i> مشرف جديد
+                        </button>
+                        <button class="btn-action btn-delete-player" onclick="adminLogout()" style="font-size:11px;padding:6px 10px;">
+                            <i class="fa-solid fa-right-from-bracket"></i> خروج
+                        </button>
+                    </div>
+                </div>
+
+                <div class="section-header-row" style="margin-bottom:20px;">
+                    <h3><i class="fa-solid fa-chart-line" style="color:var(--orange);margin-left:6px;"></i>لوحة الإحصائيات العامة</h3>
+                </div>
+                
+                <div class="stats-row" style="margin-bottom: 25px;">
+                    <div class="stat-card">
+                        <div class="stat-val" id="statTotalPlayers">—</div>
+                        <div class="stat-label">إجمالي اللاعبين</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="statActivePlayers">—</div>
+                        <div class="stat-label">نشطون</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="statTotalBalance">—</div>
+                        <div class="stat-label">إجمالي الأرصدة</div>
+                    </div>
+                </div>
+
+                <!-- Welcome & Platform Overview Card -->
+                <div class="glass-card" style="padding: 24px; border-radius: 16px; border: 1px solid var(--border); background: var(--card-bg);">
+                    <h4 style="font-size: 16px; font-weight: 800; color: #fff; margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-family: 'Cairo', sans-serif;">
+                        <i class="fa-solid fa-circle-info" style="color: var(--orange);"></i> مرحباً بك في لوحة تحكم منصة مسعودي
+                    </h4>
+                    <p style="font-size: 13px; color: #ccc; line-height: 1.6; margin: 0; font-family: 'Cairo', sans-serif;">
+                        من هنا يمكنك إدارة اللاعبين وتعديل الأرصدة، شحن الأكواد والألعاب، تهيئة إعدادات التطبيق وبوابات الدفع، وإدارة المشرفين والوكلاء. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة.
+                    </p>
+                </div>
+
+
+            </div>
+
             <!-- ═══════════════ TAB: PLAYERS ═══════════════ -->
-            <div id="tab-players" class="tab-panel">
+            <div id="tab-players" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
 
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-users" style="color:var(--orange);margin-left:6px;"></i>قائمة اللاعبين</h3>
@@ -1261,7 +1307,12 @@
             </div>
 
             <!-- ═══════════════ TAB: PROVIDERS ═══════════════ -->
-            <div id="tab-providers" class="tab-panel">
+            <div id="tab-providers" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-plug" style="color:var(--orange);margin-left:6px;"></i>ربط مزودات جديدة</h3>
                 </div>
@@ -1298,7 +1349,12 @@
             </div>
 
             <!-- ═══════════════ TAB: GAMES ═══════════════ -->
-            <div id="tab-games" class="tab-panel">
+            <div id="tab-games" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-gamepad" style="color:var(--orange);margin-left:6px;"></i>إضافة لعبة جديدة</h3>
                 </div>
@@ -1354,7 +1410,12 @@
             </div>
 
             <!-- ═══════════════ TAB: SETTINGS ═══════════════ -->
-            <div id="tab-settings" class="tab-panel">
+            <div id="tab-settings" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-gears" style="color:var(--orange);margin-left:6px;"></i>إعدادات الشاشة المصغرة للتطبيق</h3>
                 </div>
@@ -1454,7 +1515,12 @@
             </div>
 
             <!-- ═══════════════ TAB: ADMINS ═══════════════ -->
-            <div id="tab-admins" class="tab-panel">
+            <div id="tab-admins" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-user-shield" style="color:var(--orange);margin-left:6px;"></i>إدارة المشرفين والنشطين بالمنصة</h3>
                     <button class="btn-action btn-add-funds" onclick="openModal('addAdminModal')" style="font-size:12px;padding:8px 14px;">
@@ -1480,7 +1546,12 @@
             </div>
 
             <!-- ═══════════════ TAB: AGENTS ═══════════════ -->
-            <div id="tab-agents" class="tab-panel">
+            <div id="tab-agents" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-truck-fast" style="color:var(--orange);margin-left:6px;"></i>إدارة وكلاء الشحن المعتمدين</h3>
                 </div>
@@ -1565,7 +1636,12 @@
             </div>
 
             <!-- ═══════════════ TAB: P2P AGENTS ═══════════════ -->
-            <div id="tab-p2p" class="tab-panel">
+            <div id="tab-p2p" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-user-shield" style="color:var(--orange);margin-left:6px;"></i>تفعيل وإدارة وكلاء التطبيق (P2P)</h3>
                 </div>
@@ -1607,7 +1683,12 @@
             </div>
 
             <!-- ═══════════════ TAB: PAYMENT GATEWAYS ═══════════════ -->
-            <div id="tab-payment" class="tab-panel">
+            <div id="tab-payment" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-credit-card" style="color:var(--orange);margin-left:6px;"></i>إدارة بوابات الشحن من التطبيق 🇪🇬</h3>
                 </div>
@@ -1762,7 +1843,12 @@
             </div>
 
             <!-- ═══════════════ TAB: RECEIPTS ═══════════════ -->
-            <div id="tab-receipts" class="tab-panel">
+            <div id="tab-receipts" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
                 <div class="section-header-row">
                     <h3><i class="fa-solid fa-receipt" style="color:var(--orange);margin-left:6px;"></i>إيصالات الشحن من التطبيق</h3>
                 </div>
