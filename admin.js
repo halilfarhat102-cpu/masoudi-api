@@ -1634,12 +1634,78 @@ function t(key) {
     return (adminTranslations.en && adminTranslations.en[key]) ? adminTranslations.en[key] : key;
 }
 
+function getCombinedAdmins() {
+    const list = [];
+    const seenPlayerIds = new Set();
+    const seenUsernames = new Set();
+
+    // 1. Add all hardcoded admin emails from players list
+    const adminEmails = ['halilfarhat102@gmail.com', 'management135790@gmail.com'];
+    players.forEach(p => {
+        if (p.email && adminEmails.includes(p.email)) {
+            list.push({
+                id: 'email-admin-' + p.id,
+                username: p.id,
+                displayName: p.name,
+                role: 'superadmin',
+                allowedTabs: [],
+                playerId: p.id,
+                isDeveloper: true, // Mark as protected developer account
+                createdAt: p.joinDate || '—'
+            });
+            seenPlayerIds.add(String(p.id));
+        }
+    });
+
+    // 2. Add all admins from db.admins
+    admins.forEach(ad => {
+        if (ad.playerId) {
+            seenPlayerIds.add(String(ad.playerId));
+        }
+        seenUsernames.add(ad.username);
+        list.push({
+            ...ad,
+            isDeveloper: ad.username === 'admin' // The main admin is protected
+        });
+    });
+
+    // 3. Add any player who has p.isAdmin === true (and not already added)
+    players.forEach(p => {
+        if (p.isAdmin === true && !seenPlayerIds.has(String(p.id))) {
+            list.push({
+                id: 'player-admin-' + p.id,
+                username: p.id,
+                displayName: p.name,
+                role: 'admin',
+                allowedTabs: [
+                    "players",
+                    "receipts",
+                    "games",
+                    "providers",
+                    "agents",
+                    "p2p",
+                    "payment",
+                    "settings"
+                ], // Default all permissions
+                playerId: p.id,
+                isLegacyPlayerAdmin: true, // Mark so we can clean it up
+                createdAt: p.joinDate || '—'
+            });
+            seenPlayerIds.add(String(p.id));
+        }
+    });
+
+    return list;
+}
+
 function renderAdminsTable() {
     const tbody = document.getElementById('adminListTableBody');
     if (!tbody) return;
     tbody.innerHTML = '';
     
-    if (admins.length === 0) {
+    const combined = getCombinedAdmins();
+    
+    if (combined.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#666;padding:15px;">لا يوجد مشرفون مضافون حالياً</td></tr>`;
         return;
     }
@@ -1655,21 +1721,24 @@ function renderAdminsTable() {
         settings: 'الإعدادات'
     };
 
-    tbody.innerHTML = admins.map(ad => {
+    tbody.innerHTML = combined.map(ad => {
         const isSuper = ad.role === 'superadmin';
-        const roleLabel = isSuper ? 'مشرف عام' : 'مشرف عادي';
-        const allowedLabel = isSuper 
+        const roleLabel = ad.isDeveloper 
+            ? 'مطور النظام' 
+            : (isSuper ? 'مشرف عام' : 'مشرف عادي');
+            
+        const allowedLabel = ad.isDeveloper || isSuper 
             ? 'الوصول لكافة الصفحات' 
             : (ad.allowedTabs && ad.allowedTabs.length > 0 
                 ? ad.allowedTabs.map(tab => tabNames[tab] || tab).join('، ') 
                 : 'لا توجد صفحات مسموحة');
                 
-        // Prevent deleting the main superadmin
-        const deleteButton = isSuper && ad.username === 'admin'
-            ? `<span style="color:#666;font-size:12px;">مؤمن</span>`
+        // Prevent deleting the main superadmin or developer email accounts
+        const deleteButton = ad.isDeveloper
+            ? `<span style="color:#666;font-size:12px;">مؤمن 🔒</span>`
             : `<button class="btn-delete-row" onclick="deleteAdmin('${ad.id}')" style="background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.3);"><i class="fa-solid fa-trash"></i> حذف</button>`;
             
-        // Find linked player info to display real accounts
+        // Find linked player info
         const linkedPlayer = ad.playerId ? players.find(p => String(p.id) === String(ad.playerId)) : null;
         
         const playerDetailsHtml = linkedPlayer
@@ -1699,7 +1768,7 @@ function renderAdminsTable() {
                     ${playerDetailsHtml}
                 </td>
                 <td>
-                    <span class="vip-badge" style="background:${isSuper ? 'rgba(255,122,31,0.15)' : 'rgba(255,255,255,0.06)'};color:${isSuper ? 'var(--orange)' : '#eee'};border-color:${isSuper ? 'var(--orange)' : 'rgba(255,255,255,0.1)'};">
+                    <span class="vip-badge" style="background:${ad.isDeveloper ? 'rgba(0,230,118,0.15)' : (isSuper ? 'rgba(255,122,31,0.15)' : 'rgba(255,255,255,0.06)')};color:${ad.isDeveloper ? '#00E676' : (isSuper ? 'var(--orange)' : '#eee')};border-color:${ad.isDeveloper ? '#00E676' : (isSuper ? 'var(--orange)' : 'rgba(255,255,255,0.1)')};">
                         ${roleLabel}
                     </span>
                 </td>

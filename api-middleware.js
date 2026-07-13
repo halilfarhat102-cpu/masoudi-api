@@ -868,6 +868,16 @@ export async function apiMiddleware(req, res, next) {
           playerId: playerId || null,
           createdAt: new Date().toISOString().split('T')[0]
         });
+
+        // Sync player.isAdmin flag for instant app access
+        if (playerId) {
+          if (!db.players) db.players = [];
+          const player = db.players.find(p => String(p.id) === String(playerId));
+          if (player) {
+            player.isAdmin = true;
+          }
+        }
+
         await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true }));
@@ -890,6 +900,20 @@ export async function apiMiddleware(req, res, next) {
         const dbPath = resolve(__dirname, 'db.json');
         const db = await readDb();
         if (!db.admins) db.admins = [];
+
+        // Handle legacy player admins from p.isAdmin flag (starts with player-admin-)
+        if (String(adminId).startsWith('player-admin-')) {
+          const pId = String(adminId).replace('player-admin-', '');
+          if (db.players) {
+            const player = db.players.find(p => String(p.id) === pId);
+            if (player) {
+              delete player.isAdmin;
+            }
+          }
+          await writeDb(db);
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ success: true }));
+        }
         
         const idx = db.admins.findIndex(a => a.id === adminId);
         if (idx === -1) {
@@ -901,6 +925,15 @@ export async function apiMiddleware(req, res, next) {
         if (db.admins[idx].username === 'admin') {
           res.statusCode = 400;
           return res.end(JSON.stringify({ error: 'لا يمكن حذف المشرف الرئيسي' }));
+        }
+
+        // Clean up linked player's isAdmin flag
+        const deletedAdmin = db.admins[idx];
+        if (deletedAdmin.playerId && db.players) {
+          const player = db.players.find(p => String(p.id) === String(deletedAdmin.playerId));
+          if (player) {
+            delete player.isAdmin;
+          }
         }
         
         db.admins.splice(idx, 1);
