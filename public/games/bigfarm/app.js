@@ -653,7 +653,7 @@ function finishSpin(winningSlot, winningIndex) {
         const backBtn = document.getElementById('game-back-btn');
         if (backBtn) backBtn.textContent = `❮ Round ${String(roundNumber).padStart(4, '0')}`;
 
-        timerCount = 29;
+        timerCount = 19;
         isSpinning = false;
         return; // Complete background round cycle quietly without showing modal or starting overlay timer
     }
@@ -717,13 +717,13 @@ function closeNotificationAndReset() {
     if (backBtn) backBtn.textContent = `❮ Round ${String(roundNumber).padStart(4, '0')}`;
 
     // Restart timer
-    timerCount = 29;
+    timerCount = 19;
     const timerPill = document.getElementById('timer-display-pill');
     if (timerPill) timerPill.textContent = `${timerCount}s`;
 }
 
 // Timer countdown simulation
-let timerCount = 29;
+let timerCount = 19;
 let roundNumber = parseInt(localStorage.getItem('currentRoundNumber')) || 1;
 
 // Simulate background rounds progression based on elapsed time since last visit
@@ -732,7 +732,7 @@ let roundNumber = parseInt(localStorage.getItem('currentRoundNumber')) || 1;
     if (lastTime) {
         const diffMs = Date.now() - lastTime;
         if (diffMs > 0) {
-            const roundsPassed = Math.floor(diffMs / 35000); // 35 seconds per round cycle
+            const roundsPassed = Math.floor(diffMs / 25000); // 25 seconds per round cycle
             if (roundsPassed > 0) {
                 roundNumber += roundsPassed;
                 if (roundNumber > 3200) {
@@ -740,15 +740,15 @@ let roundNumber = parseInt(localStorage.getItem('currentRoundNumber')) || 1;
                 }
                 localStorage.setItem('currentRoundNumber', roundNumber);
             }
-            const remainingMs = diffMs % 35000;
-            if (remainingMs < 30000) {
-                timerCount = 30 - Math.floor(remainingMs / 1000);
+            const remainingMs = diffMs % 25000;
+            if (remainingMs < 20000) {
+                timerCount = 20 - Math.floor(remainingMs / 1000);
             } else {
-                timerCount = 29; // Fallback during spin action
+                timerCount = 19; // Fallback during spin action
             }
         }
     }
-    localStorage.setItem('masoudi_last_round_time', Date.now() - (30 - timerCount) * 1000);
+    localStorage.setItem('masoudi_last_round_time', Date.now() - (20 - timerCount) * 1000);
 })();
 
 function updateTimerPill() {
@@ -759,7 +759,7 @@ function updateTimerPill() {
 
     if (isSpinning || isResultShowing || isSplashShowing) {
         // Update baseline time forward so background simulation behaves correctly during active game phases or loading screen
-        localStorage.setItem('masoudi_last_round_time', Date.now() - (30 - timerCount) * 1000);
+        localStorage.setItem('masoudi_last_round_time', Date.now() - (20 - timerCount) * 1000);
         return;
     }
 
@@ -767,10 +767,10 @@ function updateTimerPill() {
         timerCount--;
         const timerPill = document.getElementById('timer-display-pill');
         if (timerPill) timerPill.textContent = `${timerCount}s`;
-        localStorage.setItem('masoudi_last_round_time', Date.now() - (30 - timerCount) * 1000);
+        localStorage.setItem('masoudi_last_round_time', Date.now() - (20 - timerCount) * 1000);
     } else {
         // Countdown finished! Trigger auto-spin
-        timerCount = 30; // reset
+        timerCount = 20; // reset
         const timerPill = document.getElementById('timer-display-pill');
         if (timerPill) timerPill.textContent = `0s`;
 
