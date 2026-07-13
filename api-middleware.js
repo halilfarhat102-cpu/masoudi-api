@@ -208,7 +208,7 @@ export async function apiMiddleware(req, res, next) {
     req.on('end', async () => {
       try {
         const db = await readDb();
-        const { playerId, playerName, gateway, amount, imageUrl } = JSON.parse(body);
+        const { playerId, playerName, gateway, amount, coins, imageUrl } = JSON.parse(body);
 
         if (!playerId || !gateway || !imageUrl) {
           res.statusCode = 400;
@@ -223,6 +223,7 @@ export async function apiMiddleware(req, res, next) {
           playerName: playerName || 'لاعب مسعودي',
           gateway,
           amount: amount || '—',
+          coins: coins || 0,
           imageUrl,
           date: new Date().toLocaleString('ar-EG'),
           status: 'pending'
@@ -256,6 +257,25 @@ export async function apiMiddleware(req, res, next) {
         if (action === 'delete') {
           db.receipts.splice(idx, 1);
         } else {
+          if (action === 'approve') {
+            const receipt = db.receipts[idx];
+            if (receipt.status === 'pending') {
+              if (!db.players) db.players = [];
+              const player = db.players.find(p => p.id === receipt.playerId);
+              if (player) {
+                const coins = parseFloat(receipt.coins || 0);
+                if (coins > 0) {
+                  player.balance = (player.balance || 0) + coins;
+                  if (!player.transactions) player.transactions = [];
+                  player.transactions.push({
+                    type: `شحن من التطبيق (${receipt.gateway})`,
+                    amount: coins,
+                    date: new Date().toLocaleTimeString('ar-EG')
+                  });
+                }
+              }
+            }
+          }
           db.receipts[idx].status = action === 'approve' ? 'approved' : 'rejected';
         }
 
