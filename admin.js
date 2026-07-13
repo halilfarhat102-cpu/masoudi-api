@@ -1627,6 +1627,12 @@ function toggleLanguage() {
 }
 window.toggleLanguage = toggleLanguage;
 
+function t(key) {
+    const lang = localStorage.getItem('admin_lang') || 'ar';
+    if (lang === 'ar') return key;
+    return (adminTranslations.en && adminTranslations.en[key]) ? adminTranslations.en[key] : key;
+}
+
 function renderAdminsTable() {
     const tbody = document.getElementById('adminListTableBody');
     if (!tbody) return;
@@ -1662,11 +1668,34 @@ function renderAdminsTable() {
             ? `<span style="color:#666;font-size:12px;">مؤمن</span>`
             : `<button class="btn-delete-row" onclick="deleteAdmin('${ad.id}')" style="background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.3);"><i class="fa-solid fa-trash"></i> حذف</button>`;
             
+        // Find linked player info to display real accounts
+        const linkedPlayer = ad.playerId ? players.find(p => String(p.id) === String(ad.playerId)) : null;
+        
+        const playerDetailsHtml = linkedPlayer
+            ? `
+                <div style="display:flex;align-items:center;gap:10px;text-align:right;">
+                    ${linkedPlayer.photoUrl 
+                        ? `<img src="${linkedPlayer.photoUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid var(--orange);">` 
+                        : `<div style="width:32px;height:32px;border-radius:50%;background:rgba(255,122,31,0.2);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:14px;"><i class="fa-solid fa-user"></i></div>`
+                    }
+                    <div>
+                        <div style="font-weight:bold;color:#fff;font-size:13px;">${ad.displayName}</div>
+                        <div style="font-size:11px;color:#aaa;">الاسم باللعبة: ${linkedPlayer.name} | معرف الحساب: ${ad.playerId}</div>
+                        <div style="font-size:10px;color:#777;direction:ltr;">${linkedPlayer.email}</div>
+                    </div>
+                </div>
+              `
+            : `
+                <div style="text-align:right;">
+                    <div style="font-weight:bold;color:#fff;font-size:13px;">${ad.displayName}</div>
+                    <div style="font-size:11px;color:#888;">اسم المستخدم للدخول: ${ad.username}</div>
+                </div>
+              `;
+            
         return `
             <tr>
-                <td>
-                    <div style="font-weight:bold;color:#fff;">${ad.displayName}</div>
-                    <div style="font-size:11px;color:#888;">ID: ${ad.username} ${ad.playerId ? `(لاعب: ${ad.playerId})` : ''}</div>
+                <td style="padding:12px 15px;">
+                    ${playerDetailsHtml}
                 </td>
                 <td>
                     <span class="vip-badge" style="background:${isSuper ? 'rgba(255,122,31,0.15)' : 'rgba(255,255,255,0.06)'};color:${isSuper ? 'var(--orange)' : '#eee'};border-color:${isSuper ? 'var(--orange)' : 'rgba(255,255,255,0.1)'};">
