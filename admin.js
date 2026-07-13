@@ -7,6 +7,7 @@ let dynamicGames = [];
 let players = [];
 let banners = [];
 let agents = [];
+let receipts = [];
 let currentWalletPlayerId = null;
 let currentDeletePlayerId = null;
 let settings = {
@@ -132,6 +133,7 @@ async function loadData() {
         } else {
             agents = [];
         }
+        receipts = Array.isArray(data.receipts) ? data.receipts : [];
     } catch (e) {
         console.warn('Falling back to localStorage:', e);
         providers    = JSON.parse(localStorage.getItem('masoudi_providers'))    || defaultProviders();
@@ -140,6 +142,7 @@ async function loadData() {
         agents       = JSON.parse(localStorage.getItem('masoudi_agents'))       || [];
         banners      = JSON.parse(localStorage.getItem('masoudi_banners'))      || [];
         settings     = JSON.parse(localStorage.getItem('masoudi_settings'))     || settings;
+        receipts     = JSON.parse(localStorage.getItem('masoudi_receipts'))     || [];
     }
     initSettingsUI();
     renderAll();
@@ -147,13 +150,14 @@ async function loadData() {
 
 // ─── Data: Save ──────────────────────────────
 async function saveData() {
-    const payload = { settings, banners, agents, providers, games: dynamicGames, players };
+    const payload = { settings, banners, agents, providers, games: dynamicGames, players, receipts };
     localStorage.setItem('masoudi_providers', JSON.stringify(providers));
     localStorage.setItem('masoudi_games',     JSON.stringify(dynamicGames));
     localStorage.setItem('masoudi_players',   JSON.stringify(players));
     localStorage.setItem('masoudi_agents',    JSON.stringify(agents));
     localStorage.setItem('masoudi_banners',   JSON.stringify(banners));
     localStorage.setItem('masoudi_settings',  JSON.stringify(settings));
+    localStorage.setItem('masoudi_receipts',  JSON.stringify(receipts));
     try {
         await fetch(API_BASE + '/api/data', {
             method: 'POST',
@@ -176,6 +180,7 @@ function renderAll() {
     renderAdminAgentsTable();
     renderAdminP2pAgentsTable();
     loadPaymentGateways();
+    renderReceiptsTable();
 }
 
 // ─── Payment Gateways ─────────────────────────
@@ -1242,6 +1247,78 @@ async function sendCoinsToP2pAgent(playerId, inputId) {
 Object.assign(window, {
     openModal,
     closeModal,
+// ─── Receipts Rendering & Management ──────────
+function renderReceiptsTable() {
+    const tbody = document.getElementById('adminReceiptsTableBody');
+    if (!tbody) return;
+
+    if (!receipts || receipts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;padding:20px;">لا توجد إيصالات شحن مرسلة حالياً</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = '';
+    receipts.slice().reverse().forEach(r => {
+        const statusLabels = {
+            pending: '<span style="background:rgba(255,152,0,0.12);color:#FF9800;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,152,0,0.25);">⏳ قيد المراجعة</span>',
+            approved: '<span style="background:rgba(0,230,118,0.12);color:#00E676;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,230,118,0.25);">✅ مقبول</span>',
+            rejected: '<span style="background:rgba(255,82,82,0.12);color:#FF5252;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,82,82,0.25);">❌ مرفوض</span>'
+        };
+
+        const imgUrl = resolveImageUrl(r.imageUrl);
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border)';
+        tr.innerHTML = `
+            <td style="padding:10px;">
+                <strong>${r.playerName}</strong><br>
+                <span style="font-size:11px;color:#888;">#${r.playerId}</span>
+            </td>
+            <td style="padding:10px;">${r.gateway}</td>
+            <td style="padding:10px;font-weight:bold;color:var(--orange);">${r.amount}</td>
+            <td style="padding:10px;direction:ltr;text-align:right;">${r.date}</td>
+            <td style="padding:10px;">
+                <a href="${imgUrl}" target="_blank">
+                    <img src="${imgUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" title="عرض كامل الصورة">
+                </a>
+            </td>
+            <td style="padding:10px;">${statusLabels[r.status] || r.status}</td>
+            <td style="padding:10px;">
+                <div style="display:flex;gap:6px;">
+                    ${r.status === 'pending' ? `
+                        <button onclick="handleReceiptAction('${r.id}', 'approve')" style="background:#00E676;color:#100906;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:'Cairo';font-weight:bold;font-size:11px;">قبول</button>
+                        <button onclick="handleReceiptAction('${r.id}', 'reject')" style="background:#FF5252;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:'Cairo';font-weight:bold;font-size:11px;">رفض</button>
+                    ` : ''}
+                    <button onclick="handleReceiptAction('${r.id}', 'delete')" style="background:rgba(255,82,82,0.15);color:#FF5252;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:'Cairo';font-weight:bold;font-size:11px;">حذف</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+async function handleReceiptAction(receiptId, action) {
+    if (action === 'delete' && !confirm('هل أنت متأكد من حذف هذا الإيصال نهائياً؟')) return;
+    try {
+        const res = await fetch(API_BASE + '/api/admin/action-receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ receiptId, action })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('تم تنفيذ الإجراء بنجاح ✅');
+            loadData();
+        } else {
+            showToast(data.error || 'فشل تنفيذ الإجراء', 'error');
+        }
+    } catch (e) {
+        showToast('خطأ في الاتصال بالخادم', 'error');
+    }
+}
+window.handleReceiptAction = handleReceiptAction;
+
+// ─── Export Object ──────────
+export {
     adminLogout,
     switchTab,
     toggleAddPlayerForm,

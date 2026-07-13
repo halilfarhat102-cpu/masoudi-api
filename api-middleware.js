@@ -202,6 +202,71 @@ export async function apiMiddleware(req, res, next) {
         res.end(JSON.stringify({ error: e.message }));
       }
     });
+  } else if (req.url === '/api/submit-receipt' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const db = await readDb();
+        const { playerId, playerName, gateway, amount, imageUrl } = JSON.parse(body);
+
+        if (!playerId || !gateway || !imageUrl) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'بيانات الإيصال غير كاملة' }));
+          return;
+        }
+
+        if (!db.receipts) db.receipts = [];
+        const newReceipt = {
+          id: `rcpt-${Date.now()}`,
+          playerId,
+          playerName: playerName || 'لاعب مسعودي',
+          gateway,
+          amount: amount || '—',
+          imageUrl,
+          date: new Date().toLocaleString('ar-EG'),
+          status: 'pending'
+        };
+        db.receipts.push(newReceipt);
+        await writeDb(db);
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true, receipt: newReceipt }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+  } else if (req.url === '/api/admin/action-receipt' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const db = await readDb();
+        const { receiptId, action } = JSON.parse(body);
+
+        if (!db.receipts) db.receipts = [];
+        const idx = db.receipts.findIndex(r => r.id === receiptId);
+        if (idx === -1) {
+          res.statusCode = 404;
+          res.end(JSON.stringify({ error: 'الإيصال غير موجود' }));
+          return;
+        }
+
+        if (action === 'delete') {
+          db.receipts.splice(idx, 1);
+        } else {
+          db.receipts[idx].status = action === 'approve' ? 'approved' : 'rejected';
+        }
+
+        await writeDb(db);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
   } else if (req.url === '/api/admin/add-player' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });

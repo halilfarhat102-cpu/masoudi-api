@@ -644,6 +644,9 @@
             <button class="admin-tab" onclick="switchTab('tab-payment')">
                 <i class="fa-solid fa-credit-card"></i> بوابات الشحن 🇪🇬
             </button>
+            <button class="admin-tab" onclick="switchTab('tab-receipts')">
+                <i class="fa-solid fa-receipt"></i> إيصالات الشحن 🧾
+            </button>
         </div>
 
         <main>
@@ -1181,6 +1184,36 @@
                     <button onclick="savePaymentGateways()" style="width:100%;background:var(--orange);border:none;color:#fff;border-radius:14px;padding:14px;font-family:'Cairo';font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px var(--orange-glow);">
                         <i class="fa-solid fa-floppy-disk" style="margin-left:8px;"></i> حفظ إعدادات بوابات الشحن
                     </button>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB: RECEIPTS ═══════════════ -->
+            <div id="tab-receipts" class="tab-panel">
+                <div class="section-header-row">
+                    <h3><i class="fa-solid fa-receipt" style="color:var(--orange);margin-left:6px;"></i>إيصالات الشحن من التطبيق</h3>
+                </div>
+
+                <div class="glass-card" style="padding:20px;border-radius:16px;">
+                    <p style="font-size:12px;color:#aaa;margin-bottom:15px;">هنا تظهر الإيصالات وصور التحويل المرسلة من اللاعبين عبر قسم "شحن من التطبيق". يمكنك مراجعتها وتأكيدها أو رفضها.</p>
+                    
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%;border-collapse:collapse;margin-top:10px;font-family:'Cairo';font-size:13px;text-align:right;">
+                            <thead>
+                                <tr style="border-bottom:2px solid var(--border);color:var(--orange);">
+                                    <th style="padding:10px;">اللاعب</th>
+                                    <th style="padding:10px;">بوابة الدفع</th>
+                                    <th style="padding:10px;">المبلغ/الكوينز</th>
+                                    <th style="padding:10px;">تاريخ الإرسال</th>
+                                    <th style="padding:10px;">صورة الإيصال</th>
+                                    <th style="padding:10px;">الحالة</th>
+                                    <th style="padding:10px;">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminReceiptsTableBody">
+                                <tr><td colspan="7" style="text-align:center;color:#888;padding:20px;">جاري تحميل الإيصالات...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
