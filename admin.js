@@ -65,6 +65,8 @@ function initAdminHeader() {
     if (nameEl) nameEl.textContent = name;
     if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-user-shield"></i> ${role === 'superadmin' ? 'مشرف عام' : 'مشرف'}`;
     if (addAdminBtn && role === 'superadmin') addAdminBtn.style.display = 'flex';
+    const tabBtnAdmins = document.getElementById('tabBtnAdmins');
+    if (tabBtnAdmins && role === 'superadmin') tabBtnAdmins.style.display = 'flex';
 
     // Role-based tab visibility check
     if (role !== 'superadmin') {
@@ -1410,6 +1412,7 @@ const adminTranslations = {
         "وكلاء التطبيق (P2P)": "P2P Agents",
         "بوابات الشحن 🇪🇬": "Gateways 🇪🇬",
         "إيصالات الشحن 🧾": "Receipts 🧾",
+        "إدارة المشرفين 👥": "Moderators 👥",
         "قائمة اللاعبين المسجلين في التطبيق": "Registered Players",
         "إضافة لاعب جديد": "Add New Player",
         "بحث عن لاعب بالاسم أو البريد أو المعرف...": "Search players by name, email or ID...",

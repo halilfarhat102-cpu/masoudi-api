@@ -652,6 +652,9 @@
             <button class="admin-tab" onclick="switchTab('tab-receipts')">
                 <i class="fa-solid fa-receipt"></i> إيصالات الشحن 🧾
             </button>
+            <button class="admin-tab" onclick="switchTab('tab-admins')" id="tabBtnAdmins" style="display:none;">
+                <i class="fa-solid fa-user-shield"></i> إدارة المشرفين 👥
+            </button>
         </div>
 
         <main>
@@ -908,10 +911,15 @@
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Admins/Moderators List -->
-                <div class="section-header-row" style="margin-top: 30px;">
+            <!-- ═══════════════ TAB: ADMINS ═══════════════ -->
+            <div id="tab-admins" class="tab-panel">
+                <div class="section-header-row">
                     <h3><i class="fa-solid fa-user-shield" style="color:var(--orange);margin-left:6px;"></i>إدارة المشرفين والنشطين بالمنصة</h3>
+                    <button class="btn-action btn-add-funds" onclick="openModal('addAdminModal')" style="font-size:12px;padding:8px 14px;">
+                        <i class="fa-solid fa-user-plus"></i> إضافة مشرف جديد
+                    </button>
                 </div>
                 <div class="transaction-history glass-card" style="margin-bottom: 20px;">
                     <h4 style="font-size:15px;"><i class="fa-solid fa-users-gear text-gold"></i> قائمة المشرفين وتراخيصهم</h4>
