@@ -23,12 +23,17 @@ const winners = [
     { name: "سلطان العتيبي", prize: "6,200 ر.س", game: "سلوتس كليوباترا" }
 ];
 
+// Filter State
+let currentSearchQuery = "";
+let currentCategory = "all";
+
 // Initialize application
 document.addEventListener("DOMContentLoaded", () => {
     loadGamesFromStorage();
     updateBalanceUI();
     renderTransactions();
     initWinnersTicker();
+    initBannersCarousel();
     renderDynamicGames();
     
     // Splash screen loader animation
@@ -44,6 +49,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (splashLoader) splashLoader.style.display = "none";
         if (btnEnterApp) btnEnterApp.classList.add("active");
     }, 2200);
+
+    // Search bar event handler
+    const searchInput = document.getElementById("gameSearchInput");
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            currentSearchQuery = e.target.value;
+            renderDynamicGames();
+        });
+    }
     
     // Add localStorage event listener to sync games in real-time if Admin changes them in another tab!
     window.addEventListener("storage", (e) => {
@@ -338,40 +352,50 @@ function executeModalWithdraw() {
 }
 
 
-// Render Games on Homepage
+// Render Games on Homepage (with Filter & Search logic matching Flutter)
 function renderDynamicGames() {
     const grid = document.getElementById("dynamicGamesGrid");
     if (!grid) return;
     
     grid.innerHTML = "";
     
-    if (dynamicGames.length === 0) {
+    // Filter games list
+    const filteredGames = dynamicGames.filter(game => {
+        const matchesCategory = (currentCategory === "all" || game.category === currentCategory);
+        const matchesSearch = game.title.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
+                              game.provider.toLowerCase().includes(currentSearchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    if (filteredGames.length === 0) {
         grid.innerHTML = `
-            <div class="empty-games-placeholder">
-                <i class="fa-solid fa-circle-exclamation fa-2x"></i>
-                <span style="font-weight:700;">لا يوجد ألعاب مضافة في المنصة حالياً!</span>
-                <span>يرجى الدخول إلى لوحة تحكم المسؤول المستقلة لإضافة ألعاب لكي تظهر هنا.</span>
+            <div class="empty-grid-placeholder">
+                <i class="fa-solid fa-gamepad fa-3x"></i>
+                <span class="main-txt">لا توجد ألعاب متوفرة!</span>
+                <span class="sub-txt">لم نجد أي لعبة تطابق بحثك أو تصنيفك الحالي.</span>
             </div>
         `;
         return;
     }
     
-    dynamicGames.forEach(game => {
+    filteredGames.forEach(game => {
         const card = document.createElement("div");
-        card.className = "game-card glass-card";
-        card.onclick = () => launchDynamicGame(game.id);
+        card.className = "game-card-premium";
         
+        // Use double image layout for premium blur border effect (just like Flutter image underlay)
         card.innerHTML = `
-            <div class="game-image-container">
-                <img src="${game.image}" alt="${game.title}" class="game-image">
-                <div class="game-overlay">
-                    <span class="play-btn-circle"><i class="fa-solid fa-play"></i></span>
-                </div>
+            <div class="game-image-box" onclick="launchDynamicGame('${game.id}')">
+                <img src="${game.image}" alt="${game.title}" class="game-img-blur-bg" onerror="this.style.display='none'">
+                <img src="${game.image}" alt="${game.title}" class="game-img-front" onerror="this.src='images/app_icon.png'">
+                <span class="provider-badge">${game.provider}</span>
             </div>
-            <div class="game-meta">
-                <div class="game-title">${game.title}</div>
-                <div class="game-category">${game.provider} (${translateCategory(game.category)})</div>
-                <span class="vip-tag-gold"><i class="fa-solid fa-gem"></i> API</span>
+            <div class="game-info-box">
+                <div class="game-title-text">${game.title}</div>
+                <div class="game-category-text">${translateCategory(game.category)}</div>
+                <button class="btn-play-game" onclick="launchDynamicGame('${game.id}')">
+                    <span>العب الآن</span>
+                    <i class="fa-solid fa-play"></i>
+                </button>
             </div>
         `;
         grid.appendChild(card);
@@ -384,6 +408,99 @@ function translateCategory(cat) {
     if (cat === 'live') return 'كازينو مباشر';
     return 'لعبة فورية';
 }
+
+// Category Filter Controller (matching Flutter category chips)
+function setCategoryFilter(category) {
+    currentCategory = category;
+    
+    // Update active states on visual chips
+    const chips = document.querySelectorAll(".category-chips-row .chip");
+    chips.forEach(chip => {
+        if (chip.getAttribute("data-category") === category) {
+            chip.classList.add("active");
+        } else {
+            chip.classList.remove("active");
+        }
+    });
+    
+    renderDynamicGames();
+}
+window.setCategoryFilter = setCategoryFilter;
+
+// Initialize Banner Promo Carousel (matching Flutter Home Carousel)
+function initBannersCarousel() {
+    const wrapper = document.getElementById("promoCarouselWrapper");
+    const dotsContainer = document.getElementById("promoDots");
+    if (!wrapper || !dotsContainer) return;
+
+    const promoBanners = [
+        {
+            title: "مكافأة الترحيب 150%",
+            subtitle: "أودع الآن واحصل على ضعف رصيدك فوراً في محفظتك الشخصية",
+            badge: "حصري",
+            theme: "emerald"
+        },
+        {
+            title: "جاكبوت روليت البرق",
+            subtitle: "الجائزة الكبرى تصل إلى 500,000 $ نقداً للرابحين المميزين",
+            badge: "مباشر",
+            theme: "purple"
+        },
+        {
+            title: "بطولة الأسبوع VIP",
+            subtitle: "المركز الأول يربح 25,000 $ كاش هدايا مباشرة للأعضاء",
+            badge: "جديد",
+            theme: "gold"
+        }
+    ];
+
+    wrapper.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    promoBanners.forEach((banner, index) => {
+        // Create slide
+        const slide = document.createElement("div");
+        slide.className = "promo-slide";
+        slide.innerHTML = `
+            <div class="promo-card promo-${banner.theme}">
+                <span class="promo-badge">${banner.badge}</span>
+                <div class="promo-title">${banner.title}</div>
+                <div class="promo-subtitle">${banner.subtitle}</div>
+            </div>
+        `;
+        wrapper.appendChild(slide);
+
+        // Create dot indicator
+        const dot = document.createElement("div");
+        dot.className = `promo-dot ${index === 0 ? 'active' : ''}`;
+        dot.setAttribute("data-slide", index);
+        dotsContainer.appendChild(dot);
+    });
+
+    let currentSlide = 0;
+    const slidesCount = promoBanners.length;
+
+    // Automatic slider loop every 5 seconds (matching Flutter)
+    setInterval(() => {
+        currentSlide = (currentSlide + 1) % slidesCount;
+        updateCarouselPosition();
+    }, 5000);
+
+    function updateCarouselPosition() {
+        wrapper.style.transform = `translateX(${currentSlide * 100}%)`;
+        
+        // Update dots
+        const dots = dotsContainer.querySelectorAll(".promo-dot");
+        dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+                dot.classList.add("active");
+            } else {
+                dot.classList.remove("active");
+            }
+        });
+    }
+}
+window.initBannersCarousel = initBannersCarousel;
 
 // Launch Game in Dynamic Iframe (The VIP API play zone)
 function launchDynamicGame(gameId) {

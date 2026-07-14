@@ -2449,3 +2449,373 @@ tr:last-child td {
     }
 }
 
+/* ==========================================================================
+   FLUTTER DESIGN MATCHING STYLES (Promo Banners, Chips, Redesigned Game Cards)
+   ========================================================================== */
+
+/* Promo Banners Carousel */
+.promo-carousel-container {
+    margin: 8px 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.promo-carousel-wrapper {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 100%;
+}
+
+.promo-slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 2px;
+}
+
+.promo-card {
+    height: 130px;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    background-size: cover;
+    background-position: center;
+}
+
+/* Decorative circles inside promo cards */
+.promo-card::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+}
+
+.promo-card::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    right: 20px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+}
+
+.promo-badge {
+    align-self: flex-start;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.promo-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.promo-subtitle {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    max-width: 80%;
+}
+
+.promo-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.promo-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3D2A20;
+    transition: all 0.3s ease;
+}
+
+.promo-dot.active {
+    width: 20px;
+    border-radius: 4px;
+    background: var(--gold-primary);
+    box-shadow: 0 0 8px var(--gold-glow);
+}
+
+/* Theme presets for promo cards */
+.promo-emerald {
+    background: linear-gradient(135deg, #0d2b1a 0%, #0a3d20 100%);
+    border-color: rgba(0, 230, 118, 0.2);
+}
+.promo-emerald .promo-badge {
+    background: rgba(0, 230, 118, 0.15);
+    color: #00E676;
+    border: 0.8px solid rgba(0, 230, 118, 0.3);
+}
+
+.promo-purple {
+    background: linear-gradient(135deg, #150d2e 0%, #1b1040 100%);
+    border-color: rgba(124, 77, 255, 0.2);
+}
+.promo-purple .promo-badge {
+    background: rgba(124, 77, 255, 0.15);
+    color: #7c4dff;
+    border: 0.8px solid rgba(124, 77, 255, 0.3);
+}
+
+.promo-gold {
+    background: linear-gradient(135deg, #2a1c00 0%, #3d2800 100%);
+    border-color: rgba(255, 122, 31, 0.25);
+}
+.promo-gold .promo-badge {
+    background: rgba(255, 122, 31, 0.15);
+    color: var(--gold-primary);
+    border: 0.8px solid rgba(255, 122, 31, 0.3);
+}
+
+/* Search and Filters */
+.home-search-filter-section {
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.home-search-filter-section .search-input-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #291B15;
+    border: 1px solid #3D2A20;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+}
+
+.home-search-filter-section .search-input-container:focus-within {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 10px rgba(255, 122, 31, 0.15);
+}
+
+.home-search-filter-section .search-input-container i {
+    color: #6B7080;
+    font-size: 15px;
+}
+
+.home-search-filter-section .search-input-container input {
+    background: none;
+    border: none;
+    outline: none;
+    color: #fff;
+    width: 100%;
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.category-chips-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+}
+
+.category-chips-row::-webkit-scrollbar {
+    display: none;
+}
+
+.category-chips-row .chip {
+    padding: 8px 18px;
+    background: #291B15;
+    border: 1px solid #3D2A20;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8B909E;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.category-chips-row .chip.active {
+    background: var(--gold-primary);
+    color: #1A110D;
+    border-color: var(--gold-primary);
+    font-weight: 850;
+    box-shadow: 0 4px 12px rgba(255, 122, 31, 0.25);
+}
+
+/* Redesigned Game Cards - MATCHING FLUTTER */
+.games-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 0 12px 25px 12px;
+}
+
+.game-card-premium {
+    background: #291B15;
+    border-radius: 20px;
+    border: 1px solid #3D2A20;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    position: relative;
+}
+
+.game-card-premium:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold-primary);
+}
+
+.game-card-premium .game-image-box {
+    position: relative;
+    height: 120px;
+    background: #221711;
+    overflow: hidden;
+}
+
+/* Blurred background image underlay */
+.game-card-premium .game-img-blur-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(10px) brightness(0.4);
+    transform: scale(1.15);
+}
+
+/* Front contained cover image */
+.game-card-premium .game-img-front {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 2;
+}
+
+/* Provider badge on top right of the image */
+.game-card-premium .provider-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 8.5px;
+    font-weight: 800;
+    z-index: 5;
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+}
+
+/* Details area */
+.game-card-premium .game-info-box {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.game-card-premium .game-title-text {
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-card-premium .game-category-text {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #8B909E;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Custom Play Button - MATCHING FLUTTER */
+.game-card-premium .btn-play-game {
+    width: 100%;
+    height: 34px;
+    background: var(--gold-primary);
+    color: #1A110D;
+    border: none;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.game-card-premium .btn-play-game:hover {
+    opacity: 0.95;
+    transform: scale(0.98);
+}
+
+.game-card-premium .btn-play-game i {
+    font-size: 12px;
+}
+
+/* Empty grid state */
+.empty-grid-placeholder {
+    grid-column: span 2;
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #6B7080;
+}
+
+.empty-grid-placeholder i {
+    color: var(--gold-primary);
+    opacity: 0.6;
+}
+
+.empty-grid-placeholder .main-txt {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.empty-grid-placeholder .sub-txt {
+    font-size: 11px;
+    color: #8B909E;
+    line-height: 1.5;
+}
+
+

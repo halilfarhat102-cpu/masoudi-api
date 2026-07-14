@@ -121,12 +121,41 @@
             
             <!-- VIEW 1: HOME -->
             <section id="view-home" class="app-view active">
-                <div class="section-title-row">
+                
+                <!-- Banners Carousel (promo slider like Flutter) -->
+                <div class="promo-carousel-container">
+                    <div class="promo-carousel-wrapper" id="promoCarouselWrapper">
+                        <!-- Banners will be rendered dynamically here -->
+                    </div>
+                    <!-- Indicator dots -->
+                    <div class="promo-dots" id="promoDots">
+                        <!-- Dot indicators will be rendered dynamically here -->
+                    </div>
+                </div>
+
+                <!-- Interactive Filters & Search Section -->
+                <div class="home-search-filter-section">
+                    <!-- Search Input -->
+                    <div class="search-input-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="gameSearchInput" placeholder="ابحث عن لعبتك المفضلة...">
+                    </div>
+
+                    <!-- Category Chips -->
+                    <div class="category-chips-row">
+                        <button class="chip active" data-category="all" onclick="setCategoryFilter('all')">الكل</button>
+                        <button class="chip" data-category="slots" onclick="setCategoryFilter('slots')">سلوتس</button>
+                        <button class="chip" data-category="live" onclick="setCategoryFilter('live')">كازينو مباشر</button>
+                        <button class="chip" data-category="table" onclick="setCategoryFilter('table')">ألعاب طاولة</button>
+                    </div>
+                </div>
+
+                <div class="section-title-row" style="margin-top: 10px;">
                     <h3>الألعاب المضافة</h3>
                 </div>
                 
                 <div class="games-grid" id="dynamicGamesGrid">
-                    <!-- Dynamically populated from localStorage -->
+                    <!-- Dynamically populated from JavaScript -->
                 </div>
             </section>
 
