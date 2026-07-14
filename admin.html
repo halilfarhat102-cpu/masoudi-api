@@ -24,20 +24,21 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden; /* No page-level scroll */
+            max-width: 100vw;     /* Never wider than screen */
+            overflow-x: hidden;   /* No horizontal scroll */
         }
         body {
             background: var(--dark-bg);
             color: #fff;
             font-family: 'Cairo', sans-serif;
-            overflow-x: hidden;
         }
 
         .admin-wrapper {
             display: flex;
-            height: 100vh;     /* Locked to viewport */
+            min-height: 100vh;
             width: 100%;
-            overflow: hidden;  /* No outer scroll */
+            max-width: 100vw;     /* Locked to screen width */
+            overflow-x: hidden;   /* No sideways expansion */
         }
 
         /* Sidebar styling */
@@ -183,12 +184,13 @@
         /* Main content styling */
         .main-content {
             flex: 1;
-            height: 100vh;          /* Fixed to viewport height */
-            overflow-y: auto;       /* Only this area scrolls */
-            overflow-x: hidden;
+            min-height: 100vh;
+            overflow-y: auto;       /* Vertical scroll works */
+            overflow-x: hidden;     /* No horizontal expansion */
             padding: 20px;
             margin-right: 280px;
             width: calc(100% - 280px);
+            max-width: calc(100vw - 280px); /* Never wider than screen */
             box-sizing: border-box;
             transition: margin 0.3s ease, width 0.3s ease;
         }
@@ -245,9 +247,11 @@
             margin-right: 0 !important;
             margin-left: 0 !important;
             width: 100% !important;
-            height: 100vh !important;
+            max-width: 100vw !important;
             padding: 14px !important;
             box-sizing: border-box !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
         }
 
         /* ─── Back Button Custom Styling ─── */
