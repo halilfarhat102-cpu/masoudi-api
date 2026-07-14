@@ -16,15 +16,21 @@ app.use(cors());
 app.use('/images', express.static(resolve(__dirname, 'images')));
 app.use('/public', express.static(resolve(__dirname, 'public')));
 
+// Serve root static assets directly for instant update without build
+app.get('/style.css', (req, res) => res.sendFile(resolve(__dirname, 'style.css')));
+app.get('/app.js', (req, res) => res.sendFile(resolve(__dirname, 'app.js')));
+app.get('/admin.js', (req, res) => res.sendFile(resolve(__dirname, 'admin.js')));
+
 // Mount API middleware directly (avoid express.json() because apiMiddleware handles raw streams)
 app.use(apiMiddleware);
 
-// Serve compiled static admin panel and homepage
+// Serve static files from root folder (and fallback to dist if exists)
+app.use(express.static(__dirname));
 app.use(express.static(resolve(__dirname, 'dist')));
 
 // Fallback all non-API requests to index.html
 app.get('*', (req, res) => {
-  res.sendFile(resolve(__dirname, 'dist', 'index.html'));
+  res.sendFile(resolve(__dirname, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
