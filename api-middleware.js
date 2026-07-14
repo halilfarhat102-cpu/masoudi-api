@@ -1135,11 +1135,100 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
+  // ── BET PAYOUT: Combined game round result (bet deducted + win added atomically) ──
+  // This is DIFFERENT from /adjustment. PG Soft calls this at end of each game round.
+  // Payload: { token, player_id, bet_amount, win_amount, transaction_id, game_code }
+  } else if (req.url === '/api/game/betpayout' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+
+        const token    = payload.token || payload.session_token || payload.sessionToken;
+        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const betAmt   = parseFloat(payload.bet_amount  || payload.bet  || 0);
+        const winAmt   = parseFloat(payload.win_amount  || payload.win  || 0);
+        const txId     = payload.transaction_id || payload.txid || ('BP-' + Date.now());
+        const gameName = payload.game_name || payload.game_code || 'Game';
+
+        let resultBalance  = 0;
+        let resultPlayerId = '';
+        let errorMsg       = null;
+        let isDuplicate    = false;
+
+        await runTransaction(async (db) => {
+          if (!db.players) db.players = [];
+          let player = null;
+          if (token)    player = db.players.find(p => p.sessionToken === token);
+          if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+
+          if (!player) { errorMsg = 'Player not found'; return db; }
+
+          // Duplicate transaction guard
+          if (!db.processedTxIds) db.processedTxIds = [];
+          if (db.processedTxIds.includes(txId)) {
+            isDuplicate    = true;
+            resultBalance  = player.balance || 0;
+            resultPlayerId = player.id;
+            return db;
+          }
+
+          const betCoins = Math.round(betAmt * 100);
+          const winCoins = Math.round(winAmt * 100);
+          const netCoins = winCoins - betCoins; // positive = net win, negative = net loss
+
+          // Check sufficient balance for bet
+          if ((player.balance || 0) < betCoins) {
+            errorMsg      = 'Insufficient balance';
+            resultBalance = player.balance || 0;
+            return db;
+          }
+
+          // Apply net change atomically
+          player.balance = (player.balance || 0) + netCoins;
+          if (player.balance < 0) player.balance = 0;
+
+          if (!player.transactions) player.transactions = [];
+          player.transactions.push({
+            type:   netCoins >= 0 ? `فوز 🎉 — ${gameName}` : `رهان — ${gameName}`,
+            amount: netCoins,
+            txId:   txId,
+            date:   new Date().toLocaleTimeString('ar')
+          });
+
+          db.processedTxIds.push(txId);
+          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+
+          resultBalance  = player.balance;
+          resultPlayerId = player.id;
+          return db;
+        });
+
+        res.setHeader('Content-Type', 'application/json');
+        if (errorMsg) {
+          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: (resultBalance / 100).toFixed(2) }));
+        }
+        res.end(JSON.stringify({
+          code:           1,
+          msg:            isDuplicate ? 'duplicate_ignored' : 'success',
+          balance:        (resultBalance / 100).toFixed(2),
+          transaction_id: txId,
+          player_id:      resultPlayerId
+        }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+      }
+    });
+
   } else if (req.url === '/api/game/bet' && req.method === 'POST') {
     // Deduct bet amount from player balance
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+
       try {
         const dbPath = resolve(__dirname, 'db.json');
         const db = await readDb();
