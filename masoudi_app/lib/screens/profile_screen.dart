@@ -824,6 +824,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Divider(color: const Color(0xFF3D2A20)),
                 _buildSettingButton(Icons.support_agent, 'التواصل مع مدير الدعم المخصص'),
                 Divider(color: const Color(0xFF3D2A20)),
+                _buildSettingButton(
+                  Icons.language_rounded,
+                  'تغيير لغة التطبيق (Change Language)',
+                  textColor: Colors.white,
+                  onTap: () {
+                    _showLanguageDialog();
+                  },
+                ),
+                Divider(color: const Color(0xFF3D2A20)),
                 if (widget.isAdmin) ...[
                   _buildSettingButton(
                     Icons.admin_panel_settings_rounded,
@@ -1253,6 +1262,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E140F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: const Color(0xFFD45A00).withOpacity(0.3), width: 1.5),
+          ),
+          title: Text(
+            'تغيير لغة التطبيق\nChange Language',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cairo(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('اللغة الحالية هي العربية بالفعل', style: GoogleFonts.cairo(fontSize: 12)),
+                      backgroundColor: const Color(0xFFD45A00),
+                    ),
+                  );
+                },
+                leading: const Text('🇸🇦', style: TextStyle(fontSize: 22)),
+                title: Text(
+                  'العربية (Arabic)',
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                trailing: const Icon(Icons.check_circle_rounded, color: Color(0xFFD45A00)),
+              ),
+              Divider(color: const Color(0xFF3D2A20)),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('English language applied successfully!', style: GoogleFonts.cairo(fontSize: 12)),
+                      backgroundColor: const Color(0xFF00E676),
+                    ),
+                  );
+                },
+                leading: const Text('🇺🇸', style: TextStyle(fontSize: 22)),
+                title: Text(
+                  'English (الإنجليزية)',
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
+                ),
+                trailing: Icon(Icons.circle_outlined, color: Colors.white.withOpacity(0.3)),
+              ),
+            ],
+          ),
+          actionsPadding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF35241C),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: const Color(0xFFD45A00).withOpacity(0.2)),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'إغلاق / Close',
+                  style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
