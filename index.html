@@ -11,7 +11,7 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom Style -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2.2">
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -44,64 +44,26 @@
 
     <div class="app-container">
 
-        <!-- Top App Bar (like the APK) -->
+        <!-- Top App Bar (exactly like the Flutter App) -->
         <div class="top-app-bar">
-            <div class="top-bar-logo">
-                <img src="images/app_icon.png" alt="مسعودي" class="top-bar-icon" onerror="this.style.display='none'">
-                <span class="top-bar-brand">مسعودي</span>
+            <!-- Left: Cute Fox Mascot Logo -->
+            <div class="top-bar-mascot" onclick="switchTab('home')">
+                <img src="images/fox_fab.png" alt="Mascot" class="top-bar-mascot-img" onerror="this.src='images/app_icon.png'">
             </div>
-            <div class="top-bar-actions">
-                <button class="top-bar-btn" onclick="showToast('لا توجد إشعارات جديدة', 'info')">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="notif-dot"></span>
-                </button>
-                <button class="top-bar-btn" onclick="showToast('قريباً: الدعم الفوري', 'info')">
-                    <i class="fa-regular fa-message"></i>
-                </button>
+            
+            <!-- Middle: Coin Balance Widget -->
+            <div class="top-bar-coins-widget" onclick="switchTab('wallet')">
+                <span class="coin-icon">🪙</span>
+                <span id="topBarBalance" class="coin-balance-text">250,500</span>
+            </div>
+
+            <!-- Right: Circular Profile Avatar -->
+            <div class="top-bar-profile" onclick="switchTab('profile')">
+                <div class="top-bar-avatar-container">
+                    <img src="images/player_avatar.png" alt="Profile" class="top-bar-avatar-img" id="topBarAvatar">
+                </div>
             </div>
         </div>
-
-        <!-- Top Profile & Wallet Header -->
-        <header class="vip-header glass-card">
-            <div class="profile-section">
-                <div class="avatar-container">
-                    <img src="images/player_avatar.png" alt="صورة اللاعب" class="player-avatar" id="avatarImg">
-                    <div class="vip-badge-mini">1</div>
-                </div>
-                <div class="player-info">
-                    <div class="player-name-row">
-                        <h2 class="player-name" id="playerName">أحمد الحربي</h2>
-                        <span class="vip-badge"><i class="fa-solid fa-gem"></i> رتبة 1</span>
-                    </div>
-                    <span class="player-id">رقم اللاعب: <span id="playerId">#879,204</span></span>
-                </div>
-            </div>
-            
-            <!-- Quick Wallet Card -->
-            <div class="quick-wallet">
-                <div class="balance-label">الرصيد الحالي</div>
-                <div class="balance-amount"><span id="headerBalance">250,500.00</span> <span class="currency">ر.س</span></div>
-            </div>
-        </header>
-
-        <!-- Quick Actions & Last Transaction -->
-        <section class="quick-actions-bar">
-            <div class="action-buttons">
-                <button class="btn btn-deposit glass-card" onclick="openDepositModal()">
-                    <span class="icon-circle emerald-glow"><i class="fa-solid fa-arrow-down-to-bracket"></i></span>
-                    <span class="btn-text">إيداع سريع</span>
-                </button>
-                <button class="btn btn-withdraw glass-card" onclick="openWithdrawModal()">
-                    <span class="icon-circle gold-glow"><i class="fa-solid fa-paper-plane"></i></span>
-                    <span class="btn-text">سحب سريع</span>
-                </button>
-            </div>
-            
-            <div class="last-transaction glass-card">
-                <span class="tx-title">آخر عملية:</span>
-                <span class="tx-details" id="lastTxDetails">شحن رصيد بقيمة <span class="plus-txt">+5,000 ر.س</span> - ناجحة</span>
-            </div>
-        </section>
 
         <!-- Live Winners Ticker Section -->
         <section class="winners-ticker-section glass-card">
@@ -376,6 +338,6 @@
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <script type="module" src="app.js?v=2.2"></script>
 </body>
 </html>

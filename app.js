@@ -29,12 +29,10 @@ let currentCategory = "all";
 
 // Initialize application
 document.addEventListener("DOMContentLoaded", () => {
-    loadGamesFromStorage();
+    fetchServerData(); // Dynamically load games and banners from Render server API!
     updateBalanceUI();
     renderTransactions();
     initWinnersTicker();
-    initBannersCarousel();
-    renderDynamicGames();
     
     // Splash screen loader animation
     const loaderBar = document.getElementById("loaderBar");
@@ -59,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-    // Add localStorage event listener to sync games in real-time if Admin changes them in another tab!
+    // Sync games in real-time from localStorage as local fallback
     window.addEventListener("storage", (e) => {
         if (e.key === "masoudi_games") {
             loadGamesFromStorage();
@@ -116,10 +114,30 @@ function updateBalanceUI() {
     const primary = primaryBalance.toFixed(2);
     const bonus = bonusBalance.toFixed(2);
 
-    document.getElementById("headerBalance").innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
-    document.getElementById("walletBalance").innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
-    document.getElementById("primaryBalance").innerText = Number(primary).toLocaleString('en-US', { minimumFractionDigits: 2 }) + " ر.س";
-    document.getElementById("bonusBalance").innerText = Number(bonus).toLocaleString('en-US', { minimumFractionDigits: 2 }) + " ر.س";
+    const topBarBalanceEl = document.getElementById("topBarBalance");
+    if (topBarBalanceEl) {
+        topBarBalanceEl.innerText = Math.floor(playerBalance).toLocaleString();
+    }
+
+    const headerBalEl = document.getElementById("headerBalance");
+    if (headerBalEl) {
+        headerBalEl.innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+    
+    const walletBalEl = document.getElementById("walletBalance");
+    if (walletBalEl) {
+        walletBalEl.innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+    
+    const primaryBalEl = document.getElementById("primaryBalance");
+    if (primaryBalEl) {
+        primaryBalEl.innerText = Number(primary).toLocaleString('en-US', { minimumFractionDigits: 2 }) + " ر.س";
+    }
+    
+    const bonusBalEl = document.getElementById("bonusBalance");
+    if (bonusBalEl) {
+        bonusBalEl.innerText = Number(bonus).toLocaleString('en-US', { minimumFractionDigits: 2 }) + " ر.س";
+    }
     
     const gamePlayBalEl = document.getElementById("gamePlayBalance");
     if (gamePlayBalEl) {
@@ -363,7 +381,7 @@ function renderDynamicGames() {
     const filteredGames = dynamicGames.filter(game => {
         const matchesCategory = (currentCategory === "all" || game.category === currentCategory);
         const matchesSearch = game.title.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
-                              game.provider.toLowerCase().includes(currentSearchQuery.toLowerCase());
+                              (game.provider && game.provider.toLowerCase().includes(currentSearchQuery.toLowerCase()));
         return matchesCategory && matchesSearch;
     });
 
@@ -382,20 +400,15 @@ function renderDynamicGames() {
         const card = document.createElement("div");
         card.className = "game-card-premium";
         
-        // Use double image layout for premium blur border effect (just like Flutter image underlay)
+        // Use double image layout and a bottom title overlay (exactly mirroring the Flutter UI cards!)
         card.innerHTML = `
             <div class="game-image-box" onclick="launchDynamicGame('${game.id}')">
                 <img src="${game.image}" alt="${game.title}" class="game-img-blur-bg" onerror="this.style.display='none'">
                 <img src="${game.image}" alt="${game.title}" class="game-img-front" onerror="this.src='images/app_icon.png'">
-                <span class="provider-badge">${game.provider}</span>
-            </div>
-            <div class="game-info-box">
-                <div class="game-title-text">${game.title}</div>
-                <div class="game-category-text">${translateCategory(game.category)}</div>
-                <button class="btn-play-game" onclick="launchDynamicGame('${game.id}')">
-                    <span>العب الآن</span>
-                    <i class="fa-solid fa-play"></i>
-                </button>
+                <span class="provider-badge">${game.provider || 'مسعودي'}</span>
+                <div class="game-title-overlay">
+                    <div class="title-txt">${game.title}</div>
+                </div>
             </div>
         `;
         grid.appendChild(card);
@@ -427,13 +440,135 @@ function setCategoryFilter(category) {
 }
 window.setCategoryFilter = setCategoryFilter;
 
-// Initialize Banner Promo Carousel (matching Flutter Home Carousel)
-function initBannersCarousel() {
+// Render Banners dynamically on UI
+function renderBanners(bannersList) {
     const wrapper = document.getElementById("promoCarouselWrapper");
     const dotsContainer = document.getElementById("promoDots");
     if (!wrapper || !dotsContainer) return;
 
-    const promoBanners = [
+    wrapper.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    bannersList.forEach((banner, index) => {
+        const slide = document.createElement("div");
+        slide.className = "promo-slide";
+        
+        let cardStyle = "";
+        let cardContent = "";
+
+        if (banner.image) {
+            // Resolve image path
+            const BASE = window.location.origin;
+            const imageUrl = banner.image.startsWith('http') ? banner.image : (BASE + '/' + (banner.image.startsWith('/') ? banner.image.slice(1) : banner.image));
+            cardStyle = `background-image: url('${imageUrl}'); background-size: cover; background-position: center;`;
+            cardContent = ``; // Hide text overlay for dynamic design banner images
+        } else {
+            cardStyle = ""; // fall back to css gradient theme
+            cardContent = `
+                <span class="promo-badge">${banner.badge || 'حصري'}</span>
+                <div class="promo-title">${banner.title || ''}</div>
+                <div class="promo-subtitle">${banner.subtitle || ''}</div>
+            `;
+        }
+
+        slide.innerHTML = `
+            <div class="promo-card promo-${banner.theme || 'orange'}" style="${cardStyle}">
+                ${cardContent}
+            </div>
+        `;
+        wrapper.appendChild(slide);
+
+        // Dot indicator
+        const dot = document.createElement("div");
+        dot.className = `promo-dot ${index === 0 ? 'active' : ''}`;
+        dot.setAttribute("data-slide", index);
+        dotsContainer.appendChild(dot);
+    });
+
+    let currentSlide = 0;
+    const slidesCount = bannersList.length;
+
+    // Automatic slider loop every 5 seconds (matching Flutter)
+    if (window.bannerIntervalId) clearInterval(window.bannerIntervalId);
+    window.bannerIntervalId = setInterval(() => {
+        if (slidesCount > 0) {
+            currentSlide = (currentSlide + 1) % slidesCount;
+            updateCarouselPosition();
+        }
+    }, 5000);
+
+    function updateCarouselPosition() {
+        wrapper.style.transform = `translateX(${currentSlide * 100}%)`;
+        
+        // Update dots
+        const dots = dotsContainer.querySelectorAll(".promo-dot");
+        dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+                dot.classList.add("active");
+            } else {
+                dot.classList.remove("active");
+            }
+        });
+    }
+}
+
+// Fetch dynamic games & banners from the API server (sync with DB & Flutter App!)
+async function fetchServerData() {
+    try {
+        const response = await fetch('/api/data');
+        if (response.ok) {
+            const data = await response.json();
+            
+            // 1. Load Banners
+            if (data.banners && data.banners.length > 0) {
+                renderBanners(data.banners);
+            } else {
+                initDefaultBanners();
+            }
+
+            // 2. Load Games
+            if (data.games) {
+                const BASE = window.location.origin;
+                const builtInGames = [
+                    {
+                        id: "fortune-gems",
+                        title: "Fortune Gems 3 — سلوتس الجواهر",
+                        category: "slots",
+                        provider: "مسعودي Games",
+                        launchUrl: BASE + "/public/games/fortune_gems.html",
+                        image: BASE + "/public/games/fortune_gems_icon.png"
+                    },
+                    {
+                        id: "fruit-slots",
+                        title: "Fruit Slots — سلوت الفواكه الكلاسيكية",
+                        category: "slots",
+                        provider: "مسعودي Games",
+                        launchUrl: BASE + "/public/games/fruit_slots.html",
+                        image: BASE + "/public/games/fruit_slots_icon.png"
+                    }
+                ];
+
+                const serverGames = data.games.map(g => ({
+                    ...g,
+                    image: g.image.startsWith('http') ? g.image : (BASE + '/' + (g.image.startsWith('/') ? g.image.slice(1) : g.image))
+                }));
+
+                dynamicGames = [...builtInGames, ...serverGames];
+                renderDynamicGames();
+            }
+        } else {
+            throw new Error("API failed");
+        }
+    } catch (err) {
+        console.warn("API error, loading local games & default banners:", err);
+        loadGamesFromStorage();
+        renderDynamicGames();
+        initDefaultBanners();
+    }
+}
+
+function initDefaultBanners() {
+    const defaultBanners = [
         {
             title: "مكافأة الترحيب 150%",
             subtitle: "أودع الآن واحصل على ضعف رصيدك فوراً في محفظتك الشخصية",
@@ -453,54 +588,10 @@ function initBannersCarousel() {
             theme: "gold"
         }
     ];
-
-    wrapper.innerHTML = "";
-    dotsContainer.innerHTML = "";
-
-    promoBanners.forEach((banner, index) => {
-        // Create slide
-        const slide = document.createElement("div");
-        slide.className = "promo-slide";
-        slide.innerHTML = `
-            <div class="promo-card promo-${banner.theme}">
-                <span class="promo-badge">${banner.badge}</span>
-                <div class="promo-title">${banner.title}</div>
-                <div class="promo-subtitle">${banner.subtitle}</div>
-            </div>
-        `;
-        wrapper.appendChild(slide);
-
-        // Create dot indicator
-        const dot = document.createElement("div");
-        dot.className = `promo-dot ${index === 0 ? 'active' : ''}`;
-        dot.setAttribute("data-slide", index);
-        dotsContainer.appendChild(dot);
-    });
-
-    let currentSlide = 0;
-    const slidesCount = promoBanners.length;
-
-    // Automatic slider loop every 5 seconds (matching Flutter)
-    setInterval(() => {
-        currentSlide = (currentSlide + 1) % slidesCount;
-        updateCarouselPosition();
-    }, 5000);
-
-    function updateCarouselPosition() {
-        wrapper.style.transform = `translateX(${currentSlide * 100}%)`;
-        
-        // Update dots
-        const dots = dotsContainer.querySelectorAll(".promo-dot");
-        dots.forEach((dot, index) => {
-            if (index === currentSlide) {
-                dot.classList.add("active");
-            } else {
-                dot.classList.remove("active");
-            }
-        });
-    }
+    renderBanners(defaultBanners);
 }
-window.initBannersCarousel = initBannersCarousel;
+
+window.fetchServerData = fetchServerData;
 
 // Launch Game in Dynamic Iframe (The VIP API play zone)
 function launchDynamicGame(gameId) {

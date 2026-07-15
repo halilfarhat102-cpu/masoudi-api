@@ -2346,79 +2346,89 @@ tr:last-child td {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    background: linear-gradient(135deg, rgba(10, 6, 0, 0.95) 0%, rgba(20, 13, 0, 0.98) 100%);
-    border-bottom: 1px solid rgba(255, 122, 31, 0.15);
+    padding: 12px 20px;
+    background: #1A110D;
+    border-bottom: 1px solid #3D2A20;
     position: sticky;
     top: 0;
     z-index: 50;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    height: 70px;
+    box-sizing: border-box;
 }
 
-.top-bar-logo {
+.top-bar-mascot {
     display: flex;
     align-items: center;
-    gap: 10px;
+    cursor: pointer;
+    animation: mascotIdle 3s ease-in-out infinite alternate;
 }
 
-.top-bar-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    object-fit: cover;
-    border: 1.5px solid rgba(255, 122, 31, 0.4);
-    box-shadow: 0 0 12px rgba(255, 122, 31, 0.25);
+.top-bar-mascot-img {
+    height: 44px;
+    width: 44px;
+    object-fit: contain;
 }
 
-.top-bar-brand {
-    font-size: 20px;
-    font-weight: 900;
-    background: var(--gold-metallic);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 1px;
-    filter: drop-shadow(0 1px 4px rgba(212, 175, 55, 0.3));
-}
-
-.top-bar-actions {
+.top-bar-coins-widget {
+    background: #35241C;
+    border: 1px solid #3D2A20;
+    border-radius: 24px;
+    padding: 6px 14px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.top-bar-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    width: 38px;
-    height: 38px;
+.top-bar-coins-widget:hover {
+    transform: scale(1.03);
+}
+
+.top-bar-coins-widget .coin-icon {
+    font-size: 14px;
+}
+
+.top-bar-coins-widget .coin-balance-text {
+    font-size: 13px;
+    font-weight: 800;
+    color: #FF7A1F;
+    font-family: 'Cairo', sans-serif;
+}
+
+.top-bar-profile {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.top-bar-avatar-container {
+    padding: 2px;
+    border: 2px solid #FF7A1F;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-muted);
-    font-size: 15px;
-    cursor: pointer;
-    transition: var(--transition-smooth);
-    position: relative;
+    background: #291B15;
+    overflow: hidden;
 }
 
-.top-bar-btn:hover {
-    background: rgba(255, 122, 31, 0.1);
-    border-color: rgba(255, 122, 31, 0.3);
-    color: var(--gold-text);
-}
-
-.notif-dot {
-    position: absolute;
-    top: 7px;
-    left: 8px;
-    width: 7px;
-    height: 7px;
-    background: #ff3b30;
+.top-bar-avatar-img {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    border: 1.5px solid #0a0600;
-    animation: pulse 1.5s infinite;
+    object-fit: cover;
+}
+
+@keyframes mascotIdle {
+    0% {
+        transform: scale(0.94) rotate(-2deg);
+    }
+    100% {
+        transform: scale(1.06) rotate(2deg);
+    }
 }
 
 /* Adjust app-container padding for top bar */
@@ -2663,24 +2673,24 @@ tr:last-child td {
     box-shadow: 0 4px 12px rgba(255, 122, 31, 0.25);
 }
 
-/* Redesigned Game Cards - MATCHING FLUTTER */
+/* Redesigned Game Cards - EXACTLY MATCHING FLUTTER */
 .games-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
-    padding: 0 12px 25px 12px;
+    padding: 10px 12px 25px 12px;
 }
 
 .game-card-premium {
-    background: #291B15;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: 20px;
     border: 1px solid #3D2A20;
     box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    cursor: pointer;
     transition: transform 0.25s ease, border-color 0.25s ease;
-    position: relative;
 }
 
 .game-card-premium:hover {
@@ -2689,9 +2699,9 @@ tr:last-child td {
 }
 
 .game-card-premium .game-image-box {
+    width: 100%;
+    height: 100%;
     position: relative;
-    height: 120px;
-    background: #221711;
     overflow: hidden;
 }
 
@@ -2707,14 +2717,14 @@ tr:last-child td {
     transform: scale(1.15);
 }
 
-/* Front contained cover image */
+/* Front cover image */
 .game-card-premium .game-img-front {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     z-index: 2;
 }
 
@@ -2734,58 +2744,29 @@ tr:last-child td {
     backdrop-filter: blur(4px);
 }
 
-/* Details area */
-.game-card-premium .game-info-box {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+/* Translucent title overlay at bottom - MATCHING FLUTTER */
+.game-card-premium .game-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(41, 27, 21, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 8px 6px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 5;
 }
 
-.game-card-premium .game-title-text {
-    font-size: 12px;
+.game-card-premium .game-title-overlay .title-txt {
+    font-size: 11px;
     font-weight: 800;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.game-card-premium .game-category-text {
-    font-size: 9.5px;
-    font-weight: 600;
-    color: #8B909E;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Custom Play Button - MATCHING FLUTTER */
-.game-card-premium .btn-play-game {
-    width: 100%;
-    height: 34px;
-    background: var(--gold-primary);
-    color: #1A110D;
-    border: none;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    cursor: pointer;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.game-card-premium .btn-play-game:hover {
-    opacity: 0.95;
-    transform: scale(0.98);
-}
-
-.game-card-premium .btn-play-game i {
-    font-size: 12px;
+    font-family: 'Cairo', sans-serif;
 }
 
 /* Empty grid state */

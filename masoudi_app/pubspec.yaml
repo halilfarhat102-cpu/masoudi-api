@@ -68,15 +68,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/nav_home.png
-    - assets/images/nav_wallet.png
-    - assets/images/nav_profile.png
-    - assets/images/fox_mascot.png
-    - assets/images/fox_fab.png
-    - assets/images/fox_login.png
     - assets/game/
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
