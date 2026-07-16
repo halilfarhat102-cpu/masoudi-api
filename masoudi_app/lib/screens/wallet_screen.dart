@@ -47,7 +47,7 @@ class _WalletScreenState extends State<WalletScreen> {
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            final double currentBalance = widget.agentBalance;
+            final double currentBalance = widget.balance;
             return AlertDialog(
               backgroundColor: const Color(0xFF291B15),
               shape: RoundedRectangleBorder(
@@ -348,7 +348,6 @@ class _WalletScreenState extends State<WalletScreen> {
         final playersList = decoded['players'] as List<dynamic>? ?? [];
         final p2pList = playersList.where((p) => p['isAgent'] == true && p['id'] != widget.playerId).toList();
 
-        if (!mounted) return;
         setState(() {
           _settings = Map<String, dynamic>.from(decoded['settings'] ?? {});
           _agents = agentsList;
@@ -365,14 +364,12 @@ class _WalletScreenState extends State<WalletScreen> {
           _isLoadingAgents = false;
         });
       } else {
-        if (!mounted) return;
         setState(() {
           _isLoadingAgents = false;
         });
       }
     } catch (e) {
       debugPrint("Error fetching agents: $e");
-      if (!mounted) return;
       setState(() {
         _isLoadingAgents = false;
       });
