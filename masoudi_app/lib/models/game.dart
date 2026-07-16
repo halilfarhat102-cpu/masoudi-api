@@ -21,7 +21,7 @@ class Game {
       title: json['title'] ?? '',
       category: json['category'] ?? '',
       provider: json['provider'] ?? '',
-      launchUrl: json['launchUrl'] ?? json['launch_url'] ?? '',
+      launchUrl: json['launchUrl'] ?? '',
       image: json['image'] ?? '',
     );
   }
