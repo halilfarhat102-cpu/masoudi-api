@@ -21,17 +21,6 @@ app.get('/style.css', (req, res) => res.sendFile(resolve(__dirname, 'style.css')
 app.get('/app.js', (req, res) => res.sendFile(resolve(__dirname, 'app.js')));
 app.get('/admin.js', (req, res) => res.sendFile(resolve(__dirname, 'admin.js')));
 
-// Temporary debug route to get Render outbound IP
-app.get('/api/debug-ip', async (req, res) => {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json');
-    const data = await response.json();
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
-
 // Mount API middleware directly (avoid express.json() because apiMiddleware handles raw streams)
 app.use(apiMiddleware);
 
