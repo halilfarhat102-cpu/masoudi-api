@@ -467,7 +467,7 @@ function switchTab(id) {
     }
 
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
 }
 
 function goBackToGrid() {
@@ -482,7 +482,7 @@ function goBackToGrid() {
     if (mainGrid) mainGrid.style.display = 'block';
 
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
 }
 window.goBackToGrid = goBackToGrid;
 
