@@ -18,8 +18,6 @@ import 'dart:convert';
 import 'utils/formatters.dart';
 
 
-import 'utils/language_helper.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -35,14 +33,11 @@ class MasoudiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      valueListenable: appLanguage,
-      builder: (context, lang, child) {
-        return MaterialApp(
-          title: tr('منصة مسعودي للألعاب', 'Masoudi Gaming Platform'),
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.dark,
+    return MaterialApp(
+      title: 'منصة مسعودي للألعاب',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF1A110D),
         primaryColor: const Color(0xFFFF7A1F),
         colorScheme: const ColorScheme.dark(
@@ -60,8 +55,6 @@ class MasoudiApp extends StatelessWidget {
         '/main': (context) => const MainTabControllerScreen(),
       },
     );
-  },
-);
   }
 }
 
@@ -544,7 +537,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  tr('يجب تسجيل الدخول للعب', 'Login Required to Play'),
+                  'يجب تسجيل الدخول للعب',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.cairo(
                     fontSize: 20,
@@ -554,7 +547,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  tr('سجّل دخولك أو أنشئ حساباً جديداً\nللاستمتاع بجميع الألعاب وجمع العملات المعدنية', 'Log in or register a new account\nto enjoy all games and collect coins'),
+                  'سجّل دخولك أو أنشئ حساباً جديداً\nللاستمتاع بجميع الألعاب وجمع العملات المعدنية',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.cairo(
                     fontSize: 14,
@@ -594,7 +587,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                         alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         child: Text(
-                          tr('تسجيل الدخول الآن', 'Log In Now'),
+                          'تسجيل الدخول الآن',
                           style: GoogleFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -610,7 +603,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
-                    tr('إلغاء', 'Cancel'),
+                    'إلغاء',
                     style: GoogleFonts.cairo(
                       fontSize: 14,
                       color: Colors.white38,
@@ -684,7 +677,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
               const Icon(Icons.info_outline_rounded, color: Color(0xFFFF7A1F), size: 24),
               const SizedBox(width: 8),
               Text(
-                tr('تنبيه', 'Alert'),
+                'تنبيه',
                 style: GoogleFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -709,7 +702,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                 });
               },
               child: Text(
-                tr('تسجيل الدخول', 'Log In'),
+                'تسجيل الدخول',
                 style: GoogleFonts.cairo(
                   color: const Color(0xFFFF7A1F),
                   fontWeight: FontWeight.bold,
@@ -720,7 +713,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
               child: Text(
-                tr('إلغاء', 'Cancel'),
+                'إلغاء',
                 style: GoogleFonts.cairo(
                   color: Colors.white54,
                   fontSize: 13,
@@ -880,10 +873,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                 child: InkWell(
                   onTap: () {
                     if (!_isLoggedIn) {
-                      _showLoginRequiredDialog(tr(
-                        'يرجى تسجيل الدخول أولاً للوصول إلى المحفظة والتواصل مع وكلاء الشحن.',
-                        'Please log in first to access the wallet and support agents.'
-                      ));
+                      _showLoginRequiredDialog('يرجى تسجيل الدخول أولاً للوصول إلى المحفظة والتواصل مع وكلاء الشحن.');
                       return;
                     }
                     setState(() {
@@ -915,7 +905,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        tr('المحفظة', 'Wallet'),
+                        'المحفظة',
                         style: GoogleFonts.cairo(
                           fontSize: 9,
                           fontWeight: _currentIndex == 1 ? FontWeight.bold : FontWeight.normal,
@@ -963,7 +953,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        tr('حسابي', 'Profile'),
+                        'حسابي',
                         style: GoogleFonts.cairo(
                           fontSize: 9,
                           fontWeight: _currentIndex == 2 ? FontWeight.bold : FontWeight.normal,
@@ -1323,7 +1313,7 @@ class _AnimatedTopMascotState extends State<AnimatedTopMascot> with SingleTicker
               ),
               const SizedBox(width: 8),
               Text(
-                tr('مـسـعـودي', 'Masoudi'),
+                'مـسـعـودي',
                 style: GoogleFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,

@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'admin_panel_screen.dart';
-import '../utils/language_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String playerName;
@@ -776,7 +775,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tr('تفاصيل الحساب الشخصي', 'Personal Account Details'),
+                  'تفاصيل الحساب الشخصي',
                   style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -784,16 +783,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                _buildCopyableDetailRow(Icons.badge_outlined, tr('معرّف اللاعب (ID)', 'Player ID'), _currentPlayerId),
+                _buildCopyableDetailRow(Icons.badge_outlined, 'معرّف اللاعب (ID)', _currentPlayerId),
                 Divider(color: const Color(0xFF3D2A20)),
-                _buildDetailRow(Icons.email_outlined, tr('البريد الإلكتروني', 'Email Address'), widget.playerEmail),
+                _buildDetailRow(Icons.email_outlined, 'البريد الإلكتروني', widget.playerEmail),
                 Divider(color: const Color(0xFF3D2A20)),
-                _buildDetailRow(Icons.calendar_month_outlined, tr('تاريخ التسجيل', 'Registration Date'), tr('12 مايو 2026', 'May 12, 2026')),
+                _buildDetailRow(Icons.calendar_month_outlined, 'تاريخ التسجيل', '12 مايو 2026'),
                 Divider(color: const Color(0xFF3D2A20)),
                 _buildDetailRow(
                   Icons.verified_user_outlined,
-                  tr('توثيق الحساب', 'Account Verification'),
-                  tr('موثق عبر Google', 'Verified via Google'),
+                  'توثيق الحساب',
+                  'موثق عبر Google',
                   textColor: const Color(0xFF00E676),
                 ),
               ],
@@ -813,7 +812,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tr('خيارات الأمان والتحكم', 'Security & Control Options'),
+                  'خيارات الأمان والتحكم',
                   style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -821,13 +820,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                _buildSettingButton(Icons.account_balance_wallet_outlined, tr('إدارة الحسابات البنكية', 'Manage Bank Accounts')),
+                _buildSettingButton(Icons.account_balance_wallet_outlined, 'إدارة الحسابات البنكية'),
                 Divider(color: const Color(0xFF3D2A20)),
-                _buildSettingButton(Icons.support_agent, tr('التواصل مع مدير الدعم المخصص', 'Contact Dedicated Support Manager')),
+                _buildSettingButton(Icons.support_agent, 'التواصل مع مدير الدعم المخصص'),
                 Divider(color: const Color(0xFF3D2A20)),
                 _buildSettingButton(
                   Icons.language_rounded,
-                  tr('تغيير لغة التطبيق (Change Language)', 'Change Language (تغيير اللغة)'),
+                  'تغيير لغة التطبيق (Change Language)',
                   textColor: Colors.white,
                   onTap: () {
                     _showLanguageDialog();
@@ -837,7 +836,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (widget.isAdmin) ...[
                   _buildSettingButton(
                     Icons.admin_panel_settings_rounded,
-                    tr('لوحة التحكم الإدارية', 'Admin Control Panel'),
+                    'لوحة التحكم الإدارية',
                     textColor: const Color(0xFFFF9800),
                     onTap: () {
                       Navigator.of(context).push(
@@ -853,7 +852,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
                 _buildSettingButton(
                   Icons.logout_rounded,
-                  tr('تسجيل الخروج', 'Logout'),
+                  'تسجيل الخروج',
                   textColor: const Color(0xFFD32F2F),
                   onTap: widget.onLogout,
                 ),
@@ -1279,7 +1278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             side: BorderSide(color: const Color(0xFFD45A00).withOpacity(0.3), width: 1.5),
           ),
           title: Text(
-            tr('تغيير لغة التطبيق', 'Change Language'),
+            'تغيير لغة التطبيق\nChange Language',
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
               color: Colors.white,
@@ -1292,11 +1291,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               ListTile(
                 onTap: () {
-                  appLanguage.value = 'ar';
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم تطبيق اللغة العربية بنجاح!', style: GoogleFonts.cairo(fontSize: 12)),
+                      content: Text('اللغة الحالية هي العربية بالفعل', style: GoogleFonts.cairo(fontSize: 12)),
                       backgroundColor: const Color(0xFFD45A00),
                     ),
                   );
@@ -1304,21 +1302,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 leading: const Text('🇸🇦', style: TextStyle(fontSize: 22)),
                 title: Text(
                   'العربية (Arabic)',
-                  style: GoogleFonts.cairo(
-                    color: Colors.white, 
-                    fontSize: 13, 
-                    fontWeight: appLanguage.value == 'ar' ? FontWeight.bold : FontWeight.normal
-                  ),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                 ),
-                trailing: Icon(
-                  appLanguage.value == 'ar' ? Icons.check_circle_rounded : Icons.circle_outlined, 
-                  color: const Color(0xFFD45A00)
-                ),
+                trailing: const Icon(Icons.check_circle_rounded, color: Color(0xFFD45A00)),
               ),
               Divider(color: const Color(0xFF3D2A20)),
               ListTile(
                 onTap: () {
-                  appLanguage.value = 'en';
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -1330,16 +1320,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 leading: const Text('🇺🇸', style: TextStyle(fontSize: 22)),
                 title: Text(
                   'English (الإنجليزية)',
-                  style: GoogleFonts.cairo(
-                    color: Colors.white, 
-                    fontSize: 13,
-                    fontWeight: appLanguage.value == 'en' ? FontWeight.bold : FontWeight.normal
-                  ),
+                  style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
                 ),
-                trailing: Icon(
-                  appLanguage.value == 'en' ? Icons.check_circle_rounded : Icons.circle_outlined, 
-                  color: const Color(0xFFD45A00)
-                ),
+                trailing: Icon(Icons.circle_outlined, color: Colors.white.withOpacity(0.3)),
               ),
             ],
           ),
@@ -1359,7 +1342,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   elevation: 0,
                 ),
                 child: Text(
-                  tr('إغلاق', 'Close'),
+                  'إغلاق / Close',
                   style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
