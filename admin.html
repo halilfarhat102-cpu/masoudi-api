@@ -1967,6 +1967,34 @@
                         </div>
                     </div>
 
+                    <h4 style="font-size:14px;color:var(--orange);margin-top:20px;margin-bottom:14px;">
+                        <i class="fa-solid fa-gamepad"></i> إعدادات مزود الألعاب PG Soft (Staging & Production)
+                    </h4>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;color:#fff;font-weight:bold;font-size:14px;">
+                            <input type="checkbox" id="settingPgIsProduction" style="width:20px;height:20px;accent-color:var(--orange);">
+                            تفعيل بيئة الإنتاج الحقيقية (Production Mode / Live)
+                        </label>
+                        <p style="font-size:12px;color:#888;margin-right:30px;margin-top:4px;">عند التفعيل، سيقوم التطبيق بطلب تشغيل الألعاب من سيرفرات الإنتاج الحقيقية لـ PG Soft بدلاً من بيئة الاختبار.</p>
+                    </div>
+                    <div class="form-grid-2" style="margin-bottom: 20px;">
+                        <div class="form-field">
+                            <label>Staging Operator Token (البيئة التجريبية)</label>
+                            <input type="text" id="settingPgStagingOperatorToken" placeholder="I-6c1967..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field">
+                            <label>Staging Secret Key / Salt (البيئة التجريبية)</label>
+                            <input type="text" id="settingPgStagingSecretKey" placeholder="c89632..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field">
+                            <label>Production Operator Token (البيئة الحقيقية)</label>
+                            <input type="text" id="settingPgProductionOperatorToken" placeholder="P-a5fd4c..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field">
+                            <label>Production Secret Key / Salt (البيئة الحقيقية)</label>
+                            <input type="text" id="settingPgProductionSecretKey" placeholder="c89632..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                        </div>
+                    </div>
 
                     <button class="btn-submit btn-submit-deposit" onclick="saveSettings()" style="width:100%;padding:12px;font-size:14px;font-weight:900;">
                         <i class="fa-solid fa-floppy-disk" style="margin-left:8px;"></i> حفظ الإعدادات وتحديث تطبيق الهاتف

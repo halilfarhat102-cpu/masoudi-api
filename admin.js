@@ -1035,6 +1035,20 @@ function initSettingsUI() {
     if (catLive) catLive.value = catNames.live || "كازينو مباشر";
     if (catTable) catTable.value = catNames.table || "ألعاب الطاولة";
     if (catCrash) catCrash.value = catNames.crash || "ألعاب فورية";
+
+    // Load PG Soft Config
+    const pgIsProd = document.getElementById('settingPgIsProduction');
+    const pgStagingToken = document.getElementById('settingPgStagingOperatorToken');
+    const pgStagingKey = document.getElementById('settingPgStagingSecretKey');
+    const pgProductionToken = document.getElementById('settingPgProductionOperatorToken');
+    const pgProductionKey = document.getElementById('settingPgProductionSecretKey');
+
+    const pgConfig = settings.pgConfig || {};
+    if (pgIsProd) pgIsProd.checked = !!pgConfig.isProduction;
+    if (pgStagingToken) pgStagingToken.value = pgConfig.stagingOperatorToken || "I-6c19673883aa410b98d1c0cb1a3c5edc";
+    if (pgStagingKey) pgStagingKey.value = pgConfig.stagingSecretKey || "c89632307f734f6192fa420864a2c847";
+    if (pgProductionToken) pgProductionToken.value = pgConfig.productionOperatorToken || "P-a5fd4c1a25904aae8729516557c160d0";
+    if (pgProductionKey) pgProductionKey.value = pgConfig.productionSecretKey || "c89632307f734f6192fa420864a2c847";
 }
 
 async function saveSettings() {
@@ -1051,6 +1065,13 @@ async function saveSettings() {
     const catTable = document.getElementById('categoryNameTable')?.value?.trim() || "ألعاب الطاولة";
     const catCrash = document.getElementById('categoryNameCrash')?.value?.trim() || "ألعاب فورية";
 
+    // Read PG Soft Config
+    const pgIsProd = !!document.getElementById('settingPgIsProduction')?.checked;
+    const pgStagingToken = document.getElementById('settingPgStagingOperatorToken')?.value?.trim() || "I-6c19673883aa410b98d1c0cb1a3c5edc";
+    const pgStagingKey = document.getElementById('settingPgStagingSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
+    const pgProductionToken = document.getElementById('settingPgProductionOperatorToken')?.value?.trim() || "P-a5fd4c1a25904aae8729516557c160d0";
+    const pgProductionKey = document.getElementById('settingPgProductionSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
+
     settings = {
         enablePreview: enablePreview !== undefined ? enablePreview : true,
         showBalance: showBalance !== undefined ? showBalance : true,
@@ -1063,6 +1084,13 @@ async function saveSettings() {
             live: catLive,
             table: catTable,
             crash: catCrash
+        },
+        pgConfig: {
+            isProduction: pgIsProd,
+            stagingOperatorToken: pgStagingToken,
+            stagingSecretKey: pgStagingKey,
+            productionOperatorToken: pgProductionToken,
+            productionSecretKey: pgProductionKey
         }
     };
 

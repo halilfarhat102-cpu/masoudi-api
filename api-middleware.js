@@ -1445,13 +1445,25 @@ export async function apiMiddleware(req, res, next) {
       player.sessionCreatedAt = new Date().toISOString();
       await writeDb(db);
 
-      // Call PG Soft Staging GetLaunchURLHTML API
+      // Read PG Soft configuration from db
+      const pgConfig = db.settings?.pgConfig || {
+        isProduction: false,
+        stagingOperatorToken: 'I-6c19673883aa410b98d1c0cb1a3c5edc',
+        stagingSecretKey: 'c89632307f734f6192fa420864a2c847',
+        productionOperatorToken: 'P-a5fd4c1a25904aae8729516557c160d0',
+        productionSecretKey: 'c89632307f734f6192fa420864a2c847'
+      };
+
+      const isProd = pgConfig.isProduction;
+      const operatorToken = isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken;
+      const baseUrl = isProd ? 'https://ot.pg-bo.me' : 'https://sg-test-ot.pg-bo.me';
+
+      // Call PG Soft GetLaunchURLHTML API
       const traceId = 'guid-' + crypto.randomUUID();
-      const pgUrl = `https://sg-test-ot.pg-bo.me/external-game-launcher/api/v1/GetLaunchURLHTML?trace_id=${traceId}`;
+      const pgUrl = `${baseUrl}/external-game-launcher/api/v1/GetLaunchURLHTML?trace_id=${traceId}`;
 
       const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '196.153.185.113';
 
-      const operatorToken = 'I-6c19673883aa410b98d1c0cb1a3c5edc';
       const path = `/${gameCode}/index.html`;
       const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=USD`;
 
@@ -1463,7 +1475,7 @@ export async function apiMiddleware(req, res, next) {
       formParams.append('url_type', 'game-entry');
       formParams.append('client_ip', clientIp.split(',')[0].trim());
 
-      console.log(`Calling PG Soft Staging Launcher for player ${playerId}, game ${gameCode}...`);
+      console.log(`Calling PG Soft ${isProd ? 'Production' : 'Staging'} Launcher for player ${playerId}, game ${gameCode}...`);
       
       const pgResponse = await fetch(pgUrl, {
         method: 'POST',
