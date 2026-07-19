@@ -970,13 +970,16 @@ export async function apiMiddleware(req, res, next) {
         const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
-        // Game provider sends: { token, operatorToken }
+        // Game provider sends: { token, operator_token, session_token }
         const token = payload.token || payload.session_token || payload.sessionToken;
 
         if (!token) {
-          res.statusCode = 400;
+          res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Missing token', data: null }));
+          return res.end(JSON.stringify({
+            data: null,
+            error: { code: '1034', message: 'Missing token' }
+          }));
         }
 
         // Find player by session token stored in db
@@ -986,29 +989,33 @@ export async function apiMiddleware(req, res, next) {
         if (!player) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Invalid session token', data: null }));
+          return res.end(JSON.stringify({
+            data: null,
+            error: { code: '1034', message: 'Invalid session token' }
+          }));
         }
 
         // Update last login
         player.lastLogin = new Date().toISOString().split('T')[0];
         await writeDb(db);
 
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
-          code: 1,
-          msg: 'success',
           data: {
             player_id: player.id,
-            username: player.name,
             currency: 'USD',
-            balance: ((player.balance || 0) / 100).toFixed(2), // in major units
             nickname: player.name
-          }
+          },
+          error: null
         }));
       } catch (e) {
-        res.statusCode = 500;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 0, msg: e.message, data: null }));
+        res.end(JSON.stringify({
+          data: null,
+          error: { code: '1200', message: e.message }
+        }));
       }
     });
 
@@ -1033,22 +1040,31 @@ export async function apiMiddleware(req, res, next) {
         if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
 
         if (!player) {
+          res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
+          return res.end(JSON.stringify({
+            data: null,
+            error: { code: '1000', message: 'Player not found' }
+          }));
         }
 
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
-          code: 1,
-          msg: 'success',
-          balance: ((player.balance || 0) / 100).toFixed(2),
-          currency: 'USD',
-          player_id: player.id
+          data: {
+            player_id: player.id,
+            currency: 'USD',
+            balance: parseFloat(((player.balance || 0) / 100).toFixed(2))
+          },
+          error: null
         }));
       } catch (e) {
-        res.statusCode = 500;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+        res.end(JSON.stringify({
+          data: null,
+          error: { code: '1200', message: e.message }
+        }));
       }
     });
 
@@ -1124,22 +1140,34 @@ export async function apiMiddleware(req, res, next) {
         });
 
         if (errorMsg) {
+          res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: (resultBalance / 100).toFixed(2) }));
+          return res.end(JSON.stringify({
+            data: null,
+            error: {
+              code: errorMsg === 'Insufficient balance' ? '3200' : '1000',
+              message: errorMsg
+            }
+          }));
         }
 
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
-          code: 1,
-          msg: isDuplicate ? 'duplicate_ignored' : 'success',
-          balance: (resultBalance / 100).toFixed(2),
-          transaction_id: txId,
-          player_id: resultPlayerId
+          data: {
+            player_id: resultPlayerId,
+            currency: 'USD',
+            balance: parseFloat((resultBalance / 100).toFixed(2))
+          },
+          error: null
         }));
       } catch (e) {
-        res.statusCode = 500;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+        res.end(JSON.stringify({
+          data: null,
+          error: { code: '1200', message: e.message }
+        }));
       }
     });
 
@@ -1213,21 +1241,32 @@ export async function apiMiddleware(req, res, next) {
           return db;
         });
 
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         if (errorMsg) {
-          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: (resultBalance / 100).toFixed(2) }));
+          return res.end(JSON.stringify({
+            data: null,
+            error: {
+              code: errorMsg === 'Insufficient balance' ? '3200' : '1000',
+              message: errorMsg
+            }
+          }));
         }
         res.end(JSON.stringify({
-          code:           1,
-          msg:            isDuplicate ? 'duplicate_ignored' : 'success',
-          balance:        (resultBalance / 100).toFixed(2),
-          transaction_id: txId,
-          player_id:      resultPlayerId
+          data: {
+            player_id:      resultPlayerId,
+            currency:       'USD',
+            balance:        parseFloat((resultBalance / 100).toFixed(2))
+          },
+          error: null
         }));
       } catch (e) {
-        res.statusCode = 500;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
+        res.end(JSON.stringify({
+          data: null,
+          error: { code: '1200', message: e.message }
+        }));
       }
     });
 
