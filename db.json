@@ -6,8 +6,14 @@
     "playButtonText": "العب الآن",
     "coinBuyRate": 10000,
     "coinSellRate": 20000,
+    "categoryNames": {
+      "slots": "سلوتس",
+      "live": "كازينو مباشر",
+      "table": "ألعاب الطاولة",
+      "crash": "ألعاب فورية"
+    },
     "pgConfig": {
-      "isProduction": true,
+      "isProduction": false,
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
       "productionOperatorToken": "P-a5fd4c1a25904aae8729516557c160d0",
@@ -15,8 +21,8 @@
     },
     "paymentGateways": {
       "vodafone": {
-        "number": "01008827375",
-        "name": "احمد",
+        "number": "",
+        "name": "",
         "active": true
       },
       "instapay": {
@@ -46,38 +52,18 @@
           "egp": 50
         },
         {
-          "coins": 90000,
+          "coins": 45000,
           "egp": 500
         },
         {
-          "coins": 180000,
+          "coins": 90000,
           "egp": 1000
         },
         {
-          "coins": 360000,
+          "coins": 180000,
           "egp": 2000
         }
       ]
-    },
-    "gameConfigs": {
-      "bigfarm": {
-        "winRate": 10,
-        "minBet": 500,
-        "maxBet": 10000,
-        "active": true
-      },
-      "fruit_slots": {
-        "winRate": 70,
-        "minBet": 100,
-        "maxBet": 5000,
-        "active": true
-      },
-      "fortune_gems": {
-        "winRate": 70,
-        "minBet": 100,
-        "maxBet": 5000,
-        "active": true
-      }
     }
   },
   "banners": [
@@ -126,8 +112,8 @@
       "id": "game-3",
       "title": "(Big Farm)",
       "category": "slots",
-      "provider": "",
-      "launchUrl": "assets/game/game.html",
+      "provider": "PG",
+      "launchUrl": "126",
       "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783975948825.png"
     },
     {
@@ -135,16 +121,8 @@
       "title": "(APOLLO)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "126",
+      "launchUrl": "1543163",
       "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783976683067.jpg"
-    },
-    {
-      "id": "game-1783964266659",
-      "title": "(Olympus)",
-      "category": "slots",
-      "provider": "",
-      "launchUrl": "0",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783976705065.jpg"
     },
     {
       "id": "game-1783964302523",
@@ -491,12 +469,22 @@
           "type": "شحن من التطبيق (فودافون كاش)",
           "amount": 360000,
           "date": "٤:١٤:١٠ م"
+        },
+        {
+          "type": "لعب لعبة (Big Farm)",
+          "amount": -1671424,
+          "date": "12:51:55 م"
+        },
+        {
+          "type": "لعب لعبة (Big Farm)",
+          "amount": 1671424,
+          "date": "12:51:55 م"
         }
       ],
       "isAgent": true,
       "agentBalance": 4110000,
-      "sessionToken": "a25b2e4a4a21a92536f66049e8ec4b09884a17e4afe940a05b860ef7643376f1",
-      "sessionCreatedAt": "2026-07-19T12:19:27.843Z"
+      "sessionToken": "97c0072994a9f50997553cf9e834d60438d503222984fa1097bbe5f1e301c1cb",
+      "sessionCreatedAt": "2026-07-19T13:56:49.494Z"
     },
     {
       "id": "303725",
@@ -572,7 +560,9 @@
           "date": "3:56:07 م"
         }
       ],
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJ8EOTXnvVNTMdAPNJC8q_Ji7bmQW9KrxLjjmY5mZFbo5qIRQ=s96-c"
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJ8EOTXnvVNTMdAPNJC8q_Ji7bmQW9KrxLjjmY5mZFbo5qIRQ=s96-c",
+      "sessionToken": "6f3312927f89dec3fb92d062ad9777b3a4a2f5470e9b1ec770f233436e83ccb0",
+      "sessionCreatedAt": "2026-07-19T13:35:35.214Z"
     },
     {
       "id": "840624",
