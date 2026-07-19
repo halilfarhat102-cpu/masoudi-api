@@ -1024,6 +1024,17 @@ function initSettingsUI() {
     if (playBtnText)   playBtnText.value     = settings.playButtonText || "العب الآن";
     if (coinBuyRate)   coinBuyRate.value     = settings.coinBuyRate || 10000;
     if (coinSellRate)  coinSellRate.value    = settings.coinSellRate || 20000;
+
+    // Load category names
+    const catSlots = document.getElementById('categoryNameSlots');
+    const catLive = document.getElementById('categoryNameLive');
+    const catTable = document.getElementById('categoryNameTable');
+    const catCrash = document.getElementById('categoryNameCrash');
+    const catNames = settings.categoryNames || {};
+    if (catSlots) catSlots.value = catNames.slots || "سلوتس";
+    if (catLive) catLive.value = catNames.live || "كازينو مباشر";
+    if (catTable) catTable.value = catNames.table || "ألعاب الطاولة";
+    if (catCrash) catCrash.value = catNames.crash || "ألعاب فورية";
 }
 
 async function saveSettings() {
@@ -1034,13 +1045,25 @@ async function saveSettings() {
     const coinBuyRate   = parseInt(document.getElementById('settingCoinBuyRate')?.value?.trim(), 10) || 10000;
     const coinSellRate  = parseInt(document.getElementById('settingCoinSellRate')?.value?.trim(), 10) || 20000;
 
+    // Read category names
+    const catSlots = document.getElementById('categoryNameSlots')?.value?.trim() || "سلوتس";
+    const catLive = document.getElementById('categoryNameLive')?.value?.trim() || "كازينو مباشر";
+    const catTable = document.getElementById('categoryNameTable')?.value?.trim() || "ألعاب الطاولة";
+    const catCrash = document.getElementById('categoryNameCrash')?.value?.trim() || "ألعاب فورية";
+
     settings = {
         enablePreview: enablePreview !== undefined ? enablePreview : true,
         showBalance: showBalance !== undefined ? showBalance : true,
         showLiveBadge: showLiveBadge !== undefined ? showLiveBadge : true,
         playButtonText: playBtnText || "العب الآن",
         coinBuyRate: coinBuyRate,
-        coinSellRate: coinSellRate
+        coinSellRate: coinSellRate,
+        categoryNames: {
+            slots: catSlots,
+            live: catLive,
+            table: catTable,
+            crash: catCrash
+        }
     };
 
     await saveData();
@@ -1412,7 +1435,7 @@ function renderReceiptsTable() {
             </td>
             <td style="padding:10px;">${r.gateway}</td>
             <td style="padding:10px;font-weight:bold;color:var(--orange);">${r.amount}</td>
-            <td style="padding:10px;direction:ltr;text-align:right;">${r.date}</td>
+            <td style="padding:10px;text-align:right;white-space:nowrap;">${r.date}</td>
             <td style="padding:10px;">
                 <a href="${imgUrl}" target="_blank">
                     <img src="${imgUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer;" title="عرض كامل الصورة">
