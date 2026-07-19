@@ -1003,6 +1003,7 @@ export async function apiMiddleware(req, res, next) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
+            player_name: player.id,
             player_id: player.id,
             currency: 'USD',
             nickname: player.name
@@ -1052,6 +1053,7 @@ export async function apiMiddleware(req, res, next) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
+            player_name: player.id,
             player_id: player.id,
             currency: 'USD',
             balance: parseFloat(((player.balance || 0) / 100).toFixed(2))
@@ -1155,6 +1157,7 @@ export async function apiMiddleware(req, res, next) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
+            player_name: resultPlayerId,
             player_id: resultPlayerId,
             currency: 'USD',
             balance: parseFloat((resultBalance / 100).toFixed(2))
@@ -1254,6 +1257,7 @@ export async function apiMiddleware(req, res, next) {
         }
         res.end(JSON.stringify({
           data: {
+            player_name:    resultPlayerId,
             player_id:      resultPlayerId,
             currency:       'USD',
             balance:        parseFloat((resultBalance / 100).toFixed(2))
