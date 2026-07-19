@@ -1416,6 +1416,78 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
+  } else if (req.url.startsWith('/api/pg/launch') && req.method === 'GET') {
+    // Parse query parameters
+    const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+    const playerId = parsedUrl.searchParams.get('player_id');
+    const gameCode = parsedUrl.searchParams.get('game_code');
+
+    if (!playerId || !gameCode) {
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.end('<h3>خطأ: معرف اللاعب أو كود اللعبة مفقود</h3>');
+    }
+
+    try {
+      const db = await readDb();
+      if (!db.players) db.players = [];
+      const player = db.players.find(p => p.id === playerId);
+
+      if (!player) {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.end('<h3>اللاعب غير موجود</h3>');
+      }
+
+      // Generate or retrieve session token
+      const sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
+      player.sessionToken = sessionToken;
+      player.sessionCreatedAt = new Date().toISOString();
+      await writeDb(db);
+
+      // Call PG Soft Staging GetLaunchURLHTML API
+      const traceId = 'guid-' + crypto.randomUUID();
+      const pgUrl = `https://sg-test-ot.pg-bo.me/external-game-launcher/api/v1/GetLaunchURLHTML?trace_id=${traceId}`;
+
+      const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '196.153.185.113';
+
+      const operatorToken = 'I-6c19673883aa410b98d1c0cb1a3c5edc';
+      const path = `/${gameCode}/index.html`;
+      const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=USD`;
+
+      // Build form-urlencoded request body
+      const formParams = new URLSearchParams();
+      formParams.append('operator_token', operatorToken);
+      formParams.append('path', path);
+      formParams.append('extra_args', extraArgs);
+      formParams.append('url_type', 'game-entry');
+      formParams.append('client_ip', clientIp.split(',')[0].trim());
+
+      console.log(`Calling PG Soft Staging Launcher for player ${playerId}, game ${gameCode}...`);
+      
+      const pgResponse = await fetch(pgUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formParams.toString(),
+      });
+
+      const responseText = await pgResponse.text();
+
+      // Return the HTML directly to the webview
+      res.statusCode = pgResponse.status;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.end(responseText);
+
+    } catch (e) {
+      console.error("Error launching PG game:", e);
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.end(`<h3>حدث خطأ أثناء تشغيل اللعبة: ${e.message}</h3>`);
+    }
+
   } else if (req.url === '/api/game/create-session' && req.method === 'POST') {
     // Create a session token for a player (called by APK before launching a game)
     let body = '';
