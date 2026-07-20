@@ -216,7 +216,7 @@ async function doAddAdmin() {
 // ─── Data: Load from server / localStorage ───
 async function loadData() {
     try {
-        const res = await fetch(API_BASE + '/api/data?t=' + Date.now());
+        const res = await fetch(API_BASE + '/api/data');
         if (!res.ok) throw new Error('Server error');
         const data = await res.json();
         providers    = Array.isArray(data.providers) ? data.providers : [];
@@ -263,7 +263,7 @@ async function saveData() {
     localStorage.setItem('masoudi_receipts',  JSON.stringify(receipts));
     localStorage.setItem('masoudi_admins',    JSON.stringify(admins));
     try {
-        await fetch(API_BASE + '/api/data?t=' + Date.now(), {
+        await fetch(API_BASE + '/api/data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -348,7 +348,7 @@ function loadPaymentGateways() {
                 row.className = 'pricing-row';
                 row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
                 row.innerHTML = `
-                    <input type="number" class="price-coins" value="${p.coins || ''}" placeholder="كوينز" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                    <input type="number" class="price-coins" value="${p.coins || ''}" placeholder="ر.س" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
                     <input type="number" class="price-egp" value="${p.egp || ''}" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
                     <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>`;
                 container.appendChild(row);
@@ -365,7 +365,7 @@ function addPricingRow() {
     row.className = 'pricing-row';
     row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
     row.innerHTML = `
-        <input type="number" class="price-coins" placeholder="كوينز" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+        <input type="number" class="price-coins" placeholder="ر.س" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
         <input type="number" class="price-egp" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
         <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>`;
     container.appendChild(row);
@@ -945,7 +945,7 @@ async function saveEditedGame() {
     showToast(`تم تحديث لعبة: ${title}`);
 }
 
-function addNewGame() {
+async function addNewGame() {
     const title    = document.getElementById('gameNameInput')?.value?.trim();
     const category = document.getElementById('gameCategoryInput')?.value;
     const provider = document.getElementById('gameProviderSelect')?.value;
@@ -1381,8 +1381,8 @@ function renderAdminP2pAgentsTable() {
             <td><span style="color:#00E676;font-weight:bold;">${formatNum(ag.agentBalance || 0)} كوين 🪙</span></td>
             <td>
                 <div style="display:flex;gap:6px;align-items:center;max-width:260px;">
-                    <input type="number" id="${inputId}" placeholder="كمية الكوينز..." style="margin:0;padding:6px 10px;height:32px;font-size:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;color:#fff;">
-                    <button class="btn-action btn-add-funds" onclick="sendCoinsToP2pAgent('${ag.id}', '${inputId}')" style="padding:6px 12px;height:32px;font-size:11px;margin:0;">إرسال كوينز</button>
+                    <input type="number" id="${inputId}" placeholder="كمية الرصيد..." style="margin:0;padding:6px 10px;height:32px;font-size:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;color:#fff;">
+                    <button class="btn-action btn-add-funds" onclick="sendCoinsToP2pAgent('${ag.id}', '${inputId}')" style="padding:6px 12px;height:32px;font-size:11px;margin:0;">إرسال رصيد</button>
                 </div>
             </td>
             <td>
@@ -1464,9 +1464,9 @@ async function sendCoinsToP2pAgent(playerId, inputId) {
             if (data.transactions) player.transactions = data.transactions;
             inputEl.value = '';
             renderAll();
-            showToast(`تم شحن رصيد وكالة الوكيل بـ ${formatNum(amount)} كوينز بنجاح ✅`);
+            showToast(`تم تم شحن رصيد وكالة الوكيل بـ ${formatNum(amount)} ر.س بنجاح ✅`);
         } else {
-            showToast('فشل شحن كوينز للوكيل', 'error');
+            showToast('فشل شحن رصيد للوكيل', 'error');
         }
     } catch (e) {
         showToast('تعذر الاتصال بالخادم', 'error');
@@ -1646,8 +1646,8 @@ const adminTranslations = {
         "تفعيل الوضع التجريبي (Preview Mode)": "Enable Demo/Preview Mode",
         "إظهار شارة البث المباشر (Live Badge)": "Show Live Badge",
         "نص زر التشغيل الافتراضي": "Default Play Button Text",
-        "سعر شراء الكوينز (مثال: 10000 = 10000 كوينز لكل 1 دولار)": "Coin Buy Rate (e.g. 10000 = 10000 coins per 1 USD)",
-        "سعر بيع الكوينز (مثال: 20000 = 20000 كوينز لكل 1 دولار)": "Coin Sell Rate (e.g. 20000 = 20000 coins per 1 USD)",
+        "سعر شراء الرصيد (مثال: 10000 = 10000 ر.س لكل 1 دولار)": "Coin Buy Rate (e.g. 10000 = 10000 coins per 1 USD)",
+        "سعر بيع الرصيد (مثال: 20000 = 20000 ر.س لكل 1 دولار)": "Coin Sell Rate (e.g. 20000 = 20000 coins per 1 USD)",
         "عنوان البنر": "Banner Title",
         "العنوان الفرعي": "Subtitle",
         "الشارة (Badge)": "Badge Label",
@@ -1662,8 +1662,8 @@ const adminTranslations = {
         "ربط الوكيل بحساب لاعب (ID)": "Link Agent to Player ID",
         "اسم اللاعب": "Player Name",
         "رصيد الوكالة (P2P)": "Agency Balance (P2P)",
-        "شحن كوينز الوكالة": "Recharge Agency Coins",
-        "إرسال كوينز": "Send Coins",
+        "شحن رصيد الوكالة": "Recharge Agency Coins",
+        "إرسال رصيد": "Send Coins",
         "إلغاء التفعيل": "Deactivate",
         "تفعيل وكيل P2P جديد": "Activate New P2P Agent",
         "تكوين بوابات الدفع الإلكتروني في مصر": "Configure Electronic Payment Gateways (Egypt)",
@@ -1677,7 +1677,7 @@ const adminTranslations = {
         "خيارات أسعار الشحن السريع": "Quick Pricing Packages Settings",
         "إضافة باقة شحن": "Add Recharge Package",
         "المبلغ بالجنيه المصري": "Amount in EGP",
-        "الكوينز المقابلة": "Equivalent Coins",
+        "الرصيد المقابل": "Equivalent Coins",
         "شارة الباقة": "Package Badge",
         "القيمة (جنيه مصري)": "Amount (EGP)",
         "مقبول": "Approved",

@@ -65,6 +65,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Auto-poll server data every 6 seconds so game additions & edits appear quickly and stay updated
+    setInterval(() => {
+        fetchServerData();
+    }, 6000);
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            fetchServerData();
+        }
+    });
+
     // Register Service Worker for PWA installation
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -515,7 +526,7 @@ function renderBanners(bannersList) {
 // Fetch dynamic games & banners from the API server (sync with DB & Flutter App!)
 async function fetchServerData() {
     try {
-        const response = await fetch('/api/data?t=' + Date.now());
+        const response = await fetch('/api/data');
         if (response.ok) {
             const data = await response.json();
             
@@ -553,7 +564,9 @@ async function fetchServerData() {
                     image: g.image.startsWith('http') ? g.image : (BASE + '/' + (g.image.startsWith('/') ? g.image.slice(1) : g.image))
                 }));
 
-                dynamicGames = [...builtInGames, ...serverGames];
+                // Keep built-in games only if they are not overridden in serverGames
+                const remainingBuiltIn = builtInGames.filter(bg => !serverGames.some(sg => sg.id === bg.id));
+                dynamicGames = [...remainingBuiltIn, ...serverGames];
                 renderDynamicGames();
             }
         } else {

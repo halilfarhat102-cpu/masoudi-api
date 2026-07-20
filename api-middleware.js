@@ -174,9 +174,6 @@ export async function apiMiddleware(req, res, next) {
         // Exclude sessions (auth tokens) from public data response for security
         const { sessions, ...publicData } = db;
         res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
         res.end(JSON.stringify(publicData));
       } catch (e) {
         res.statusCode = 500;

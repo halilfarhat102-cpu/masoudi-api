@@ -1945,12 +1945,12 @@
                     </div>
 
                     <div class="form-field" style="margin-bottom:20px;">
-                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">سعر شراء الكوينز من الوكلاء مقابل 1$ (شراء المستخدمين - مثال: 10000 كوينز لكل 1$)</label>
+                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">سعر شراء الرصيد من الوكلاء مقابل 1$ (شراء المستخدمين - مثال: 10000 ر.س لكل 1$)</label>
                         <input type="number" id="settingCoinBuyRate" placeholder="10000" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
                     </div>
 
                     <div class="form-field" style="margin-bottom:20px;">
-                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">سعر بيع الكوينز للوكلاء مقابل 1$ (بيع المستخدمين - مثال: 20000 كوينز لكل 1$)</label>
+                        <label style="font-size:13px;color:#aaa;font-weight:bold;margin-bottom:6px;display:block;">سعر بيع الرصيد للوكلاء مقابل 1$ (بيع المستخدمين - مثال: 20000 ر.س لكل 1$)</label>
                         <input type="number" id="settingCoinSellRate" placeholder="20000" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
                     </div>
 
@@ -2158,12 +2158,12 @@
                         <div class="form-field">
                             <label style="color:#00E676;">🔗 معرف حساب الوكيل في التطبيق (Player ID)</label>
                             <input type="text" id="newAgentPlayerId" placeholder="مثال: 123456" style="border-color:#00897B;">
-                            <small style="color:#8B909E;font-size:11px;">عند بيع اللاعبين كوينزهم لهذا الوكيل ستُحوَّل مباشرةً لمحفظته</small>
+                            <small style="color:#8B909E;font-size:11px;">عند بيع اللاعبين رصيدهم لهذا الوكيل ستُحوَّل مباشرةً لمحفظته</small>
                         </div>
                     </div>
                     <div class="form-field" style="margin-top:10px;margin-bottom:20px;">
                         <label>سعر الصرف الشحن (Rate)</label>
-                        <input type="text" id="newAgentRate" placeholder="مثال: 1$ = 1,000 كوين">
+                        <input type="text" id="newAgentRate" placeholder="مثال: 1$ = 1,000 ر.س">
                     </div>
                     <button class="btn-submit btn-submit-deposit" onclick="addNewAgent()" style="width:100%;">
                         <i class="fa-solid fa-plus" style="margin-left:8px;"></i> إضافة الوكيل وتعميمه
@@ -2228,8 +2228,8 @@
                                 <tr>
                                     <th>المعرف (ID)</th>
                                     <th>الاسم</th>
-                                    <th>رصيد الكوينز الحالي</th>
-                                    <th>إرسال كوينز للوكيل</th>
+                                    <th>رصيد المحفظة الحالي</th>
+                                    <th>إرسال رصيد للوكيل</th>
                                     <th>حالة الوكيل</th>
                                 </tr>
                             </thead>
@@ -2383,7 +2383,7 @@
                         <p style="font-size:11px;color:#888;margin-bottom:12px;">حدد عروض الشحن التي ستظهر للمستخدمين عند اختيار الشحن من التطبيق.</p>
                         <div id="pricingTableInputs">
                             <div class="pricing-row" style="display:flex;gap:8px;margin-bottom:8px;">
-                                <input type="number" class="price-coins" placeholder="كوينز" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                                <input type="number" class="price-coins" placeholder="ر.س" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
                                 <input type="number" class="price-egp" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
                                 <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>
                             </div>
@@ -2419,7 +2419,7 @@
                                 <tr style="border-bottom:2px solid var(--border);color:var(--orange);">
                                     <th style="padding:10px;">اللاعب</th>
                                     <th style="padding:10px;">بوابة الدفع</th>
-                                    <th style="padding:10px;">المبلغ/الكوينز</th>
+                                    <th style="padding:10px;">المبلغ/الرصيد</th>
                                     <th style="padding:10px;">تاريخ الإرسال</th>
                                     <th style="padding:10px;">صورة الإيصال</th>
                                     <th style="padding:10px;">الحالة</th>
