@@ -13,57 +13,12 @@
       "crash": "ألعاب فورية"
     },
     "pgConfig": {
-      "isProduction": true,
+      "isProduction": false,
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
-      "productionOperatorToken": "P-a5fd4c1a25904aae8729516557c160d0",
-      "productionSecretKey": "c89632307f734f6192fa420864a2c847"
-    },
-    "paymentGateways": {
-      "vodafone": {
-        "number": "",
-        "name": "",
-        "active": true
-      },
-      "instapay": {
-        "number": "",
-        "name": "",
-        "active": false
-      },
-      "orange": {
-        "number": "",
-        "name": "",
-        "active": false
-      },
-      "etisalat": {
-        "number": "",
-        "name": "",
-        "active": false
-      },
-      "bank": {
-        "account": "",
-        "bankName": "",
-        "holder": "",
-        "active": false
-      },
-      "pricing": [
-        {
-          "coins": 9000,
-          "egp": 50
-        },
-        {
-          "coins": 45000,
-          "egp": 500
-        },
-        {
-          "coins": 90000,
-          "egp": 1000
-        },
-        {
-          "coins": 180000,
-          "egp": 2000
-        }
-      ]
+      "productionOperatorToken": "",
+      "productionSecretKey": "",
+      "currency": "USD"
     }
   },
   "banners": [
@@ -78,7 +33,7 @@
     },
     {
       "id": "banner-1783251638276",
-      "title": "سياسة التطبيق",
+      "title": "سياسة التط��يق",
       "subtitle": "نلتزم بحماية بياناتك وخصوصيتك وتقديم تجربة آمنة وموثوقة لك في مسعودي",
       "badge": "تنبيه",
       "icon": "🔒",
@@ -110,27 +65,48 @@
   "games": [
     {
       "id": "game-3",
-      "title": "(Big Farm)",
+      "title": "(Fortune OX)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "126",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783975948825.png"
+      "tag": "new",
+      "launchUrl": "98",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535418644.png"
     },
     {
       "id": "game-1783964222923",
-      "title": "(APOLLO)",
+      "title": "(Mahjong Ways2)",
       "category": "slots",
       "provider": "PG",
+      "tag": "hot",
       "launchUrl": "74",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783976683067.jpg"
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535546986.jpg"
     },
     {
       "id": "game-1783964302523",
-      "title": "(Wood)",
+      "title": "(Fortune Tiger)",
       "category": "slots",
       "provider": "PG",
+      "tag": "hot",
+      "launchUrl": "126",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535138841.jpg"
+    },
+    {
+      "id": "game-1784535661609",
+      "title": "(Mahjong Ways)",
+      "category": "slots",
+      "provider": "PG",
+      "tag": "new",
       "launchUrl": "65",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783976716219.jpg"
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535852509.jpg"
+    },
+    {
+      "id": "game-1784539597345",
+      "title": "Hs",
+      "category": "slots",
+      "provider": "PG",
+      "tag": "new",
+      "launchUrl": "60",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784539592659.jpg"
     }
   ],
   "players": [
@@ -483,8 +459,8 @@
       ],
       "isAgent": true,
       "agentBalance": 4110000,
-      "sessionToken": "22ce87960f9ade046104b6453f9e8e5a39eb47666901b25c47bd0d70f20e5545",
-      "sessionCreatedAt": "2026-07-20T06:35:41.521Z"
+      "sessionToken": "fd631f341b5d0723f38af114e43fdce8f7f38a403310311490b1f81dbdfe6d48",
+      "sessionCreatedAt": "2026-07-20T12:22:55.485Z"
     },
     {
       "id": "303725",
@@ -494,7 +470,7 @@
       "bonus": 500,
       "status": "active",
       "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-19",
+      "lastLogin": "2026-07-20",
       "transactions": [
         {
           "type": "هدية التسجيل",
@@ -542,7 +518,9 @@
           "date": "11:28:14 ص"
         }
       ],
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLQjxL4BCYlDyH7yAESLP9ylwLx9A5eL4UWZeG3ySZs8qT3UgoT=s96-c"
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLQjxL4BCYlDyH7yAESLP9ylwLx9A5eL4UWZeG3ySZs8qT3UgoT=s96-c",
+      "sessionToken": "1115e4757771afe9c04b89e704678fb02faae2a27191e4acfdda39a7f0ab4b63",
+      "sessionCreatedAt": "2026-07-20T07:29:22.498Z"
     },
     {
       "id": "127761",
@@ -601,7 +579,7 @@
       "bonus": 500,
       "status": "active",
       "joinDate": "2026-07-13",
-      "lastLogin": "2026-07-19",
+      "lastLogin": "2026-07-20",
       "transactions": [
         {
           "type": "هدية التسجيل",
@@ -630,8 +608,8 @@
         }
       ],
       "isAdmin": true,
-      "sessionToken": "f3570396373c66dbe74eaed50d5a2590d4f20b02f379cd9a75d1e17549ffbeaf",
-      "sessionCreatedAt": "2026-07-19T14:31:38.078Z"
+      "sessionToken": "36163570f172a7b7258ab17cfaff68e3a68978d9be7773e1b6af9a2b41f51ae4",
+      "sessionCreatedAt": "2026-07-20T06:51:17.210Z"
     },
     {
       "id": "873939",
