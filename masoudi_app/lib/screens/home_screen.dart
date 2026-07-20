@@ -230,12 +230,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Game> _getFilteredGames() {
-    return _games.where((game) {
+    final seenIds = <String>{};
+    final uniqueGames = <Game>[];
+    for (final game in _games) {
+      final key = (game.id.isNotEmpty ? game.id : game.title).trim().toLowerCase();
+      if (seenIds.contains(key)) continue;
+      seenIds.add(key);
       final matchesSearch = game.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           game.provider.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesCategory = _selectedCategory == 'all' || game.category == _selectedCategory;
-      return matchesSearch && matchesCategory;
-    }).toList();
+      if (matchesSearch && matchesCategory) {
+        uniqueGames.add(game);
+      }
+    }
+    return uniqueGames;
   }
 
   Color _bannerAccent(int index) {
@@ -541,38 +549,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 15),
 
                   // Horizontal Section 1: شائع 🔥 (Popular Games matching Screenshot 3)
-                  _buildHorizontalGameSection(
-                    title: 'شائع',
-                    emoji: '🔥',
-                    games: _games.where((g) {
-                      final t = g.tag.toLowerCase().trim();
-                      return t == 'hot' || t == 'popular' || t == 'شائع' || g.category.toLowerCase() == 'hot';
-                    }).isNotEmpty
-                        ? _games.where((g) {
-                            final t = g.tag.toLowerCase().trim();
-                            return t == 'hot' || t == 'popular' || t == 'شائع' || g.category.toLowerCase() == 'hot';
-                          }).toList()
-                        : _games.take(6).toList(),
-                    defaultBadgeText: 'HOT',
-                    defaultBadgeColor: const Color(0xFF1F1510),
-                  ),
+                  if (_games.any((g) => g.tag.toLowerCase().trim() == 'hot' || g.tag.toLowerCase().trim() == 'popular' || g.tag.trim() == 'شائع' || g.category.toLowerCase().trim() == 'hot'))
+                    _buildHorizontalGameSection(
+                      title: 'شائع',
+                      emoji: '🔥',
+                      games: _games.where((g) {
+                        final t = g.tag.toLowerCase().trim();
+                        return t == 'hot' || t == 'popular' || t == 'شائع' || g.category.toLowerCase().trim() == 'hot';
+                      }).toList(),
+                      defaultBadgeText: 'HOT',
+                      defaultBadgeColor: const Color(0xFF1F1510),
+                    ),
 
                   // Horizontal Section 2: ألعاب جديدة ⭐ (New Games matching Screenshot 3)
-                  _buildHorizontalGameSection(
-                    title: 'ألعاب جديدة',
-                    emoji: '⭐',
-                    games: _games.where((g) {
-                      final t = g.tag.toLowerCase().trim();
-                      return t == 'new' || t == 'جديد' || g.category.toLowerCase() == 'new';
-                    }).isNotEmpty
-                        ? _games.where((g) {
-                            final t = g.tag.toLowerCase().trim();
-                            return t == 'new' || t == 'جديد' || g.category.toLowerCase() == 'new';
-                          }).toList()
-                        : _games.skip(2).take(6).toList(),
-                    defaultBadgeText: 'NEW',
-                    defaultBadgeColor: const Color(0xFFD32F2F),
-                  ),
+                  if (_games.any((g) => g.tag.toLowerCase().trim() == 'new' || g.tag.trim() == 'جديد' || g.category.toLowerCase().trim() == 'new'))
+                    _buildHorizontalGameSection(
+                      title: 'ألعاب جديدة',
+                      emoji: '⭐',
+                      games: _games.where((g) {
+                        final t = g.tag.toLowerCase().trim();
+                        return t == 'new' || t == 'جديد' || g.category.toLowerCase().trim() == 'new';
+                      }).toList(),
+                      defaultBadgeText: 'NEW',
+                      defaultBadgeColor: const Color(0xFFD32F2F),
+                    ),
                 ],
               ),
             ),

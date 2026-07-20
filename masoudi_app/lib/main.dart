@@ -240,14 +240,23 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         final bool newIsAgent = data['isAgent'] ?? false;
         final double newAgentBalance = (data['agentBalance'] ?? 0.0).toDouble();
         final bool newIsAdmin = data['isAdmin'] ?? false;
+        final String? serverId = data['id']?.toString();
 
-        // 1. Check if balance, agency info, or admin privilege changed
+        // 1. Check if ID, balance, agency info, or admin privilege changed
         bool hasMainChanges = _playerBalance != newBalance ||
             _primaryBalance != newPrimaryBalance ||
             _bonusBalance != newBonusBalance ||
             _isAgent != newIsAgent ||
             _agentBalance != newAgentBalance ||
             _isAdmin != newIsAdmin;
+
+        if (serverId != null && serverId.isNotEmpty && _playerName != serverId) {
+          _playerName = serverId;
+          hasMainChanges = true;
+          try {
+            user.updateDisplayName(serverId);
+          } catch (_) {}
+        }
 
         // 2. Format transactions using stable IDs (derived from type, amount, date)
         final List<Map<String, String>> newTxList = [];

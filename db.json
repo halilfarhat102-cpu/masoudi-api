@@ -120,7 +120,7 @@
   ],
   "players": [
     {
-      "id": "519997",
+      "id": "810422",
       "name": "Halil Farhat",
       "email": "halilfarhat102@gmail.com",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
@@ -671,6 +671,24 @@
           "type": "هدية التسجيل",
           "amount": 5000,
           "date": "7:08:14 ص"
+        }
+      ]
+    },
+    {
+      "id": "810422",
+      "name": "Halil Farhat",
+      "email": "halilfarhat102@gmail.com",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
+      "balance": 5000,
+      "bonus": 500,
+      "status": "active",
+      "joinDate": "2026-07-20",
+      "lastLogin": "2026-07-20",
+      "transactions": [
+        {
+          "type": "هدية التسجيل",
+          "amount": 5000,
+          "date": "2:46:38 م"
         }
       ]
     }
