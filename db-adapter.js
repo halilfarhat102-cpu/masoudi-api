@@ -7,7 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const dbPath = resolve(__dirname, 'db.json');
-let isInitialized = false;
+let lastSyncTime = 0;
+const SYNC_TTL_MS = 5 * 60 * 1000; // Re-sync from Supabase every 5 minutes
 
 // Helper to get default database
 function getDefaultDb() {
@@ -30,10 +31,11 @@ function getDefaultDb() {
 }
 
 export async function readDb() {
-  // 1. Sync from Supabase Storage on first initialization
-  if (!isInitialized) {
+  // 1. Sync from Supabase Storage on first call OR every 5 minutes
+  const now = Date.now();
+  if (now - lastSyncTime > SYNC_TTL_MS) {
     try {
-      console.log("Initializing database from Supabase Storage...");
+      console.log("Syncing database from Supabase Storage...");
       const { data, error } = await supabase.storage
         .from('images')
         .download('db.json');
@@ -65,10 +67,11 @@ export async function readDb() {
           console.log("Successfully synced database from Supabase Storage locally.");
         }
       }
-      isInitialized = true;
+      lastSyncTime = now;
     } catch (e) {
-      console.error("Exception during database initialization from Supabase:", e.message);
-      isInitialized = true;
+      console.error("Exception during database sync from Supabase:", e.message);
+      // Still update lastSyncTime to avoid hammering Supabase on errors
+      lastSyncTime = now;
     }
   }
 
@@ -84,6 +87,7 @@ export async function readDb() {
     throw error;
   }
 }
+
 
 export async function writeDb(db) {
   try {
@@ -103,6 +107,8 @@ export async function writeDb(db) {
         console.error("Failed to sync database write to Supabase Storage:", error.message);
       } else {
         console.log("Successfully synced database write to Supabase Storage.");
+        // Reset TTL so next readDb() gets fresh data from Supabase
+        lastSyncTime = 0;
       }
     } catch (supabaseError) {
       console.error("Supabase Storage write exception:", supabaseError.message);

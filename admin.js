@@ -1083,7 +1083,26 @@ async function saveSettings() {
     const catCrash = document.getElementById('categoryNameCrash')?.value?.trim() || "ألعاب فورية";
 
     // Read PG Soft Config
-    const pgIsProd = !!document.getElementById('settingPgIsProduction')?.checked;
+    const pgIsProdChecked = !!document.getElementById('settingPgIsProduction')?.checked;
+    
+    // SAFETY: Confirm before enabling Production Mode
+    if (pgIsProdChecked) {
+        const confirmed = confirm(
+            '⚠️ تحذير: أنت على وشك تفعيل بيئة الإنتاج الحقيقية (Production Mode)!\n\n' +
+            'هذا سيستخدم رمز المشغل الحقيقي وسيؤثر على حسابات اللاعبين الحقيقيين.\n\n' +
+            'هل أنت متأكد أن شركة PG Soft وافقت على الانتقال للإنتاج؟\n\n' +
+            'اضغط "موافق" فقط إذا كنت متأكداً 100%.'
+        );
+        if (!confirmed) {
+            // Revert the checkbox
+            const pgIsProdEl = document.getElementById('settingPgIsProduction');
+            if (pgIsProdEl) pgIsProdEl.checked = false;
+            showToast('⚠️ تم إلغاء تفعيل بيئة الإنتاج', 'warning');
+            return;
+        }
+    }
+    
+    const pgIsProd = pgIsProdChecked;
     const pgStagingToken = document.getElementById('settingPgStagingOperatorToken')?.value?.trim() || "I-6c19673883aa410b98d1c0cb1a3c5edc";
     const pgStagingKey = document.getElementById('settingPgStagingSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
     const pgProductionToken = document.getElementById('settingPgProductionOperatorToken')?.value?.trim() || "a5fd4c1a25904aae8729516557c160d0";
