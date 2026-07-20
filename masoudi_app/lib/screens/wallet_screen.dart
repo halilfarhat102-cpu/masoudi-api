@@ -47,7 +47,7 @@ class _WalletScreenState extends State<WalletScreen> {
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            final double currentBalance = widget.balance;
+            final double currentBalance = widget.agentBalance;
             return AlertDialog(
               backgroundColor: const Color(0xFF291B15),
               shape: RoundedRectangleBorder(
@@ -59,7 +59,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   const Icon(Icons.swap_horizontal_circle_rounded, color: Color(0xFFFF7A1F), size: 24),
                   const SizedBox(width: 8),
                   Text(
-                    'تحويل رصيد إلى لاعب',
+                    'تحويل كوينز إلى لاعب',
                     style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -73,7 +73,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'رصيدك المتاح للتوزيع: ${currentBalance.toLocaleString()} $',
+                    'رصيدك المتاح للتوزيع: ${currentBalance.toLocaleString()} كوين',
                     style: GoogleFonts.cairo(fontSize: 11, color: const Color(0xFF8B909E)),
                   ),
                   const SizedBox(height: 16),
@@ -107,7 +107,7 @@ class _WalletScreenState extends State<WalletScreen> {
 
                   // Amount Field
                   Text(
-                    'المبلغ',
+                    'كمية الكوينز',
                     style: GoogleFonts.cairo(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
@@ -127,14 +127,14 @@ class _WalletScreenState extends State<WalletScreen> {
                             enabled: !isTransferring,
                             style: GoogleFonts.cairo(color: Colors.white, fontSize: 13),
                             decoration: InputDecoration(
-                              hintText: 'أدخل المبلغ...',
+                              hintText: 'أدخل عدد الكوينز...',
                               hintStyle: GoogleFonts.cairo(color: const Color(0xFF6B7080), fontSize: 12),
                               border: InputBorder.none,
                             ),
                           ),
                         ),
                         Text(
-                          '🪙 $',
+                          '🪙 كوين',
                           style: GoogleFonts.cairo(color: const Color(0xFFFF7A1F), fontWeight: FontWeight.bold, fontSize: 11),
                         ),
                       ],
@@ -208,7 +208,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      'تم تحويل ${amountVal.toLocaleString()} $ بنجاح للاعب $recipientId 🚀',
+                                      'تم تحويل ${amountVal.toLocaleString()} كوين بنجاح للاعب $recipientId 🚀',
                                       textAlign: TextAlign.right,
                                       style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
                                     ),
@@ -348,6 +348,7 @@ class _WalletScreenState extends State<WalletScreen> {
         final playersList = decoded['players'] as List<dynamic>? ?? [];
         final p2pList = playersList.where((p) => p['isAgent'] == true && p['id'] != widget.playerId).toList();
 
+        if (!mounted) return;
         setState(() {
           _settings = Map<String, dynamic>.from(decoded['settings'] ?? {});
           _agents = agentsList;
@@ -364,12 +365,14 @@ class _WalletScreenState extends State<WalletScreen> {
           _isLoadingAgents = false;
         });
       } else {
+        if (!mounted) return;
         setState(() {
           _isLoadingAgents = false;
         });
       }
     } catch (e) {
       debugPrint("Error fetching agents: $e");
+      if (!mounted) return;
       setState(() {
         _isLoadingAgents = false;
       });
@@ -387,7 +390,7 @@ class _WalletScreenState extends State<WalletScreen> {
       cleanedPhone = cleanedPhone.substring(2);
     }
 
-    final message = "مرحباً وكيل شحن مسعودي، أريد شحن رصيد للعب. معرف حسابي في اللعبة هو: ${widget.playerId}";
+    final message = "مرحباً وكيل شحن مسعودي، أريد شراء كوينز للعب. معرف حسابي في اللعبة هو: ${widget.playerId}";
     final encodedMsg = Uri.encodeComponent(message);
 
     // List of URIs to try in order
@@ -488,7 +491,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'سحب رصيد للوكيل',
+                        'بيع كوينز للوكيل',
                         style: GoogleFonts.cairo(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -662,7 +665,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               style: GoogleFonts.cairo(fontSize: 11, color: const Color(0xFF8B909E)),
                             ),
                             Text(
-                              '${widget.primaryBalance.toLocaleString()} $ 🪙',
+                              '${widget.primaryBalance.toLocaleString()} كوين 🪙',
                               style: GoogleFonts.cairo(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -676,7 +679,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               style: GoogleFonts.cairo(fontSize: 11, color: const Color(0xFF8B909E)),
                             ),
                             Text(
-                              '1\$ = ${double.parse((_settings['coinSellRate'] ?? 20000).toString()).toLocaleString()} $',
+                              '1\$ = ${double.parse((_settings['coinSellRate'] ?? 20000).toString()).toLocaleString()} كوين',
                               style: GoogleFonts.cairo(
                                 fontSize: 12,
                                 color: const Color(0xFFFF7A1F),
@@ -690,7 +693,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'المبلغ المراد سحبه',
+                    'كمية الكوينز للبيع',
                     style: GoogleFonts.cairo(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
@@ -707,10 +710,10 @@ class _WalletScreenState extends State<WalletScreen> {
                       enabled: !isSelling,
                       style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: 'أدخل المبلغ...',
+                        hintText: 'أدخل كمية الكوينز...',
                         hintStyle: GoogleFonts.cairo(color: const Color(0xFF6B7080), fontSize: 12),
                         border: InputBorder.none,
-                        suffix: Text('🪙 $', style: GoogleFonts.cairo(fontSize: 11, color: const Color(0xFF8B909E))),
+                        suffix: Text('🪙 كوين', style: GoogleFonts.cairo(fontSize: 11, color: const Color(0xFF8B909E))),
                       ),
                     ),
                   ),
@@ -739,7 +742,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'أؤكد أن الوكيل سيدفع قيمة الرصيد نقداً وأنني أوافق على الخصم الفوري',
+                            'أؤكد أن الوكيل سيدفع قيمة الكوينز نقداً وأنني أوافق على الخصم الفوري',
                             style: GoogleFonts.cairo(
                               fontSize: 10,
                               color: _confirmed ? const Color(0xFF00E676) : Colors.orange.shade300,
@@ -772,7 +775,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           if (amountVal > widget.primaryBalance) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(
-                                'رصيد المكافآت لا يمكن بيعه — يمكن استخدامه في الألعاب فقط. رصيدك الأساسي القابل للبيع: ${widget.primaryBalance.toLocaleString()} $',
+                                'رصيد المكافآت لا يمكن بيعه — يمكن استخدامه في الألعاب فقط. رصيدك الأساسي القابل للبيع: ${widget.primaryBalance.toLocaleString()} كوين',
                                 textAlign: TextAlign.right,
                                 style: GoogleFonts.cairo(fontSize: 12),
                               ),
@@ -815,7 +818,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 widget.onTransactionExecuted(-amountVal, 'sell');
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                   content: Text(
-                                    'تم بيع ${amountVal.toLocaleString()} $ للوكيل ${data['agentName'] ?? ''} بنجاح 💰',
+                                    'تم بيع ${amountVal.toLocaleString()} كوين للوكيل ${data['agentName'] ?? ''} بنجاح 💰',
                                     textAlign: TextAlign.right,
                                     style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
                                   ),
@@ -949,7 +952,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'مجموع رصيد المحفظة',
+                  'مجموع رصيد العملات المعدنية',
                   style: GoogleFonts.cairo(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -971,7 +974,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '$ 🪙',
+                      'كوين 🪙',
                       style: GoogleFonts.cairo(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -997,7 +1000,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             ),
                           ),
                           Text(
-                            '${widget.primaryBalance.toLocaleString()} $',
+                            '${widget.primaryBalance.toLocaleString()} كوين',
                             style: GoogleFonts.cairo(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -1046,7 +1049,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             ],
                           ),
                           Text(
-                            '${widget.bonusBalance.toLocaleString()} $',
+                            '${widget.bonusBalance.toLocaleString()} كوين',
                             style: GoogleFonts.cairo(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -1143,7 +1146,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'رصيد توزيع الشحن (الوكالة)',
+                              'رصيد كوينز التوزيع (الوكالة)',
                               style: GoogleFonts.cairo(
                                 fontSize: 10,
                                 color: const Color(0xFF8B909E),
@@ -1152,7 +1155,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${widget.agentBalance.toLocaleString()} $ 🪙',
+                              '${widget.agentBalance.toLocaleString()} كوين 🪙',
                               style: GoogleFonts.cairo(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
@@ -1183,7 +1186,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   const SizedBox(height: 14),
 
                   Text(
-                    'بصفتك وكيلاً معتمداً، يمكنك تحويل الرصيد مباشرة إلى حسابات اللاعبين وبيعها لهم بشكل آمن.',
+                    'بصفتك وكيلاً معتمداً، يمكنك تحويل الكوينز مباشرة إلى حسابات اللاعبين وبيعها لهم بشكل آمن.',
                     style: GoogleFonts.cairo(
                       fontSize: 11,
                       color: const Color(0xFF8B909E),
@@ -1208,7 +1211,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                       icon: const Icon(Icons.swap_horizontal_circle_rounded, size: 20),
                       label: Text(
-                        'شحن رصيد للاعب',
+                        'شحن عملات معدنية للاعب',
                         style: GoogleFonts.cairo(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -1238,7 +1241,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'شحن رصيد (الوكلاء المعتمدون)',
+                      'شراء كوينز (الوكلاء المعتمدون)',
                       style: GoogleFonts.cairo(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -1469,7 +1472,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    'شراء: 1\$ = ${double.parse((_settings['coinBuyRate'] ?? 10000).toString()).toLocaleString()} $',
+                                    'شراء: 1\$ = ${double.parse((_settings['coinBuyRate'] ?? 10000).toString()).toLocaleString()} كوين',
                                     style: GoogleFonts.cairo(
                                       fontSize: 9,
                                       fontWeight: FontWeight.bold,
@@ -1547,7 +1550,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                       ),
                                       icon: const Icon(Icons.sell_rounded, size: 14),
                                       label: Text(
-                                        'سحب رصيد',
+                                        'بيع كوينز',
                                         style: GoogleFonts.cairo(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
