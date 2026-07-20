@@ -270,7 +270,10 @@ export async function apiMiddleware(req, res, next) {
 
         await runTransaction(async (db) => {
           if (!db.players) db.players = [];
-          let player = db.players.find(p => p.id === playerInput.id);
+          let player = db.players.find(p => 
+            (playerInput.id && String(p.id) === String(playerInput.id)) ||
+            (playerInput.email && playerInput.email !== '—' && playerInput.email !== 'لا يوجد بريد مرتبط' && p.email && p.email.trim().toLowerCase() === playerInput.email.trim().toLowerCase())
+          );
           if (!player) {
             const newName = (!isNumericId(playerInput.name) && playerInput.name)
               ? playerInput.name
@@ -291,6 +294,7 @@ export async function apiMiddleware(req, res, next) {
             };
             db.players.push(player);
           } else {
+            if (playerInput.id) player.id = playerInput.id;
             if (playerInput.name && !isNumericId(playerInput.name)) {
               player.name = playerInput.name;
             }
