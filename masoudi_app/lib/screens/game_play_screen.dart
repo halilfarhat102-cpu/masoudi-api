@@ -110,7 +110,7 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${widget.balance.toLocaleString()} ر.س',
+                      '${widget.balance.toLocaleString()} $',
                       style: GoogleFonts.cairo(
                         color: Colors.white,
                         fontSize: 12,

@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'title': 'جاكبوت روليت البرق',
-      'subtitle': 'الجائزة الكبرى تصل إلى 500,000 ر.س 🪙',
+      'subtitle': 'الجائزة الكبرى تصل إلى 500,000 $ 🪙',
       'badge': 'مباشر',
       'icon': '🎰',
       'accentR': 124,
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'title': 'بطولة الأسبوع VIP',
-      'subtitle': 'المركز الأول يربح 25,000 ر.س 🪙',
+      'subtitle': 'المركز الأول يربح 25,000 $ 🪙',
       'badge': 'جديد',
       'icon': '🏆',
       'accentR': 245,
@@ -85,10 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   final List<Map<String, String>> _winners = [
-    {"name": "خالد المري", "prize": "15,000 ر.س 🪙", "game": "روليت البرق"},
-    {"name": "أبو فهد", "prize": "8,500 ر.س 🪙", "game": "فتحات أوليمبوس"},
-    {"name": "سارة الدوسري", "prize": "32,000 ر.س 🪙", "game": "بلاك جاك مسعودي"},
-    {"name": "سلطان العتيبي", "prize": "6,200 ر.س 🪙", "game": "سلوتس كليوباترا"}
+    {"name": "خالد المري", "prize": "15,000 $ 🪙", "game": "روليت البرق"},
+    {"name": "أبو فهد", "prize": "8,500 $ 🪙", "game": "فتحات أوليمبوس"},
+    {"name": "سارة الدوسري", "prize": "32,000 $ 🪙", "game": "بلاك جاك مسعودي"},
+    {"name": "سلطان العتيبي", "prize": "6,200 $ 🪙", "game": "سلوتس كليوباترا"}
   ];
 
   @override

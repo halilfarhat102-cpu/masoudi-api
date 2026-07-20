@@ -10,17 +10,17 @@ const playerId = "879204";
 let dynamicGames = [];
 
 const transactions = [
-    { id: "TX-99837", type: "إيداع", amount: "+5,000 ر.س", date: "اليوم، 12:45 ص", status: "ناجحة" },
-    { id: "TX-99712", type: "لعب (سلوتس API)", amount: "-1,200 ر.س", date: "أمس، 08:30 م", status: "ناجحة" },
-    { id: "TX-99645", type: "سحب", amount: "-10,000 ر.س", date: "أمس، 02:15 م", status: "ناجحة" },
-    { id: "TX-99501", type: "إيداع", amount: "+25,000 ر.س", date: "02 يوليو 2026", status: "ناجحة" }
+    { id: "TX-99837", type: "إيداع", amount: "+$5,000", date: "اليوم، 12:45 ص", status: "ناجحة" },
+    { id: "TX-99712", type: "لعب (سلوتس API)", amount: "-$1,200", date: "أمس، 08:30 م", status: "ناجحة" },
+    { id: "TX-99645", type: "سحب", amount: "-$10,000", date: "أمس، 02:15 م", status: "ناجحة" },
+    { id: "TX-99501", type: "إيداع", amount: "+$25,000", date: "02 يوليو 2026", status: "ناجحة" }
 ];
 
 const winners = [
-    { name: "خالد المري", prize: "15,000 ر.س", game: "روليت البرق" },
-    { name: "أبو فهد", prize: "8,500 ر.س", game: "فتحات أوليمبوس" },
-    { name: "سارة الدوسري", prize: "32,000 ر.س", game: "بلاك جاك مسعودي" },
-    { name: "سلطان العتيبي", prize: "6,200 ر.س", game: "سلوتس كليوباترا" }
+    { name: "خالد المري", prize: "$15,000", game: "روليت البرق" },
+    { name: "أبو فهد", prize: "$8,500", game: "فتحات أوليمبوس" },
+    { name: "سارة الدوسري", prize: "$32,000", game: "بلاك جاك مسعودي" },
+    { name: "سلطان العتيبي", prize: "$6,200", game: "سلوتس كليوباترا" }
 ];
 
 // Filter State
@@ -127,32 +127,32 @@ function updateBalanceUI() {
 
     const topBarBalanceEl = document.getElementById("topBarBalance");
     if (topBarBalanceEl) {
-        topBarBalanceEl.innerText = Math.floor(playerBalance).toLocaleString();
+        topBarBalanceEl.innerText = '$' + Math.floor(playerBalance).toLocaleString();
     }
 
     const headerBalEl = document.getElementById("headerBalance");
     if (headerBalEl) {
-        headerBalEl.innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        headerBalEl.innerText = '$' + Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
     
     const walletBalEl = document.getElementById("walletBalance");
     if (walletBalEl) {
-        walletBalEl.innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        walletBalEl.innerText = '$' + Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
     
     const primaryBalEl = document.getElementById("primaryBalance");
     if (primaryBalEl) {
-        primaryBalEl.innerText = Number(primary).toLocaleString('en-US', { minimumFractionDigits: 2 }) + " ر.س";
+        primaryBalEl.innerText = '$' + Number(primary).toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
     
     const bonusBalEl = document.getElementById("bonusBalance");
     if (bonusBalEl) {
-        bonusBalEl.innerText = Number(bonus).toLocaleString('en-US', { minimumFractionDigits: 2 }) + " ر.س";
+        bonusBalEl.innerText = '$' + Number(bonus).toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
     
     const gamePlayBalEl = document.getElementById("gamePlayBalance");
     if (gamePlayBalEl) {
-        gamePlayBalEl.innerText = Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
+        gamePlayBalEl.innerText = '$' + Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
 }
 

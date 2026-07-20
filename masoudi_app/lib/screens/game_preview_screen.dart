@@ -240,7 +240,7 @@ class _GamePreviewScreenState extends State<GamePreviewScreen>
                                     _statChip(
                                       icon: Icons.account_balance_wallet_rounded,
                                       label: 'رصيدك',
-                                      value: '${widget.balance.toLocaleString()} ر.س',
+                                      value: '${widget.balance.toLocaleString()} $',
                                       color: const Color(0xFFFF7A1F),
                                     ),
                                     const SizedBox(width: 10),

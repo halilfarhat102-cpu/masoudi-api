@@ -53,8 +53,8 @@
             
             <!-- Middle: Coin Balance Widget -->
             <div class="top-bar-coins-widget" onclick="switchTab('wallet')">
-                <span class="coin-icon">🪙</span>
-                <span id="topBarBalance" class="coin-balance-text">250,500</span>
+                <span class="coin-icon"><i class="fa-solid fa-wallet" style="color:var(--gold-text);"></i></span>
+                <span id="topBarBalance" class="coin-balance-text">$250,500</span>
             </div>
 
             <!-- Right: Circular Profile Avatar -->
@@ -127,15 +127,15 @@
                 <div class="wallet-balance-card glass-card glow-border-gold">
                     <div class="card-chip"><i class="fa-solid fa-gem text-gold"></i> رتبة مسعودي 1</div>
                     <div class="wallet-label">مجموع رصيد المحفظة</div>
-                    <div class="wallet-total-amount"><span id="walletBalance">250,500.00</span> <span class="currency">ر.س</span></div>
+                    <div class="wallet-total-amount"><span id="walletBalance">$250,500.00</span> <span class="currency">$</span></div>
                     <div class="wallet-breakdown">
                         <div class="breakdown-item">
                             <span class="b-lbl">الرصيد الأساسي</span>
-                            <span class="b-val" id="primaryBalance">240,000.00 ر.س</span>
+                            <span class="b-val" id="primaryBalance">$240,000.00</span>
                         </div>
                         <div class="breakdown-item border-left">
                             <span class="b-lbl">رصيد المكافآت</span>
-                            <span class="b-val" id="bonusBalance">10,500.00 ر.س</span>
+                            <span class="b-val" id="bonusBalance">$10,500.00</span>
                         </div>
                     </div>
                 </div>
@@ -144,13 +144,13 @@
                     <div class="quick-form-card glass-card">
                         <h4>عملية إيداع سريعة</h4>
                         <div class="amount-presets">
-                            <button onclick="setDepositAmount(1000)">1,000 ر.س</button>
-                            <button onclick="setDepositAmount(5000)">5,000 ر.س</button>
-                            <button onclick="setDepositAmount(10000)">10,000 ر.س</button>
+                            <button onclick="setDepositAmount(1000)">$1,000</button>
+                            <button onclick="setDepositAmount(5000)">$5,000</button>
+                            <button onclick="setDepositAmount(10000)">$10,000</button>
                         </div>
                         <div class="custom-amount-input">
                             <input type="number" id="depositInput" placeholder="أدخل مبلغ الإيداع...">
-                            <span class="input-currency">ر.س</span>
+                            <span class="input-currency">$</span>
                         </div>
                         <button class="btn-submit btn-submit-deposit" onclick="executeDeposit()">إيداع الآن</button>
                     </div>
@@ -158,13 +158,13 @@
                     <div class="quick-form-card glass-card">
                         <h4>عملية سحب سريعة</h4>
                         <div class="amount-presets">
-                            <button onclick="setWithdrawAmount(1000)">1,000 ر.س</button>
-                            <button onclick="setWithdrawAmount(5000)">5,000 ر.س</button>
-                            <button onclick="setWithdrawAmount(10000)">10,000 ر.س</button>
+                            <button onclick="setWithdrawAmount(1000)">$1,000</button>
+                            <button onclick="setWithdrawAmount(5000)">$5,000</button>
+                            <button onclick="setWithdrawAmount(10000)">$10,000</button>
                         </div>
                         <div class="custom-amount-input">
                             <input type="number" id="withdrawInput" placeholder="أدخل مبلغ السحب...">
-                            <span class="input-currency">ر.س</span>
+                            <span class="input-currency">$</span>
                         </div>
                         <button class="btn-submit btn-submit-withdraw" onclick="executeWithdraw()">سحب الآن</button>
                     </div>
@@ -286,7 +286,7 @@
                 </div>
                 <div class="custom-amount-input">
                     <input type="number" id="modalDepositInput" placeholder="أدخل مبلغ الإيداع...">
-                    <span class="input-currency">ر.س</span>
+                    <span class="input-currency">$</span>
                 </div>
                 <button class="btn-submit btn-submit-deposit" onclick="executeModalDeposit()">إتمام الشحن</button>
             </div>
@@ -308,7 +308,7 @@
                 </div>
                 <div class="custom-amount-input">
                     <input type="number" id="modalWithdrawInput" placeholder="أدخل مبلغ السحب...">
-                    <span class="input-currency">ر.س</span>
+                    <span class="input-currency">$</span>
                 </div>
                 <button class="btn-submit btn-submit-withdraw" onclick="executeModalWithdraw()">تأكيد السحب الفوري</button>
             </div>
@@ -322,7 +322,7 @@
             
             <div class="game-modal-header">
                 <h3 id="gameModalTitle">اسم اللعبة</h3>
-                <span class="game-modal-balance"><i class="fa-solid fa-wallet text-gold"></i> الرصيد: <span id="gamePlayBalance">250,500.00</span> ر.س</span>
+                <span class="game-modal-balance"><i class="fa-solid fa-wallet text-gold"></i> الرصيد: <span id="gamePlayBalance">$250,500.00</span></span>
             </div>
             
             <div class="game-play-area" id="gamePlayArea">
