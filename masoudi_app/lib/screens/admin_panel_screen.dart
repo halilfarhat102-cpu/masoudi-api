@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AdminPanelScreen extends StatefulWidget {
@@ -28,12 +25,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFF100906))
-      ..addJavaScriptChannel(
-        'MasoudiApp',
-        onMessageReceived: (JavaScriptMessage message) {
-          _handleNativeMessage(message.message);
-        },
-      )
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
@@ -56,69 +47,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         ),
       )
       ..loadRequest(Uri.parse('${widget.serverUrl}/admin.html'));
-  }
-
-  Future<void> _handleNativeMessage(String msg) async {
-    final parts = msg.split('|');
-    if (parts.length >= 3 && parts[0] == 'pickImage') {
-      final targetInputId = parts[1];
-      final statusId = parts[2];
-      await _pickAndUploadImage(targetInputId, statusId);
-    }
-  }
-
-  Future<void> _pickAndUploadImage(String targetInputId, String statusId) async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-      );
-      if (image == null) return;
-
-      // Set loading status in WebView
-      await _controller.runJavaScript("""
-        document.getElementById('$statusId').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--orange);"></i> جاري رفع الصورة...';
-        document.getElementById('$statusId').style.color = 'var(--orange)';
-      """);
-
-      final bytes = await image.readAsBytes();
-      final base64Data = base64Encode(bytes);
-      final extension = image.name.split('.').last;
-
-      final res = await http.post(
-        Uri.parse('${widget.serverUrl}/api/upload'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'fileName': image.name,
-          'fileData': 'data:image/$extension;base64,$base64Data',
-        }),
-      ).timeout(const Duration(seconds: 30));
-
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body);
-        if (data['success'] == true && data['url'] != null) {
-          final imageUrl = data['url'];
-          await _controller.runJavaScript("""
-            document.getElementById('$targetInputId').value = '$imageUrl';
-            document.getElementById('$statusId').innerHTML = '<i class="fa-solid fa-circle-check" style="color:#00E676;"></i> تم الرفع بنجاح';
-            document.getElementById('$statusId').style.color = '#00E676';
-            if (window.showToast) { window.showToast('تم رفع الصورة بنجاح ✅'); }
-          """);
-        } else {
-          throw Exception(data['error'] ?? 'Server error');
-        }
-      } else {
-        throw Exception('HTTP ${res.statusCode}');
-      }
-    } catch (e) {
-      debugPrint("Native upload error: $e");
-      await _controller.runJavaScript("""
-        document.getElementById('$statusId').innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#ff5252;"></i> فشل الرفع: $e';
-        document.getElementById('$statusId').style.color = '#ff5252';
-        if (window.showToast) { window.showToast('فشل رفع الصورة', 'error'); }
-      """);
-    }
   }
 
   @override

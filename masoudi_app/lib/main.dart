@@ -625,12 +625,9 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
             game: game,
             balance: _playerBalance,
             playerId: _playerId,
-            serverUrl: _serverUrl,
           ),
         ),
-      ).then((_) {
-        _syncPlayerWithServer();
-      });
+      );
       return;
     }
 
@@ -643,7 +640,6 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
           balance: _playerBalance,
           playerId: _playerId,
           playerName: _playerRealName.isNotEmpty ? _playerRealName : 'لاعب مسعودي',
-          serverUrl: _serverUrl,
           showBalance: _showBalance,
           showLiveBadge: _showLiveBadge,
           playButtonText: _playButtonText,
@@ -656,9 +652,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         },
         transitionDuration: const Duration(milliseconds: 300),
       ),
-    ).then((_) {
-      _syncPlayerWithServer();
-    });
+    );
   }
 
   void _showLoginRequiredDialog(String message) {
