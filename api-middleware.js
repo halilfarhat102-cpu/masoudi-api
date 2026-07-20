@@ -174,6 +174,9 @@ export async function apiMiddleware(req, res, next) {
         // Exclude sessions (auth tokens) from public data response for security
         const { sessions, ...publicData } = db;
         res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.end(JSON.stringify(publicData));
       } catch (e) {
         res.statusCode = 500;
@@ -766,7 +769,7 @@ export async function apiMiddleware(req, res, next) {
         // Log transactions
         if (!agent.transactions) agent.transactions = [];
         agent.transactions.push({
-          type: `تحويل كوينز إلى لاعب (${recipient.name || recipientId})`,
+          type: `تحويل رصيد إلى لاعب (${recipient.name || recipientId})`,
           amount: -amount,
           date: new Date().toLocaleTimeString('ar')
         });
@@ -861,14 +864,14 @@ export async function apiMiddleware(req, res, next) {
 
         if (!player.transactions) player.transactions = [];
         player.transactions.push({
-          type: `بيع كوينز للوكيل (${finalAgentName})`,
+          type: `سحب رصيد للوكيل (${finalAgentName})`,
           amount: -amount,
           date: now
         });
 
         if (!agent.transactions) agent.transactions = [];
         agent.transactions.push({
-          type: `شراء كوينز من لاعب (${player.name || playerId})`,
+          type: `شحن رصيد من لاعب (${player.name || playerId})`,
           amount: amount,
           date: now
         });

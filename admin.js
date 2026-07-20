@@ -216,7 +216,7 @@ async function doAddAdmin() {
 // ─── Data: Load from server / localStorage ───
 async function loadData() {
     try {
-        const res = await fetch(API_BASE + '/api/data');
+        const res = await fetch(API_BASE + '/api/data?t=' + Date.now());
         if (!res.ok) throw new Error('Server error');
         const data = await res.json();
         providers    = Array.isArray(data.providers) ? data.providers : [];
@@ -263,7 +263,7 @@ async function saveData() {
     localStorage.setItem('masoudi_receipts',  JSON.stringify(receipts));
     localStorage.setItem('masoudi_admins',    JSON.stringify(admins));
     try {
-        await fetch(API_BASE + '/api/data', {
+        await fetch(API_BASE + '/api/data?t=' + Date.now(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
