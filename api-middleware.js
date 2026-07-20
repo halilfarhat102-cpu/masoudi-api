@@ -1521,7 +1521,9 @@ export async function apiMiddleware(req, res, next) {
 
       const isProd = pgConfig.isProduction;
       const operatorToken = isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken;
-      const baseUrl = isProd ? 'https://api.pgsoft-games.com' : 'https://api.pg-bo.me';
+      const baseUrl = isProd 
+        ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com') 
+        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me');
 
       // Call PG Soft GetLaunchURLHTML API
       const traceId = 'guid-' + crypto.randomUUID();
