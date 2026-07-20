@@ -67,9 +67,13 @@ function extractPGIdentifiers(payload) {
 function findPGPlayer(db, token, playerId) {
   if (!db.players) db.players = [];
   let player = null;
-  if (token) player = db.players.find(p => p.sessionToken === token || p.id === token);
-  if (!player && playerId) player = db.players.find(p => p.id === String(playerId) || p.name === String(playerId));
-  if (!player && db.players.length > 0) player = db.players.find(p => p.id === '519997') || db.players[0];
+  // 1) Match by session token (most specific)
+  if (token) player = db.players.find(p => p.sessionToken === token);
+  // 2) Match by player ID exact match
+  if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+  // 3) Match by player name (PG Soft sometimes sends player_name = player.id)
+  if (!player && playerId) player = db.players.find(p => p.name === String(playerId));
+  // NOTE: No wildcard fallback — invalid tokens must fail with error, not silently use a random player
   return player;
 }
 
@@ -1171,10 +1175,12 @@ export async function apiMiddleware(req, res, next) {
 
         let resultBalance = 0;
         let resultPlayerId = '';
+        let resultCurrency = 'USD';
         let errorMsg = null;
         let isDuplicate = false;
 
         await runTransaction(async (db) => {
+          resultCurrency = db.settings?.pgConfig?.currency || 'USD';
           const player = findPGPlayer(db, token, playerId);
 
           if (!player) {
@@ -1239,7 +1245,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name: resultPlayerId,
             player_id: resultPlayerId,
-            currency: db.settings?.pgConfig?.currency || 'USD',
+            currency: resultCurrency,
             balance: parseFloat((resultBalance / 100).toFixed(2))
           },
           error: null
@@ -1272,10 +1278,12 @@ export async function apiMiddleware(req, res, next) {
 
         let resultBalance  = 0;
         let resultPlayerId = '';
+        let resultCurrency = 'USD';
         let errorMsg       = null;
         let isDuplicate    = false;
 
         await runTransaction(async (db) => {
+          resultCurrency = db.settings?.pgConfig?.currency || 'USD';
           const player = findPGPlayer(db, token, playerId);
 
           if (!player) { errorMsg = 'Player not found'; return db; }
@@ -1335,7 +1343,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name:    resultPlayerId,
             player_id:      resultPlayerId,
-            currency: db.settings?.pgConfig?.currency || 'USD',
+            currency:       resultCurrency,
             balance:        parseFloat((resultBalance / 100).toFixed(2))
           },
           error: null
