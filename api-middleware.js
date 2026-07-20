@@ -12,6 +12,15 @@ function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
 }
 
+function findPGPlayer(db, token, playerId) {
+  if (!db.players) db.players = [];
+  let player = null;
+  if (token) player = db.players.find(p => p.sessionToken === token || p.id === token);
+  if (!player && playerId) player = db.players.find(p => p.id === String(playerId) || p.name === String(playerId));
+  if (!player && db.players.length > 0) player = db.players.find(p => p.id === '519997') || db.players[0];
+  return player;
+}
+
 // ─── Persistent Token Store (survives server restarts) ───────────────────────
 // Tokens are stored in db.json under db.sessions to persist across Render deploys
 async function getAdminSession(token) {
@@ -986,14 +995,10 @@ export async function apiMiddleware(req, res, next) {
           }
         }
 
-        if (!db.players) db.players = [];
         const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
         const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
 
-        let player = null;
-        if (token) player = db.players.find(p => p.sessionToken === token || p.id === token);
-        if (!player && playerId) player = db.players.find(p => p.id === String(playerId) || p.name === String(playerId));
-        if (!player && db.players.length > 0) player = db.players.find(p => p.id === '519997') || db.players[0];
+        const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
           res.statusCode = 200;
@@ -1053,14 +1058,10 @@ export async function apiMiddleware(req, res, next) {
           }
         }
 
-        if (!db.players) db.players = [];
         const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
         const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
 
-        let player = null;
-        if (token) player = db.players.find(p => p.sessionToken === token || p.id === token);
-        if (!player && playerId) player = db.players.find(p => p.id === String(playerId) || p.name === String(playerId));
-        if (!player && db.players.length > 0) player = db.players.find(p => p.id === '519997') || db.players[0];
+        const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
           res.statusCode = 200;
@@ -1100,10 +1101,10 @@ export async function apiMiddleware(req, res, next) {
       try {
         const payload = JSON.parse(body || '{}');
 
-        const token = payload.token || payload.session_token || payload.sessionToken;
-        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
+        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
         // Amount in major currency units (e.g. 1.50 USD)
-        const amountRaw = parseFloat(payload.amount || payload.bet_amount || 0);
+        const amountRaw = parseFloat(payload.amount || payload.bet_amount || payload.win_amount || payload.transfer_amount || 0);
         const txType = payload.type || payload.transaction_type || 'adjustment';
         const txId = payload.transaction_id || payload.txid || payload.bet_id || ('TX-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
@@ -1114,10 +1115,7 @@ export async function apiMiddleware(req, res, next) {
         let isDuplicate = false;
 
         await runTransaction(async (db) => {
-          if (!db.players) db.players = [];
-          let player = null;
-          if (token) player = db.players.find(p => p.sessionToken === token);
-          if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+          const player = findPGPlayer(db, token, playerId);
 
           if (!player) {
             errorMsg = 'Player not found';
@@ -1206,8 +1204,8 @@ export async function apiMiddleware(req, res, next) {
       try {
         const payload = JSON.parse(body || '{}');
 
-        const token    = payload.token || payload.session_token || payload.sessionToken;
-        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
+        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
         const betAmt   = parseFloat(payload.bet_amount  || payload.bet  || 0);
         const winAmt   = parseFloat(payload.win_amount  || payload.win  || 0);
         const txId     = payload.transaction_id || payload.txid || ('BP-' + Date.now());
@@ -1219,10 +1217,7 @@ export async function apiMiddleware(req, res, next) {
         let isDuplicate    = false;
 
         await runTransaction(async (db) => {
-          if (!db.players) db.players = [];
-          let player = null;
-          if (token)    player = db.players.find(p => p.sessionToken === token);
-          if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+          const player = findPGPlayer(db, token, playerId);
 
           if (!player) { errorMsg = 'Player not found'; return db; }
 
@@ -1307,16 +1302,13 @@ export async function apiMiddleware(req, res, next) {
         const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
-        const token = payload.token || payload.session_token || payload.sessionToken;
-        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
+        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
         const betAmount = parseFloat(payload.amount || payload.bet_amount || 0);
         const txId = payload.transaction_id || payload.bet_id || ('BET-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
 
-        if (!db.players) db.players = [];
-        let player = null;
-        if (token) player = db.players.find(p => p.sessionToken === token);
-        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+        const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
           res.setHeader('Content-Type', 'application/json');
@@ -1364,16 +1356,13 @@ export async function apiMiddleware(req, res, next) {
         const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
-        const token = payload.token || payload.session_token || payload.sessionToken;
-        const playerId = payload.player_id || payload.playerId || payload.uid;
+        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
+        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
         const winAmount = parseFloat(payload.amount || payload.win_amount || 0);
         const txId = payload.transaction_id || payload.payout_id || ('WIN-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
 
-        if (!db.players) db.players = [];
-        let player = null;
-        if (token) player = db.players.find(p => p.sessionToken === token);
-        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+        const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
           res.setHeader('Content-Type', 'application/json');
@@ -1415,16 +1404,13 @@ export async function apiMiddleware(req, res, next) {
         const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
-        const token = payload.token || payload.session_token;
-        const playerId = payload.player_id || payload.playerId;
+        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
+        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
         const originalTxId = payload.original_transaction_id || payload.ref_transaction_id || payload.transaction_id;
         const refundAmount = parseFloat(payload.amount || 0);
         const txId = payload.rollback_id || ('RB-' + Date.now());
 
-        if (!db.players) db.players = [];
-        let player = null;
-        if (token) player = db.players.find(p => p.sessionToken === token);
-        if (!player && playerId) player = db.players.find(p => p.id === String(playerId));
+        const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
           res.setHeader('Content-Type', 'application/json');
