@@ -13,6 +13,7 @@ class GamePreviewScreen extends StatefulWidget {
   final bool showBalance;
   final bool showLiveBadge;
   final String playButtonText;
+  final String serverUrl;
 
   const GamePreviewScreen({
     Key? key,
@@ -20,6 +21,7 @@ class GamePreviewScreen extends StatefulWidget {
     required this.balance,
     required this.playerId,
     required this.playerName,
+    required this.serverUrl,
     this.showBalance = true,
     this.showLiveBadge = true,
     this.playButtonText = 'العب الآن',
@@ -115,6 +117,7 @@ class _GamePreviewScreenState extends State<GamePreviewScreen>
           game: widget.game,
           balance: widget.balance,
           playerId: widget.playerId,
+          serverUrl: widget.serverUrl,
         ),
         transitionsBuilder: (_, anim, __, child) {
           return FadeTransition(
@@ -314,13 +317,32 @@ class _GamePreviewScreenState extends State<GamePreviewScreen>
             ),
           ),
 
-          // Game image
           Positioned.fill(
             child: widget.game.image.isNotEmpty
-                ? Image.network(
-                    widget.game.image,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _emojiCover(_gameEmoji, catColor),
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Blurred background copy of the image to fill the card beautifully
+                      Image.network(
+                        widget.game.image.startsWith('http')
+                            ? widget.game.image
+                            : '${widget.serverUrl}/${widget.game.image}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const SizedBox(),
+                      ),
+                      // Dark/blur overlay
+                      Container(
+                        color: Colors.black.withOpacity(0.65),
+                      ),
+                      // Sharp full image in front
+                      Image.network(
+                        widget.game.image.startsWith('http')
+                            ? widget.game.image
+                            : '${widget.serverUrl}/${widget.game.image}',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => _emojiCover(_gameEmoji, catColor),
+                      ),
+                    ],
                   )
                 : _emojiCover(_gameEmoji, catColor),
           ),
