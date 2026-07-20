@@ -767,62 +767,156 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: Container(
-          padding: const EdgeInsets.only(top: 32, left: 20, right: 20, bottom: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A110D),
+          padding: const EdgeInsets.only(top: 32, left: 16, right: 16, bottom: 10),
+          decoration: const BoxDecoration(
+            color: Color(0xFF10121B),
             border: Border(
-              bottom: BorderSide(color: const Color(0xFF3D2A20), width: 1),
+              bottom: BorderSide(color: Color(0xFF1F2436), width: 1),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // App Mascot Logo (Animated)
-              const AnimatedTopMascot(),
-
-              // Balance & Avatar
+              // Logo on Right (Masoudi Gaming 👑)
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF35241C),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: const Color(0xFF3D2A20), width: 1),
-                    ),
-                    child: Row(
-                      children: [
-                        const Text('🪙', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 5),
-                        Text(
-                          _playerBalance.toLocaleString(),
-                          style: GoogleFonts.cairo(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFFFF7A1F),
-                          ),
-                        ),
-                      ],
+                  const AnimatedTopMascot(),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Masoudi',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFFF7A1F), width: 2),
-                    ),
-                    child: CircleAvatar(
-                      radius: 15,
-                      backgroundColor: const Color(0xFF291B15),
-                      backgroundImage: _googleAvatarUrl != null ? NetworkImage(_googleAvatarUrl!) : null,
-                      child: _googleAvatarUrl == null
-                          ? const Icon(Icons.person_rounded, size: 17, color: Color(0xFFFF7A1F))
-                          : null,
+                  Text(
+                    'Dahab👑',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFFFFC107),
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
+
+              // Action Buttons / Balance on Left
+              if (!_isLoggedIn)
+                Row(
+                  children: [
+                    // Register button (Yellow)
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentIndex = 2; // Open Profile / Sign in
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFC107),
+                        foregroundColor: const Color(0xFF10121B),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'سجّل',
+                        style: GoogleFonts.cairo(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Login button (Dark outlined)
+                    OutlinedButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentIndex = 2; // Open Profile / Sign in
+                        });
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Color(0xFF282D45), width: 1.2),
+                        backgroundColor: const Color(0xFF1A1D2E),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      ),
+                      child: Text(
+                        'تسجيل الدخول',
+                        style: GoogleFonts.cairo(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _currentIndex = 1; // Switch to Wallet Tab
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1D2E),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: const Color(0xFFFFC107).withOpacity(0.4), width: 1.2),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.credit_card_rounded, color: Color(0xFFFFC107), size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              _playerBalance.toLocaleString(),
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '\$',
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFFFFC107),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFFFFC107), width: 2),
+                      ),
+                      child: CircleAvatar(
+                        radius: 15,
+                        backgroundColor: const Color(0xFF1A1D2E),
+                        backgroundImage: _googleAvatarUrl != null ? NetworkImage(_googleAvatarUrl!) : null,
+                        child: _googleAvatarUrl == null
+                            ? const Icon(Icons.person_rounded, size: 17, color: Color(0xFFFFC107))
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
