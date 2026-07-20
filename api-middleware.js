@@ -1535,8 +1535,6 @@ export async function apiMiddleware(req, res, next) {
       // Build form-urlencoded request body
       const formParams = new URLSearchParams();
       formParams.append('operator_token', operatorToken);
-      formParams.append('player_name', playerId);
-      formParams.append('currency', pgConfig.currency || 'USD');
       formParams.append('path', path);
       formParams.append('extra_args', extraArgs);
       formParams.append('url_type', 'game-entry');
