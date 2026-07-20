@@ -1099,6 +1099,7 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       try {
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
@@ -1202,6 +1203,7 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       try {
+        const db = await readDb();
         const payload = JSON.parse(body || '{}');
 
         const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
