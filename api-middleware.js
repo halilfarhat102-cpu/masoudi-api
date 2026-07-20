@@ -12,6 +12,58 @@ function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
 }
 
+// ─── PG Soft HMAC-SHA256 Signature Validator ─────────────────────────────────
+// Authorization header format: PWS-HMAC-SHA256 {operatorToken}:{base64(signature)}
+// Signature = HMAC-SHA256({host}{x-content-sha256}{x-date}, secretKey)
+function validatePGRequest(req, rawBody, secretKey) {
+  try {
+    const authHeader = req.headers['authorization'] || req.headers['Authorization'] || '';
+    if (!authHeader.startsWith('PWS-HMAC-SHA256 ')) return true; // No auth header = optional check passed
+    const host = req.headers['host'] || '';
+    const xContentSha256 = req.headers['x-content-sha256'] || '';
+    const xDate = req.headers['x-date'] || '';
+    const stringToSign = host + xContentSha256 + xDate;
+    const expectedSig = crypto.createHmac('sha256', secretKey).update(stringToSign).digest('base64');
+    const parts = authHeader.split(' ')[1] || '';
+    const incomingSig = parts.split(':')[1] || '';
+    return incomingSig === expectedSig;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ─── Robust PG Soft Payload Parser ───────────────────────────────────────────
+// Parses JSON, URL-encoded and query-string payloads from PG Soft callbacks
+function parsePGPayload(reqUrl, rawBody, host) {
+  const payload = {};
+  try {
+    const urlObj = new URL(reqUrl, `http://${host || 'localhost'}`);
+    for (const [k, v] of urlObj.searchParams.entries()) payload[k] = v;
+  } catch (_) {}
+  if (rawBody) {
+    try {
+      const parsed = JSON.parse(rawBody);
+      if (parsed && typeof parsed === 'object') Object.assign(payload, parsed);
+    } catch (_) {
+      try {
+        const params = new URLSearchParams(rawBody);
+        for (const [k, v] of params.entries()) payload[k] = v;
+      } catch (_2) {}
+    }
+  }
+  return payload;
+}
+
+// ─── Extract PG Soft Token and Player ID from payload ────────────────────────
+function extractPGIdentifiers(payload) {
+  const token = payload.token || payload.session_token || payload.sessionToken ||
+    payload.operator_player_session || payload.player_session || payload.ops ||
+    payload.custom_parameter || payload.trace_id || null;
+  const playerId = payload.player_name || payload.player_id || payload.playerId ||
+    payload.uid || null;
+  return { token, playerId };
+}
+
 function findPGPlayer(db, token, playerId) {
   if (!db.players) db.players = [];
   let player = null;
@@ -73,10 +125,29 @@ async function deleteAdminSession(token) {
 
 
 export async function apiMiddleware(req, res, next) {
+  // ── Request/Response Logger ──────────────────────────────────────────────────
+  const reqStart = Date.now();
+  const originalEnd = res.end.bind(res);
+  res.end = function(chunk, encoding, callback) {
+    const duration = Date.now() - reqStart;
+    const status = res.statusCode || 200;
+    const label = `[API] ${req.method} ${req.url} → ${status} (${duration}ms)`;
+    if (req.url && req.url.includes('/api/game/')) {
+      // Log PG Soft callbacks in detail
+      console.log(`${label}`);
+      if (chunk) {
+        try { console.log('[Response]', JSON.parse(chunk.toString())); } catch(_) {}
+      }
+    } else {
+      console.log(label);
+    }
+    return originalEnd(chunk, encoding, callback);
+  };
+
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-date, x-content-sha256');
 
   if (req.method === 'OPTIONS') {
     res.statusCode = 200;
@@ -188,59 +259,59 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
-        const playerInput = JSON.parse(body);
-
-        // Helper: is the name a pure numeric ID (not a real name)?
+        const playerInput = JSON.parse(body || '{}');
         const isNumericId = (s) => /^\d+$/.test((s || '').trim());
 
-        if (!db.players) db.players = [];
-        let player = db.players.find(p => p.id === playerInput.id);
-        if (!player) {
-          // New player — use real name only (not numeric ID)
-          const newName = (!isNumericId(playerInput.name) && playerInput.name)
-            ? playerInput.name
-            : 'لاعب مسعودي';
-          player = {
-            id: playerInput.id,
-            name: newName,
-            email: playerInput.email || '—',
-            photoUrl: playerInput.photoUrl || '',
-            balance: 5000, // Gift on signup
-            bonus: 500,
-            status: 'active',
-            joinDate: new Date().toISOString().split('T')[0],
-            lastLogin: new Date().toISOString().split('T')[0],
-            transactions: [
-              { type: 'هدية التسجيل', amount: 5000, date: new Date().toLocaleTimeString('ar') }
-            ]
-          };
-          db.players.push(player);
-        } else {
-          // Existing player — only update name if incoming is a real name (not numeric)
-          if (playerInput.name && !isNumericId(playerInput.name)) {
-            player.name = playerInput.name;
-          }
-          // Always update email, photoUrl, and lastLogin
-          if (playerInput.email) player.email = playerInput.email;
-          if (playerInput.photoUrl) player.photoUrl = playerInput.photoUrl;
-          player.lastLogin = new Date().toISOString().split('T')[0];
-        }
+        let resultPlayer = null;
 
-        await writeDb(db);
-        res.setHeader('Content-Type', 'application/json');
-        
+        await runTransaction(async (db) => {
+          if (!db.players) db.players = [];
+          let player = db.players.find(p => p.id === playerInput.id);
+          if (!player) {
+            const newName = (!isNumericId(playerInput.name) && playerInput.name)
+              ? playerInput.name
+              : 'لاعب مسعودي';
+            player = {
+              id: playerInput.id,
+              name: newName,
+              email: playerInput.email || '—',
+              photoUrl: playerInput.photoUrl || '',
+              balance: 5000,
+              bonus: 500,
+              status: 'active',
+              joinDate: new Date().toISOString().split('T')[0],
+              lastLogin: new Date().toISOString().split('T')[0],
+              transactions: [
+                { type: 'هدية التسجيل', amount: 5000, date: new Date().toLocaleTimeString('ar') }
+              ]
+            };
+            db.players.push(player);
+          } else {
+            if (playerInput.name && !isNumericId(playerInput.name)) {
+              player.name = playerInput.name;
+            }
+            if (playerInput.email) player.email = playerInput.email;
+            if (playerInput.photoUrl) player.photoUrl = playerInput.photoUrl;
+            player.lastLogin = new Date().toISOString().split('T')[0];
+          }
+          resultPlayer = player;
+          return db;
+        });
+
+        const db = await readDb();
         const adminEmails = ['halilfarhat102@gmail.com'];
-        const isLinkedAdmin = (db.admins || []).some(a => String(a.playerId) === String(player.id));
-        const isAdmin = player.isAdmin === true || adminEmails.includes(player.email) || isLinkedAdmin;
-        
+        const isLinkedAdmin = (db.admins || []).some(a => String(a.playerId) === String(resultPlayer.id));
+        const isAdmin = resultPlayer.isAdmin === true || adminEmails.includes(resultPlayer.email) || isLinkedAdmin;
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
-          ...player,
+          ...resultPlayer,
           isAdmin: isAdmin
         }));
       } catch (e) {
         res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ error: e.message }));
       }
     });
@@ -300,42 +371,47 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
-        const db = await readDb();
-        const { playerId, playerName, gateway, amount, coins, imageUrl } = JSON.parse(body);
+        const { playerId, playerName, gateway, amount, coins, imageUrl } = JSON.parse(body || '{}');
 
         if (!playerId || !gateway || !imageUrl) {
           res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ error: 'بيانات الإيصال غير كاملة' }));
           return;
         }
 
-        if (!db.receipts) db.receipts = [];
-        const newReceipt = {
-          id: `rcpt-${Date.now()}`,
-          playerId,
-          playerName: playerName || 'لاعب مسعودي',
-          gateway,
-          amount: amount || '—',
-          coins: coins || 0,
-          imageUrl,
-          date: (() => {
-            const d = new Date();
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const min = String(d.getMinutes()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
-          })(),
-          status: 'pending'
-        };
-        db.receipts.push(newReceipt);
-        await writeDb(db);
+        let newReceipt = null;
+
+        await runTransaction(async (db) => {
+          if (!db.receipts) db.receipts = [];
+          newReceipt = {
+            id: `rcpt-${Date.now()}`,
+            playerId,
+            playerName: playerName || 'لاعب مسعودي',
+            gateway,
+            amount: amount || '—',
+            coins: coins || 0,
+            imageUrl,
+            date: (() => {
+              const d = new Date();
+              const yyyy = d.getFullYear();
+              const mm = String(d.getMonth() + 1).padStart(2, '0');
+              const dd = String(d.getDate()).padStart(2, '0');
+              const hh = String(d.getHours()).padStart(2, '0');
+              const min = String(d.getMinutes()).padStart(2, '0');
+              return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+            })(),
+            status: 'pending'
+          };
+          db.receipts.push(newReceipt);
+          return db;
+        });
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, receipt: newReceipt }));
       } catch (e) {
         res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ error: e.message }));
       }
     });
@@ -344,47 +420,56 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
-        const db = await readDb();
-        const { receiptId, action } = JSON.parse(body);
+        const { receiptId, action } = JSON.parse(body || '{}');
+        let errorMsg = null;
 
-        if (!db.receipts) db.receipts = [];
-        const idx = db.receipts.findIndex(r => r.id === receiptId);
-        if (idx === -1) {
-          res.statusCode = 404;
-          res.end(JSON.stringify({ error: 'الإيصال غير موجود' }));
-          return;
-        }
+        await runTransaction(async (db) => {
+          if (!db.receipts) db.receipts = [];
+          const idx = db.receipts.findIndex(r => r.id === receiptId);
+          if (idx === -1) {
+            errorMsg = 'الإيصال غير موجود';
+            return db;
+          }
 
-        if (action === 'delete') {
-          db.receipts.splice(idx, 1);
-        } else {
-          if (action === 'approve') {
-            const receipt = db.receipts[idx];
-            if (receipt.status === 'pending') {
-              if (!db.players) db.players = [];
-              const player = db.players.find(p => p.id === receipt.playerId);
-              if (player) {
-                const coins = parseFloat(receipt.coins || 0);
-                if (coins > 0) {
-                  player.balance = (player.balance || 0) + coins;
-                  if (!player.transactions) player.transactions = [];
-                  player.transactions.push({
-                    type: `شحن من التطبيق (${receipt.gateway})`,
-                    amount: coins,
-                    date: new Date().toLocaleTimeString('ar-EG')
-                  });
+          if (action === 'delete') {
+            db.receipts.splice(idx, 1);
+          } else {
+            if (action === 'approve') {
+              const receipt = db.receipts[idx];
+              if (receipt.status === 'pending') {
+                if (!db.players) db.players = [];
+                const player = db.players.find(p => p.id === receipt.playerId);
+                if (player) {
+                  const coins = parseFloat(receipt.coins || 0);
+                  if (coins > 0) {
+                    player.balance = (player.balance || 0) + coins;
+                    if (!player.transactions) player.transactions = [];
+                    player.transactions.push({
+                      type: `شحن من التطبيق (${receipt.gateway})`,
+                      amount: coins,
+                      date: new Date().toLocaleTimeString('ar-EG')
+                    });
+                  }
                 }
               }
             }
+            db.receipts[idx].status = action === 'approve' ? 'approved' : 'rejected';
           }
-          db.receipts[idx].status = action === 'approve' ? 'approved' : 'rejected';
+          return db;
+        });
+
+        if (errorMsg) {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: errorMsg }));
+          return;
         }
 
-        await writeDb(db);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true }));
       } catch (e) {
         res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ error: e.message }));
       }
     });
@@ -974,33 +1059,26 @@ export async function apiMiddleware(req, res, next) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+      console.log('[PG] verify-session called, body:', body.substring(0, 200));
       try {
-        const db = await readDb();
-        
-        // Robust payload parser (JSON, Form Data, URL Query)
-        let payload = {};
-        try {
-          const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-          for (const [k, v] of urlObj.searchParams.entries()) payload[k] = v;
-        } catch (e) {}
-        if (body) {
-          try {
-            const parsed = JSON.parse(body);
-            if (parsed && typeof parsed === 'object') Object.assign(payload, parsed);
-          } catch (e) {
-            try {
-              const params = new URLSearchParams(body);
-              for (const [k, v] of params.entries()) payload[k] = v;
-            } catch (e2) {}
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+        const { token, playerId } = extractPGIdentifiers(payload);
+
+        let foundPlayer = null;
+        let currency = 'USD';
+
+        // Update lastLogin atomically within the transaction lock
+        await runTransaction(async (db) => {
+          currency = db.settings?.pgConfig?.currency || 'USD';
+          const player = findPGPlayer(db, token, playerId);
+          if (player) {
+            player.lastLogin = new Date().toISOString().split('T')[0];
+            foundPlayer = { id: player.id, name: player.name };
           }
-        }
+          return db;
+        });
 
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
-
-        const player = findPGPlayer(db, token, playerId);
-
-        if (!player) {
+        if (!foundPlayer) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
           return res.end(JSON.stringify({
@@ -1009,21 +1087,19 @@ export async function apiMiddleware(req, res, next) {
           }));
         }
 
-        player.lastLogin = new Date().toISOString().split('T')[0];
-        await writeDb(db);
-
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
-            player_name: player.id,
-            player_id: player.id,
-            currency: db.settings?.pgConfig?.currency || 'USD',
-            nickname: player.name || 'Player'
+            player_name: foundPlayer.id,
+            player_id: foundPlayer.id,
+            currency: currency,
+            nickname: foundPlayer.name || 'Player'
           },
           error: null
         }));
       } catch (e) {
+        console.error('[PG] verify-session error:', e.message);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -1038,29 +1114,12 @@ export async function apiMiddleware(req, res, next) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+      console.log('[PG] get-balance called, body:', body.substring(0, 200));
       try {
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+        const { token, playerId } = extractPGIdentifiers(payload);
+
         const db = await readDb();
-
-        let payload = {};
-        try {
-          const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-          for (const [k, v] of urlObj.searchParams.entries()) payload[k] = v;
-        } catch (e) {}
-        if (body) {
-          try {
-            const parsed = JSON.parse(body);
-            if (parsed && typeof parsed === 'object') Object.assign(payload, parsed);
-          } catch (e) {
-            try {
-              const params = new URLSearchParams(body);
-              for (const [k, v] of params.entries()) payload[k] = v;
-            } catch (e2) {}
-          }
-        }
-
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
-
         const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
@@ -1084,6 +1143,7 @@ export async function apiMiddleware(req, res, next) {
           error: null
         }));
       } catch (e) {
+        console.error('[PG] get-balance error:', e.message);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -1098,12 +1158,11 @@ export async function apiMiddleware(req, res, next) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+      console.log('[PG] adjustment called, body:', body.substring(0, 300));
       try {
-        const db = await readDb();
-        const payload = JSON.parse(body || '{}');
+        const payload = parsePGPayload(req.url, body, req.headers.host);
 
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
+        const { token, playerId } = extractPGIdentifiers(payload);
         // Amount in major currency units (e.g. 1.50 USD)
         const amountRaw = parseFloat(payload.amount || payload.bet_amount || payload.win_amount || payload.transfer_amount || 0);
         const txType = payload.type || payload.transaction_type || 'adjustment';
@@ -1202,12 +1261,10 @@ export async function apiMiddleware(req, res, next) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+      console.log('[PG] betpayout called, body:', body.substring(0, 300));
       try {
-        const db = await readDb();
-        const payload = JSON.parse(body || '{}');
-
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+        const { token, playerId } = extractPGIdentifiers(payload);
         const betAmt   = parseFloat(payload.bet_amount  || payload.bet  || 0);
         const winAmt   = parseFloat(payload.win_amount  || payload.win  || 0);
         const txId     = payload.transaction_id || payload.txid || ('BP-' + Date.now());
@@ -1294,150 +1351,186 @@ export async function apiMiddleware(req, res, next) {
     });
 
   } else if (req.url === '/api/game/bet' && req.method === 'POST') {
-    // Deduct bet amount from player balance
+    // Deduct bet amount from player balance (atomic via runTransaction)
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
-
+      console.log('[PG] bet called, body:', body.substring(0, 300));
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
-        const payload = JSON.parse(body || '{}');
-
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+        const { token, playerId } = extractPGIdentifiers(payload);
         const betAmount = parseFloat(payload.amount || payload.bet_amount || 0);
         const txId = payload.transaction_id || payload.bet_id || ('BET-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
 
-        const player = findPGPlayer(db, token, playerId);
+        let resultBalance = 0;
+        let resultPlayerId = '';
+        let errorMsg = null;
+        let isDuplicate = false;
 
-        if (!player) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
-        }
+        await runTransaction(async (db) => {
+          const player = findPGPlayer(db, token, playerId);
+          if (!player) { errorMsg = 'Player not found'; return db; }
 
-        const betCoins = Math.round(betAmount * 100);
+          if (!db.processedTxIds) db.processedTxIds = [];
+          if (db.processedTxIds.includes(txId)) {
+            isDuplicate = true;
+            resultBalance = player.balance || 0;
+            resultPlayerId = player.id;
+            return db;
+          }
 
-        // Duplicate check
-        if (!db.processedTxIds) db.processedTxIds = [];
-        if (db.processedTxIds.includes(txId)) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
-        }
+          const betCoins = Math.round(betAmount * 100);
+          if ((player.balance || 0) < betCoins) {
+            errorMsg = 'Insufficient balance';
+            resultBalance = player.balance || 0;
+            return db;
+          }
 
-        if ((player.balance || 0) < betCoins) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Insufficient balance', balance: ((player.balance || 0) / 100).toFixed(2) }));
-        }
+          player.balance = (player.balance || 0) - betCoins;
+          if (!player.transactions) player.transactions = [];
+          player.transactions.push({ type: `رهان — ${gameName}`, amount: -betCoins, txId, date: new Date().toLocaleTimeString('ar') });
 
-        player.balance = (player.balance || 0) - betCoins;
-        if (!player.transactions) player.transactions = [];
-        player.transactions.push({ type: `رهان — ${gameName}`, amount: -betCoins, txId, date: new Date().toLocaleTimeString('ar') });
+          db.processedTxIds.push(txId);
+          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
-        db.processedTxIds.push(txId);
-        if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+          resultBalance = player.balance;
+          resultPlayerId = player.id;
+          return db;
+        });
 
-        await writeDb(db);
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId, player_id: player.id }));
+        if (errorMsg) {
+          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: (resultBalance / 100).toFixed(2) }));
+        }
+        if (isDuplicate) {
+          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: (resultBalance / 100).toFixed(2), transaction_id: txId }));
+        }
+        res.end(JSON.stringify({ code: 1, msg: 'success', balance: (resultBalance / 100).toFixed(2), transaction_id: txId, player_id: resultPlayerId }));
       } catch (e) {
-        res.statusCode = 500;
+        console.error('[PG] bet error:', e.message);
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
       }
     });
 
   } else if (req.url === '/api/game/payout' && req.method === 'POST') {
-    // Add winnings to player balance
+    // Add winnings to player balance (atomic via runTransaction)
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+      console.log('[PG] payout called, body:', body.substring(0, 300));
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
-        const payload = JSON.parse(body || '{}');
-
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+        const { token, playerId } = extractPGIdentifiers(payload);
         const winAmount = parseFloat(payload.amount || payload.win_amount || 0);
         const txId = payload.transaction_id || payload.payout_id || ('WIN-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
 
-        const player = findPGPlayer(db, token, playerId);
+        let resultBalance = 0;
+        let resultPlayerId = '';
+        let errorMsg = null;
+        let isDuplicate = false;
 
-        if (!player) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
-        }
+        await runTransaction(async (db) => {
+          const player = findPGPlayer(db, token, playerId);
+          if (!player) { errorMsg = 'Player not found'; return db; }
 
-        const winCoins = Math.round(winAmount * 100);
+          if (!db.processedTxIds) db.processedTxIds = [];
+          if (db.processedTxIds.includes(txId)) {
+            isDuplicate = true;
+            resultBalance = player.balance || 0;
+            resultPlayerId = player.id;
+            return db;
+          }
 
-        if (!db.processedTxIds) db.processedTxIds = [];
-        if (db.processedTxIds.includes(txId)) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
-        }
+          const winCoins = Math.round(winAmount * 100);
+          player.balance = (player.balance || 0) + winCoins;
+          if (!player.transactions) player.transactions = [];
+          player.transactions.push({ type: `فوز 🎉 — ${gameName}`, amount: winCoins, txId, date: new Date().toLocaleTimeString('ar') });
 
-        player.balance = (player.balance || 0) + winCoins;
-        if (!player.transactions) player.transactions = [];
-        player.transactions.push({ type: `فوز 🎉 — ${gameName}`, amount: winCoins, txId, date: new Date().toLocaleTimeString('ar') });
+          db.processedTxIds.push(txId);
+          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
-        db.processedTxIds.push(txId);
-        if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+          resultBalance = player.balance;
+          resultPlayerId = player.id;
+          return db;
+        });
 
-        await writeDb(db);
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId, player_id: player.id }));
+        if (errorMsg) {
+          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: '0.00' }));
+        }
+        if (isDuplicate) {
+          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: (resultBalance / 100).toFixed(2), transaction_id: txId }));
+        }
+        res.end(JSON.stringify({ code: 1, msg: 'success', balance: (resultBalance / 100).toFixed(2), transaction_id: txId, player_id: resultPlayerId }));
       } catch (e) {
-        res.statusCode = 500;
+        console.error('[PG] payout error:', e.message);
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
       }
     });
 
   } else if (req.url === '/api/game/rollback' && req.method === 'POST') {
-    // Called by game provider to cancel/rollback a transaction
+    // Called by game provider to cancel/rollback a transaction (atomic via runTransaction)
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
+      console.log('[PG] rollback called, body:', body.substring(0, 300));
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
-        const payload = JSON.parse(body || '{}');
-
-        const token = payload.token || payload.session_token || payload.sessionToken || payload.operator_player_session || payload.player_session || payload.ops || payload.custom_parameter || payload.trace_id;
-        const playerId = payload.player_name || payload.player_id || payload.playerId || payload.uid;
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+        const { token, playerId } = extractPGIdentifiers(payload);
         const originalTxId = payload.original_transaction_id || payload.ref_transaction_id || payload.transaction_id;
         const refundAmount = parseFloat(payload.amount || 0);
         const txId = payload.rollback_id || ('RB-' + Date.now());
 
-        const player = findPGPlayer(db, token, playerId);
+        let resultBalance = 0;
+        let resultPlayerId = '';
+        let errorMsg = null;
+        let isDuplicate = false;
 
-        if (!player) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 0, msg: 'Player not found', balance: '0.00' }));
-        }
+        await runTransaction(async (db) => {
+          const player = findPGPlayer(db, token, playerId);
+          if (!player) { errorMsg = 'Player not found'; return db; }
 
-        if (!db.processedTxIds) db.processedTxIds = [];
-        if (db.processedTxIds.includes(txId)) {
-          res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: ((player.balance || 0) / 100).toFixed(2) }));
-        }
+          if (!db.processedTxIds) db.processedTxIds = [];
+          if (db.processedTxIds.includes(txId)) {
+            isDuplicate = true;
+            resultBalance = player.balance || 0;
+            resultPlayerId = player.id;
+            return db;
+          }
 
-        // Refund the bet amount back to player
-        const refundCoins = Math.round(refundAmount * 100);
-        player.balance = (player.balance || 0) + refundCoins;
-        if (!player.transactions) player.transactions = [];
-        player.transactions.push({ type: `استرداد رهان (Rollback)`, amount: refundCoins, txId, ref: originalTxId, date: new Date().toLocaleTimeString('ar') });
+          const refundCoins = Math.round(refundAmount * 100);
+          player.balance = (player.balance || 0) + refundCoins;
+          if (!player.transactions) player.transactions = [];
+          player.transactions.push({ type: 'استرداد رهان (Rollback)', amount: refundCoins, txId, ref: originalTxId, date: new Date().toLocaleTimeString('ar') });
 
-        db.processedTxIds.push(txId);
-        await writeDb(db);
+          db.processedTxIds.push(txId);
+          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
+          resultBalance = player.balance;
+          resultPlayerId = player.id;
+          return db;
+        });
+
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ code: 1, msg: 'success', balance: ((player.balance || 0) / 100).toFixed(2), transaction_id: txId }));
+        if (errorMsg) {
+          return res.end(JSON.stringify({ code: 0, msg: errorMsg, balance: '0.00' }));
+        }
+        if (isDuplicate) {
+          return res.end(JSON.stringify({ code: 1, msg: 'duplicate', balance: (resultBalance / 100).toFixed(2) }));
+        }
+        res.end(JSON.stringify({ code: 1, msg: 'success', balance: (resultBalance / 100).toFixed(2), transaction_id: txId }));
       } catch (e) {
-        res.statusCode = 500;
+        console.error('[PG] rollback error:', e.message);
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 0, msg: e.message, balance: '0.00' }));
       }
@@ -1449,7 +1542,6 @@ export async function apiMiddleware(req, res, next) {
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       try {
-        const dbPath = resolve(__dirname, 'db.json');
         const db = await readDb();
 
         const players = (db.players || []).map(p => ({
@@ -1460,10 +1552,11 @@ export async function apiMiddleware(req, res, next) {
           balance: ((p.balance || 0) / 100).toFixed(2)
         }));
 
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 1, msg: 'success', data: players, total: players.length }));
       } catch (e) {
-        res.statusCode = 500;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ code: 0, msg: e.message, data: [] }));
       }
@@ -1492,11 +1585,17 @@ export async function apiMiddleware(req, res, next) {
         return res.end('<h3>اللاعب غير موجود</h3>');
       }
 
-      // Generate or retrieve session token
-      const sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
-      player.sessionToken = sessionToken;
-      player.sessionCreatedAt = new Date().toISOString();
-      await writeDb(db);
+      // Generate session token and persist atomically
+      let sessionToken = '';
+      await runTransaction(async (db2) => {
+        const p2 = (db2.players || []).find(x => x.id === playerId);
+        if (p2) {
+          sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
+          p2.sessionToken = sessionToken;
+          p2.sessionCreatedAt = new Date().toISOString();
+        }
+        return db2;
+      });
 
       // Read PG Soft configuration from db
       const pgConfig = db.settings?.pgConfig || {
@@ -1557,30 +1656,44 @@ export async function apiMiddleware(req, res, next) {
 
   } else if (req.url === '/api/game/create-session' && req.method === 'POST') {
     // Create a session token for a player (called by APK before launching a game)
+    // Uses runTransaction to prevent race conditions when creating session
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       try {
-        const dbPath = resolve(__dirname, 'db.json');
-        const db = await readDb();
         const { playerId } = JSON.parse(body || '{}');
 
-        if (!db.players) db.players = [];
-        const player = db.players.find(p => p.id === playerId);
-
-        if (!player) {
-          res.statusCode = 404;
+        if (!playerId) {
+          res.statusCode = 400;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({ error: 'اللاعب غير موجود' }));
+          return res.end(JSON.stringify({ error: 'playerId is required' }));
         }
 
-        // Generate a unique session token
-        const sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
-        player.sessionToken = sessionToken;
-        player.sessionCreatedAt = new Date().toISOString();
+        let sessionToken = null;
+        let errorMsg = null;
 
-        await writeDb(db);
+        await runTransaction(async (db) => {
+          if (!db.players) db.players = [];
+          const player = db.players.find(p => p.id === playerId);
 
+          if (!player) {
+            errorMsg = 'اللاعب غير موجود';
+            return db;
+          }
+
+          sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
+          player.sessionToken = sessionToken;
+          player.sessionCreatedAt = new Date().toISOString();
+          return db;
+        });
+
+        if (errorMsg) {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ error: errorMsg }));
+        }
+
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, sessionToken, playerId }));
       } catch (e) {
