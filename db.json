@@ -13,11 +13,11 @@
       "crash": "ألعاب فورية"
     },
     "pgConfig": {
-      "isProduction": false,
+      "isProduction": true,
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
-      "productionOperatorToken": "",
-      "productionSecretKey": "",
+      "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0",
+      "productionSecretKey": "c89632307f734f6192fa420864a2c847",
       "currency": "USD"
     }
   },
@@ -459,8 +459,8 @@
       ],
       "isAgent": true,
       "agentBalance": 4110000,
-      "sessionToken": "fd631f341b5d0723f38af114e43fdce8f7f38a403310311490b1f81dbdfe6d48",
-      "sessionCreatedAt": "2026-07-20T12:22:55.485Z"
+      "sessionToken": "ec181909fbc71ea003bd917467810936fc5a424b78e669886b57f65dd2e52302",
+      "sessionCreatedAt": "2026-07-20T12:30:38.213Z"
     },
     {
       "id": "303725",
