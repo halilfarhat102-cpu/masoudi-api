@@ -18,7 +18,8 @@
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
       "productionOperatorToken": "",
       "productionSecretKey": "",
-      "currency": "USD"
+      "currency": "USD",
+      "stagingApiDomain": "https://api.pg-bo.me/external/"
     }
   },
   "banners": [

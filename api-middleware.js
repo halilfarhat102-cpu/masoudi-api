@@ -1616,9 +1616,13 @@ export async function apiMiddleware(req, res, next) {
 
       const isProd = pgConfig.isProduction;
       const operatorToken = isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken;
-      const baseUrl = isProd 
+      let baseUrl = isProd 
         ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com') 
-        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me');
+        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me/external/');
+
+      if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.slice(0, -1);
+      }
 
       // Call PG Soft GetLaunchURLHTML API
       const traceId = 'guid-' + crypto.randomUUID();
