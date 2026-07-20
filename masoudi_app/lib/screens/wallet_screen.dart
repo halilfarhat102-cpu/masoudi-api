@@ -888,131 +888,178 @@ class _WalletScreenState extends State<WalletScreen> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Top Wallet Balance Card (Matching Screenshot 1 exactly!)
+          // Elegant Gold Gradient Card
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF241914),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFF8C00),
+                  Color(0xFFD45A00),
+                  Color(0xFF996515),
+                ],
+              ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFFF7A1F).withOpacity(0.3), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF7A1F).withOpacity(0.12),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+                  color: const Color(0xFFD45A00).withOpacity(0.28),
+                  blurRadius: 14,
+                  offset: const Offset(0, 7),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top Header Row: Icon + Title on Left, MASOUDI COINS badge on Right
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF7A1F).withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.account_balance_wallet_rounded,
-                            color: Color(0xFFFF7A1F),
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
+                        const Icon(Icons.account_balance_wallet_rounded,
+                            color: Color(0xFF100906), size: 16),
+                        const SizedBox(width: 6),
                         Text(
                           'محفظة مسعودي',
                           style: GoogleFonts.cairo(
-                            fontSize: 15,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: const Color(0xFF100906),
                           ),
                         ),
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF7A1F).withOpacity(0.15),
+                        color: const Color(0xFF100906).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFFFF7A1F).withOpacity(0.3)),
                       ),
                       child: Text(
-                        'MASOUDI COINS',
+                        '🪙 MASOUDI',
                         style: GoogleFonts.cairo(
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
-                          color: const Color(0xFFFF7A1F),
+                          color: const Color(0xFF100906),
                           letterSpacing: 1,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Text(
-                  'رصيدك الحالي',
+                  'مجموع رصيد العملات المعدنية',
                   style: GoogleFonts.cairo(
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF8B909E),
+                    color: const Color(0xFF100906).withOpacity(0.6),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
                       widget.balance.toLocaleString(),
                       style: GoogleFonts.cairo(
-                        fontSize: 28,
+                        fontSize: 26,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: const Color(0xFF100906),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Text('🪙', style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 6),
                     Text(
-                      'كوين',
+                      'كوين 🪙',
                       style: GoogleFonts.cairo(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFFFF7A1F),
+                        color: const Color(0xFF100906),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                // Sub-balance badge matching Screenshot 1: ⭐ $ الرصيد الأساسي: 5,000
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1F140F),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFFF7A1F).withOpacity(0.2)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.star_rounded, color: Color(0xFFFFD700), size: 14),
-                      const SizedBox(width: 6),
-                      Text(
-                        '\$ الرصيد الأساسي: ${widget.primaryBalance.toLocaleString()}',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFFF7A1F),
-                        ),
+                // Breakdown
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'الرصيد الأساسي',
+                            style: GoogleFonts.cairo(
+                              fontSize: 9,
+                              color: const Color(0xFF100906).withOpacity(0.55),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${widget.primaryBalance.toLocaleString()} كوين',
+                            style: GoogleFonts.cairo(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF100906),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      width: 1,
+                      height: 26,
+                      color: const Color(0xFF100906).withOpacity(0.15),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'رصيد المكافآت',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 9,
+                                  color: const Color(0xFF100906).withOpacity(0.55),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF100906).withOpacity(0.18),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'للألعاب فقط',
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 7,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF100906),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${widget.bonusBalance.toLocaleString()} كوين',
+                            style: GoogleFonts.cairo(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF100906),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

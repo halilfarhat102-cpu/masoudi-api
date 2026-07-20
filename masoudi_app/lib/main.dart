@@ -240,23 +240,14 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         final bool newIsAgent = data['isAgent'] ?? false;
         final double newAgentBalance = (data['agentBalance'] ?? 0.0).toDouble();
         final bool newIsAdmin = data['isAdmin'] ?? false;
-        final String? serverId = data['id']?.toString();
 
-        // 1. Check if ID, balance, agency info, or admin privilege changed
+        // 1. Check if balance, agency info, or admin privilege changed
         bool hasMainChanges = _playerBalance != newBalance ||
             _primaryBalance != newPrimaryBalance ||
             _bonusBalance != newBonusBalance ||
             _isAgent != newIsAgent ||
             _agentBalance != newAgentBalance ||
             _isAdmin != newIsAdmin;
-
-        if (serverId != null && serverId.isNotEmpty && _playerName != serverId) {
-          _playerName = serverId;
-          hasMainChanges = true;
-          try {
-            user.updateDisplayName(serverId);
-          } catch (_) {}
-        }
 
         // 2. Format transactions using stable IDs (derived from type, amount, date)
         final List<Map<String, String>> newTxList = [];
@@ -792,42 +783,26 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
               // Balance & Avatar
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _currentIndex = 1; // Switch to Wallet Tab
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF35241C),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFFF7A1F).withOpacity(0.4), width: 1.2),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.credit_card_rounded, color: Color(0xFFFF7A1F), size: 16),
-                          const SizedBox(width: 6),
-                          Text(
-                            _playerBalance.toLocaleString(),
-                            style: GoogleFonts.cairo(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF35241C),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: const Color(0xFF3D2A20), width: 1),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('🪙', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 5),
+                        Text(
+                          _playerBalance.toLocaleString(),
+                          style: GoogleFonts.cairo(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFFF7A1F),
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '\$',
-                            style: GoogleFonts.cairo(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFFF7A1F),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 10),

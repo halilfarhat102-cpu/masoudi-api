@@ -3,7 +3,6 @@ class Game {
   final String title;
   final String category;
   final String provider;
-  final String tag;
   final String launchUrl;
   final String image;
 
@@ -12,7 +11,6 @@ class Game {
     required this.title,
     required this.category,
     required this.provider,
-    this.tag = '',
     required this.launchUrl,
     required this.image,
   });
@@ -23,7 +21,6 @@ class Game {
       title: json['title'] ?? '',
       category: json['category'] ?? '',
       provider: json['provider'] ?? '',
-      tag: json['tag'] ?? '',
       launchUrl: json['launchUrl'] ?? json['launch_url'] ?? '',
       image: json['image'] ?? '',
     );

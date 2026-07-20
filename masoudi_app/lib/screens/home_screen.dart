@@ -230,20 +230,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Game> _getFilteredGames() {
-    final seenIds = <String>{};
-    final uniqueGames = <Game>[];
-    for (final game in _games) {
-      final key = (game.id.isNotEmpty ? game.id : game.title).trim().toLowerCase();
-      if (seenIds.contains(key)) continue;
-      seenIds.add(key);
+    return _games.where((game) {
       final matchesSearch = game.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           game.provider.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesCategory = _selectedCategory == 'all' || game.category == _selectedCategory;
-      if (matchesSearch && matchesCategory) {
-        uniqueGames.add(game);
-      }
-    }
-    return uniqueGames;
+      return matchesSearch && matchesCategory;
+    }).toList();
   }
 
   Color _bannerAccent(int index) {
@@ -547,32 +539,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 15),
-
-                  // Horizontal Section 1: شائع 🔥 (Popular Games matching Screenshot 3)
-                  if (_games.any((g) => g.tag.toLowerCase().trim() == 'hot' || g.tag.toLowerCase().trim() == 'popular' || g.tag.trim() == 'شائع' || g.category.toLowerCase().trim() == 'hot'))
-                    _buildHorizontalGameSection(
-                      title: 'شائع',
-                      emoji: '🔥',
-                      games: _games.where((g) {
-                        final t = g.tag.toLowerCase().trim();
-                        return t == 'hot' || t == 'popular' || t == 'شائع' || g.category.toLowerCase().trim() == 'hot';
-                      }).toList(),
-                      defaultBadgeText: 'HOT',
-                      defaultBadgeColor: const Color(0xFF1F1510),
-                    ),
-
-                  // Horizontal Section 2: ألعاب جديدة ⭐ (New Games matching Screenshot 3)
-                  if (_games.any((g) => g.tag.toLowerCase().trim() == 'new' || g.tag.trim() == 'جديد' || g.category.toLowerCase().trim() == 'new'))
-                    _buildHorizontalGameSection(
-                      title: 'ألعاب جديدة',
-                      emoji: '⭐',
-                      games: _games.where((g) {
-                        final t = g.tag.toLowerCase().trim();
-                        return t == 'new' || t == 'جديد' || g.category.toLowerCase().trim() == 'new';
-                      }).toList(),
-                      defaultBadgeText: 'NEW',
-                      defaultBadgeColor: const Color(0xFFD32F2F),
-                    ),
                 ],
               ),
             ),
@@ -823,211 +789,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildHorizontalGameSection({
-    required String title,
-    required String emoji,
-    required List<Game> games,
-    required String defaultBadgeText,
-    required Color defaultBadgeColor,
-  }) {
-    if (games.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section Header Row: Title on right, controls on left
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.cairo(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(emoji, style: const TextStyle(fontSize: 16)),
-              ],
-            ),
-            Row(
-              children: [
-                // Navigation Arrow <
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF291B15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF3D2A20)),
-                  ),
-                  child: const Icon(Icons.chevron_left_rounded, size: 16, color: Colors.white70),
-                ),
-                const SizedBox(width: 6),
-                // "الكل" Button
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = title.contains('شائع') ? 'hot' : 'all';
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF291B15),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFF3D2A20)),
-                    ),
-                    child: Text(
-                      'الكل',
-                      style: GoogleFonts.cairo(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                // Navigation Arrow >
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF291B15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF3D2A20)),
-                  ),
-                  child: const Icon(Icons.chevron_right_rounded, size: 16, color: Colors.white70),
-                ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        // Horizontal Scroll Cards
-        SizedBox(
-          height: 175,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: games.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final game = games[index];
-              return GestureDetector(
-                onTap: () => widget.onPlayGame(game),
-                child: Container(
-                  width: 125,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFFF7A1F).withOpacity(0.25), width: 1),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Stack(
-                      children: [
-                        // Background Cover Image
-                        Positioned.fill(
-                          child: CachedNetworkImage(
-                            imageUrl: game.image.startsWith('http') ? game.image : '${widget.serverUrl}/${game.image}',
-                            fit: BoxFit.cover,
-                            errorWidget: (_, __, ___) => Container(color: const Color(0xFF291B15)),
-                          ),
-                        ),
-                        // Top Right Badge (HOT 🔥 or NEW)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: defaultBadgeColor,
-                              borderRadius: BorderRadius.circular(6),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  defaultBadgeText,
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                if (title.contains('شائع')) ...[
-                                  const SizedBox(width: 2),
-                                  const Text('🔥', style: TextStyle(fontSize: 8)),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Bottom Title Overlay
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.95),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '(${game.title})',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                Text(
-                                  game.provider.isNotEmpty ? game.provider : 'PG',
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w900,
-                                    color: const Color(0xFFFF7A1F),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
     );
   }
 }
