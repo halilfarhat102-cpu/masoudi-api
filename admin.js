@@ -1047,7 +1047,7 @@ function initSettingsUI() {
     if (pgIsProd) pgIsProd.checked = !!pgConfig.isProduction;
     if (pgStagingToken) pgStagingToken.value = pgConfig.stagingOperatorToken || "I-6c19673883aa410b98d1c0cb1a3c5edc";
     if (pgStagingKey) pgStagingKey.value = pgConfig.stagingSecretKey || "c89632307f734f6192fa420864a2c847";
-    if (pgProductionToken) pgProductionToken.value = pgConfig.productionOperatorToken || "P-a5fd4c1a25904aae8729516557c160d0";
+    if (pgProductionToken) pgProductionToken.value = pgConfig.productionOperatorToken || "a5fd4c1a25904aae8729516557c160d0";
     if (pgProductionKey) pgProductionKey.value = pgConfig.productionSecretKey || "c89632307f734f6192fa420864a2c847";
 }
 
@@ -1069,7 +1069,7 @@ async function saveSettings() {
     const pgIsProd = !!document.getElementById('settingPgIsProduction')?.checked;
     const pgStagingToken = document.getElementById('settingPgStagingOperatorToken')?.value?.trim() || "I-6c19673883aa410b98d1c0cb1a3c5edc";
     const pgStagingKey = document.getElementById('settingPgStagingSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
-    const pgProductionToken = document.getElementById('settingPgProductionOperatorToken')?.value?.trim() || "P-a5fd4c1a25904aae8729516557c160d0";
+    const pgProductionToken = document.getElementById('settingPgProductionOperatorToken')?.value?.trim() || "a5fd4c1a25904aae8729516557c160d0";
     const pgProductionKey = document.getElementById('settingPgProductionSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
 
     settings = {

@@ -13,7 +13,7 @@
       "crash": "ألعاب فورية"
     },
     "pgConfig": {
-      "isProduction": false,
+      "isProduction": true,
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
       "productionOperatorToken": "P-a5fd4c1a25904aae8729516557c160d0",
@@ -121,7 +121,7 @@
       "title": "(APOLLO)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "1543163",
+      "launchUrl": "74",
       "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783976683067.jpg"
     },
     {
@@ -129,7 +129,7 @@
       "title": "(Wood)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "98",
+      "launchUrl": "65",
       "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1783976716219.jpg"
     }
   ],
@@ -143,7 +143,7 @@
       "bonus": 0,
       "status": "active",
       "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-19",
+      "lastLogin": "2026-07-20",
       "transactions": [
         {
           "type": "هدية التسجيل",
@@ -483,8 +483,8 @@
       ],
       "isAgent": true,
       "agentBalance": 4110000,
-      "sessionToken": "97c0072994a9f50997553cf9e834d60438d503222984fa1097bbe5f1e301c1cb",
-      "sessionCreatedAt": "2026-07-19T13:56:49.494Z"
+      "sessionToken": "22ce87960f9ade046104b6453f9e8e5a39eb47666901b25c47bd0d70f20e5545",
+      "sessionCreatedAt": "2026-07-20T06:35:41.521Z"
     },
     {
       "id": "303725",
@@ -573,7 +573,7 @@
       "bonus": 500,
       "status": "active",
       "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-16",
+      "lastLogin": "2026-07-19",
       "transactions": [
         {
           "type": "هدية التسجيل",
@@ -601,7 +601,7 @@
       "bonus": 500,
       "status": "active",
       "joinDate": "2026-07-13",
-      "lastLogin": "2026-07-14",
+      "lastLogin": "2026-07-19",
       "transactions": [
         {
           "type": "هدية التسجيل",
@@ -629,7 +629,9 @@
           "date": "9:17:51 م"
         }
       ],
-      "isAdmin": true
+      "isAdmin": true,
+      "sessionToken": "f3570396373c66dbe74eaed50d5a2590d4f20b02f379cd9a75d1e17549ffbeaf",
+      "sessionCreatedAt": "2026-07-19T14:31:38.078Z"
     },
     {
       "id": "873939",

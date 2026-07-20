@@ -1493,7 +1493,7 @@ export async function apiMiddleware(req, res, next) {
         isProduction: false,
         stagingOperatorToken: 'I-6c19673883aa410b98d1c0cb1a3c5edc',
         stagingSecretKey: 'c89632307f734f6192fa420864a2c847',
-        productionOperatorToken: 'P-a5fd4c1a25904aae8729516557c160d0',
+        productionOperatorToken: 'a5fd4c1a25904aae8729516557c160d0',
         productionSecretKey: 'c89632307f734f6192fa420864a2c847'
       };
 
