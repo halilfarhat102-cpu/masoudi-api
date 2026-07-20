@@ -821,6 +821,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHorizontalGameSection({
     required String title,
     required String emoji,
