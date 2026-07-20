@@ -794,7 +794,6 @@ function addNewPlayer() {
     const balance = parseFloat(document.getElementById('newPlayerBalance')?.value) || 0;
     const status  = document.getElementById('newPlayerStatus')?.value || 'active';
     if (!name) return showToast('أدخل اسم اللاعب', 'error');
-
     fetch(API_BASE + '/api/admin/add-player', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -816,6 +815,16 @@ function addNewPlayer() {
         }
     })
     .catch(err => showToast('خطأ في الاتصال بالخادم: ' + err, 'error'));
+}
+
+function translateTag(t) {
+    if (!t) return '';
+    const clean = t.trim().toLowerCase();
+    if (clean === 'hot' || clean === 'popular' || clean === 'شائع') return '🔥 شائع';
+    if (clean === 'new' || clean === 'جديد') return '✨ جديد';
+    if (clean === 'vip' || clean === 'حصري') return '👑 VIP';
+    if (clean === 'jackpot' || clean === 'جاكبوت') return '💰 جاكبوت';
+    return t;
 }
 
 // ─── Providers ───────────────────────────────
@@ -865,12 +874,13 @@ function renderAdminGamesTable() {
     }
     tbody.innerHTML = dynamicGames.map((g, i) => {
         const imgUrl = g.image ? resolveImageUrl(g.image) : 'images/slots.png';
+        const tagBadgeHtml = g.tag ? `<span class="status-badge" style="background:rgba(255,122,31,0.15);color:#FF7A1F;border-color:rgba(255,122,31,0.3);margin-right:6px;font-size:10px;">${translateTag(g.tag)}</span>` : '';
         return `
         <tr>
             <td style="text-align:center; vertical-align:middle; padding:8px;">
                 <img src="${imgUrl}" style="width:46px;height:46px;object-fit:cover;border-radius:8px;border:1.5px solid rgba(255,122,31,0.25);box-shadow:0 3px 6px rgba(0,0,0,0.3);" onerror="this.src='images/slots.png'">
             </td>
-            <td style="vertical-align:middle;"><strong>${g.title}</strong></td>
+            <td style="vertical-align:middle;"><strong>${g.title}</strong> ${tagBadgeHtml}</td>
             <td style="vertical-align:middle;"><span class="status-badge" style="background:rgba(255,255,255,0.05);color:#fff;border-color:rgba(255,255,255,0.1);">${translateCategory(g.category)}</span></td>
             <td style="vertical-align:middle;color:var(--orange);font-weight:700;">${g.provider}</td>
             <td style="vertical-align:middle;text-align:center;">
@@ -890,6 +900,8 @@ function editGame(index) {
     document.getElementById('editGameIndex').value = index;
     document.getElementById('editGameNameInput').value = g.title || '';
     document.getElementById('editGameCategoryInput').value = g.category || 'slots';
+    const tagSelect = document.getElementById('editGameTagInput');
+    if (tagSelect) tagSelect.value = g.tag || '';
     document.getElementById('editGameLaunchUrlInput').value = g.launchUrl || '';
     document.getElementById('editGameImageInputVal').value = g.image || '';
     document.getElementById('editGameUploadStatus').textContent = 'يمكنك رفع صورة جديدة أو تعديل المسار';
@@ -911,6 +923,7 @@ async function saveEditedGame() {
     const title    = document.getElementById('editGameNameInput')?.value?.trim();
     const category = document.getElementById('editGameCategoryInput')?.value;
     const provider = document.getElementById('editGameProviderSelect')?.value;
+    const tag      = document.getElementById('editGameTagInput')?.value || '';
     const url      = document.getElementById('editGameLaunchUrlInput')?.value?.trim();
     const image    = document.getElementById('editGameImageInputVal')?.value?.trim() || 'images/slots.png';
 
