@@ -294,7 +294,10 @@ export async function apiMiddleware(req, res, next) {
             };
             db.players.push(player);
           } else {
-            if (playerInput.id) player.id = playerInput.id;
+            // Keep existing permanent ID (e.g. 519997) if already set
+            if (playerInput.id && (!player.id || player.id === '')) {
+              player.id = playerInput.id;
+            }
             if (playerInput.name && !isNumericId(playerInput.name)) {
               player.name = playerInput.name;
             }
