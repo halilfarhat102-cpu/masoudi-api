@@ -606,8 +606,19 @@ function launchDynamicGame(gameId) {
     modal.classList.add("active");
     title.innerText = game.title;
     
-    const separator = game.launchUrl.includes("?") ? "&" : "?";
-    const secureLaunchUrl = `${game.launchUrl}${separator}player_id=${playerId}&balance=${playerBalance}&token=secure_session_masoudi&provider=${encodeURIComponent(game.provider)}`;
+    // Determine the correct launch URL:
+    // - If launchUrl is a pure number (PG Soft game_code) → route through our /api/pg/launch
+    // - If launchUrl is a full URL (built-in games) → open directly in iframe
+    let secureLaunchUrl;
+    const isPGSoftGame = game.provider === 'PG' || /^\d+$/.test((game.launchUrl || '').trim());
+    
+    if (isPGSoftGame) {
+        const gameCode = (game.launchUrl || '').trim();
+        secureLaunchUrl = `/api/pg/launch?player_id=${playerId}&game_code=${gameCode}`;
+    } else {
+        const separator = game.launchUrl.includes("?") ? "&" : "?";
+        secureLaunchUrl = `${game.launchUrl}${separator}player_id=${playerId}&balance=${playerBalance}&token=secure_session_masoudi&provider=${encodeURIComponent(game.provider)}`;
+    }
     
     playArea.innerHTML = `
         <div style="display:flex; flex-direction:column; align-items:center; gap:15px; color:var(--gold-text); font-weight:700; font-size:13px;" id="gameLoader">

@@ -958,14 +958,14 @@ function addNewGame() {
     ['gameNameInput','gameLaunchUrlInput','gameImageInputVal','gameTagInput'].forEach(x => { const el=document.getElementById(x); if(el) el.value=''; });
     const statusEl = document.getElementById('gameUploadStatus');
     if (statusEl) statusEl.textContent = 'يمكنك كتابة المسار يدوياً أو الضغط على رفع';
-    saveData(); renderAll();
+    await saveData(); renderAll();
     showToast(`تمت إضافة لعبة: ${title}`);
 }
 
-function deleteGame(i) {
+async function deleteGame(i) {
     const name = dynamicGames[i]?.title;
     dynamicGames.splice(i, 1);
-    saveData(); renderAll();
+    await saveData(); renderAll();
     showToast(`تم حذف ${name}`, 'error');
 }
 
