@@ -934,12 +934,13 @@ async function saveEditedGame() {
         title,
         category,
         provider,
+        tag,
         launchUrl: url,
         image
     };
 
     closeModal('editGameModal');
-    saveData();
+    await saveData();
     renderAll();
     showToast(`تم تحديث لعبة: ${title}`);
 }
@@ -948,12 +949,13 @@ function addNewGame() {
     const title    = document.getElementById('gameNameInput')?.value?.trim();
     const category = document.getElementById('gameCategoryInput')?.value;
     const provider = document.getElementById('gameProviderSelect')?.value;
+    const tag      = document.getElementById('gameTagInput')?.value || '';
     const url      = document.getElementById('gameLaunchUrlInput')?.value?.trim();
     const image    = document.getElementById('gameImageInputVal')?.value?.trim() || 'images/slots.png';
     if (!title || !url) return showToast('أدخل اسم اللعبة والرابط', 'error');
     const id = `game-${Date.now()}`;
-    dynamicGames.push({ id, title, category, provider, launchUrl: url, image });
-    ['gameNameInput','gameLaunchUrlInput','gameImageInputVal'].forEach(x => { const el=document.getElementById(x); if(el) el.value=''; });
+    dynamicGames.push({ id, title, category, provider, tag, launchUrl: url, image });
+    ['gameNameInput','gameLaunchUrlInput','gameImageInputVal','gameTagInput'].forEach(x => { const el=document.getElementById(x); if(el) el.value=''; });
     const statusEl = document.getElementById('gameUploadStatus');
     if (statusEl) statusEl.textContent = 'يمكنك كتابة المسار يدوياً أو الضغط على رفع';
     saveData(); renderAll();
