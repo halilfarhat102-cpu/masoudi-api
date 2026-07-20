@@ -256,7 +256,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
             final double amount = (tx['amount'] ?? 0.0).toDouble();
             final String type = tx['type'] ?? 'عملية';
             final String date = tx['date'] ?? 'الآن';
-            final String amountText = '${amount >= 0 ? '+' : ''}${amount.toLocaleString()} كوين';
+            final String amountText = '${amount >= 0 ? '+' : ''}${amount.toLocaleString()} ر.س';
             // Stable ID hash so it doesn't change randomly and cause Flutter list items to rebuild completely
             final String stableId = 'TX-${(type + amountText + date).hashCode.abs() % 100000}';
 
@@ -403,16 +403,16 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
   double _agentBalance = 0.00;
 
   final List<Map<String, dynamic>> _transactions = [
-    { 'id': "TX-99837", 'type': "شراء كوينز", 'amount': "+5,000 كوين", 'date': "اليوم، 12:45 ص", 'status': "ناجحة" },
-    { 'id': "TX-99712", 'type': "لعب (سلوتس API)", 'amount': "-1,200 كوين", 'date': "أمس، 08:30 م", 'status': "ناجحة" },
-    { 'id': "TX-99645", 'type': "سحب أرباح", 'amount': "-10,000 كوين", 'date': "أمس، 02:15 م", 'status': "ناجحة" },
-    { 'id': "TX-99501", 'type': "شراء كوينز", 'amount': "+25,000 كوين", 'date': "02 يوليو 2026", 'status': "ناجحة" }
+    { 'id': "TX-99837", 'type': "شحن رصيد", 'amount': "+5,000 ر.س", 'date': "اليوم، 12:45 ص", 'status': "ناجحة" },
+    { 'id': "TX-99712", 'type': "لعب (سلوتس API)", 'amount': "-1,200 ر.س", 'date': "أمس، 08:30 م", 'status': "ناجحة" },
+    { 'id': "TX-99645", 'type': "سحب أرباح", 'amount': "-10,000 ر.س", 'date': "أمس، 02:15 م", 'status': "ناجحة" },
+    { 'id': "TX-99501", 'type': "شحن رصيد", 'amount': "+25,000 ر.س", 'date': "02 يوليو 2026", 'status': "ناجحة" }
   ];
 
   Future<void> _executeTransaction(double amount, String type) async {
     // For sell, the amount is already negative (-amountVal)
     final double netAmount = type == 'deposit' ? amount : (type == 'sell' ? amount : -amount);
-    final String txType = type == 'deposit' ? 'إيداع سريع' : (type == 'sell' ? 'بيع كوينز للوكيل' : 'سحب سريع');
+    final String txType = type == 'deposit' ? 'إيداع سريع' : (type == 'sell' ? 'سحب رصيد للوكيل' : 'سحب سريع');
 
     // Optimistically update local state first
     setState(() {
@@ -422,8 +422,8 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         _primaryBalance += amount;
         _transactions.insert(0, {
           'id': txId,
-          'type': 'شراء كوينز',
-          'amount': '+${amount.toLocaleString()} كوين',
+          'type': 'شحن رصيد',
+          'amount': '+${amount.toLocaleString()} ر.س',
           'date': 'الآن',
           'status': 'ناجحة'
         });
@@ -433,7 +433,7 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         _transactions.insert(0, {
           'id': txId,
           'type': 'سحب أرباح',
-          'amount': '-${amount.toLocaleString()} كوين',
+          'amount': '-${amount.toLocaleString()} ر.س',
           'date': 'الآن',
           'status': 'ناجحة'
         });
@@ -441,8 +441,8 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         _agentBalance -= amount;
         _transactions.insert(0, {
           'id': txId,
-          'type': 'تحويل كوينز للاعب',
-          'amount': '-${amount.toLocaleString()} كوين',
+          'type': 'تحويل رصيد للاعب',
+          'amount': '-${amount.toLocaleString()} ر.س',
           'date': 'الآن',
           'status': 'ناجحة'
         });
@@ -452,8 +452,8 @@ class _MainTabControllerScreenState extends State<MainTabControllerScreen> {
         _primaryBalance += amount;
         _transactions.insert(0, {
           'id': txId,
-          'type': 'بيع كوينز للوكيل',
-          'amount': '${amount.toLocaleString()} كوين',
+          'type': 'سحب رصيد للوكيل',
+          'amount': '${amount.toLocaleString()} ر.س',
           'date': 'الآن',
           'status': 'ناجحة'
         });

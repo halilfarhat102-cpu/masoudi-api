@@ -26,7 +26,7 @@
     {
       "id": "banner-1783249648300",
       "title": "مرحباً بك في عالم الألعاب",
-      "subtitle": "اكتشف أفضل الألعاب واستمتع بتجربة لا تنتهي من المرح والإثارة",
+      "subtitle": "اكتشف أفضل الألعاب واستمتع بتجربة لا تنتهي من المرح والإثار��",
       "badge": "جديد",
       "icon": "🎮",
       "image": "images/uploaded_1783249646987.png",
@@ -108,6 +108,15 @@
       "tag": "new",
       "launchUrl": "60",
       "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784539592659.jpg"
+    },
+    {
+      "id": "game-1784553596274",
+      "title": "Journey",
+      "category": "slots",
+      "provider": "PG",
+      "tag": "hot",
+      "launchUrl": "50",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784554147848.jpg"
     }
   ],
   "players": [
