@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { readDb, writeDb, runTransaction } from './db-adapter.js';
 import crypto from 'crypto';
+import https from 'https';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { supabase } from './supabase.js';
@@ -1542,22 +1543,33 @@ export async function apiMiddleware(req, res, next) {
 
       console.log(`Calling PG Soft ${isProd ? 'Production' : 'Staging'} Launcher for player ${playerId}, game ${gameCode}...`);
       
-      const pgResponse = await fetch(pgUrl, {
-        method: 'POST',
-        headers: {
-          'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formParams.toString(),
+      const userAgent = req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+      const bodyData = formParams.toString();
+
+      const responseText = await new Promise((resolvePromise, rejectPromise) => {
+        const reqObj = https.request(pgUrl, {
+          method: 'POST',
+          family: 4,
+          headers: {
+            'User-Agent': userAgent,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(bodyData)
+          }
+        }, pgRes => {
+          let html = '';
+          pgRes.on('data', chunk => html += chunk);
+          pgRes.on('end', () => resolvePromise({ status: pgRes.statusCode, html }));
+        });
+        reqObj.on('error', err => rejectPromise(err));
+        reqObj.write(bodyData);
+        reqObj.end();
       });
 
-      const responseText = await pgResponse.text();
-
       // Return the HTML directly to the webview
-      res.statusCode = pgResponse.status;
+      res.statusCode = responseText.status || 200;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.end(responseText);
+      res.end(responseText.html);
 
     } catch (e) {
       console.error("Error launching PG game:", e);
