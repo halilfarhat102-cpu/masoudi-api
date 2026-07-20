@@ -1013,7 +1013,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name: player.id,
             player_id: player.id,
-            currency: 'USD',
+            currency: db.settings?.pgConfig?.currency || 'USD',
             nickname: player.name || 'Player'
           },
           error: null
@@ -1077,7 +1077,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name: player.id,
             player_id: player.id,
-            currency: 'USD',
+            currency: db.settings?.pgConfig?.currency || 'USD',
             balance: parseFloat(((player.balance || 0) / 100).toFixed(2))
           },
           error: null
@@ -1181,7 +1181,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name: resultPlayerId,
             player_id: resultPlayerId,
-            currency: 'USD',
+            currency: db.settings?.pgConfig?.currency || 'USD',
             balance: parseFloat((resultBalance / 100).toFixed(2))
           },
           error: null
@@ -1281,7 +1281,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name:    resultPlayerId,
             player_id:      resultPlayerId,
-            currency:       'USD',
+            currency: db.settings?.pgConfig?.currency || 'USD',
             balance:        parseFloat((resultBalance / 100).toFixed(2))
           },
           error: null
@@ -1468,7 +1468,7 @@ export async function apiMiddleware(req, res, next) {
           player_id: p.id,
           username: p.name,
           status: p.status || 'active',
-          currency: 'USD',
+          currency: db.settings?.pgConfig?.currency || 'USD',
           balance: ((p.balance || 0) / 100).toFixed(2)
         }));
 
@@ -1530,7 +1530,7 @@ export async function apiMiddleware(req, res, next) {
       const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '196.153.185.113';
 
       const path = `/${gameCode}/index.html`;
-      const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=USD`;
+      const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=${pgConfig.currency || 'USD'}`;
 
       // Build form-urlencoded request body
       const formParams = new URLSearchParams();

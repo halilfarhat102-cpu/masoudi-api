@@ -1998,11 +1998,22 @@
                         </div>
                         <div class="form-field">
                             <label>Production Operator Token (البيئة الحقيقية)</label>
-                            <input type="text" id="settingPgProductionOperatorToken" placeholder="P-a5fd4c..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                            <input type="text" id="settingPgProductionOperatorToken" placeholder="a5fd4c..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
                         </div>
                         <div class="form-field">
                             <label>Production Secret Key / Salt (البيئة الحقيقية)</label>
                             <input type="text" id="settingPgProductionSecretKey" placeholder="c89632..." style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                        </div>
+                        <div class="form-field">
+                            <label>رمز عملة الـ API المعتمدة لدى PG Soft (Currency)</label>
+                            <select id="settingPgCurrency" style="width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;">
+                                <option value="USD">USD (الدولار الأمريكي)</option>
+                                <option value="EUR">EUR (اليورو الأوروبي)</option>
+                                <option value="EGP">EGP (الجنيه المصري)</option>
+                                <option value="THB">THB (البات التايلاندي)</option>
+                                <option value="CNY">CNY (اليوان الصيني)</option>
+                                <option value="BRL">BRL (الريال البرازيلي)</option>
+                            </select>
                         </div>
                     </div>
 

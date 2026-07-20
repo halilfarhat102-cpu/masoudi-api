@@ -1057,6 +1057,7 @@ function initSettingsUI() {
     const pgStagingKey = document.getElementById('settingPgStagingSecretKey');
     const pgProductionToken = document.getElementById('settingPgProductionOperatorToken');
     const pgProductionKey = document.getElementById('settingPgProductionSecretKey');
+    const pgCurrency = document.getElementById('settingPgCurrency');
 
     const pgConfig = settings.pgConfig || {};
     if (pgIsProd) pgIsProd.checked = !!pgConfig.isProduction;
@@ -1064,6 +1065,7 @@ function initSettingsUI() {
     if (pgStagingKey) pgStagingKey.value = pgConfig.stagingSecretKey || "c89632307f734f6192fa420864a2c847";
     if (pgProductionToken) pgProductionToken.value = pgConfig.productionOperatorToken || "a5fd4c1a25904aae8729516557c160d0";
     if (pgProductionKey) pgProductionKey.value = pgConfig.productionSecretKey || "c89632307f734f6192fa420864a2c847";
+    if (pgCurrency) pgCurrency.value = pgConfig.currency || "USD";
 }
 
 async function saveSettings() {
@@ -1086,6 +1088,7 @@ async function saveSettings() {
     const pgStagingKey = document.getElementById('settingPgStagingSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
     const pgProductionToken = document.getElementById('settingPgProductionOperatorToken')?.value?.trim() || "a5fd4c1a25904aae8729516557c160d0";
     const pgProductionKey = document.getElementById('settingPgProductionSecretKey')?.value?.trim() || "c89632307f734f6192fa420864a2c847";
+    const pgCurrency = document.getElementById('settingPgCurrency')?.value?.trim() || "USD";
 
     settings = {
         enablePreview: enablePreview !== undefined ? enablePreview : true,
@@ -1105,7 +1108,8 @@ async function saveSettings() {
             stagingOperatorToken: pgStagingToken,
             stagingSecretKey: pgStagingKey,
             productionOperatorToken: pgProductionToken,
-            productionSecretKey: pgProductionKey
+            productionSecretKey: pgProductionKey,
+            currency: pgCurrency
         }
     };
 
