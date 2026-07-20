@@ -1623,6 +1623,9 @@ export async function apiMiddleware(req, res, next) {
       if (baseUrl.endsWith('/')) {
         baseUrl = baseUrl.slice(0, -1);
       }
+      if (baseUrl.endsWith('/external')) {
+        baseUrl = baseUrl.slice(0, -9);
+      }
 
       // Call PG Soft GetLaunchURLHTML API
       const traceId = 'guid-' + crypto.randomUUID();
