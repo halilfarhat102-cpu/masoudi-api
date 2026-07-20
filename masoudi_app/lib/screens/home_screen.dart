@@ -277,7 +277,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return _games.where((game) {
       final matchesSearch = game.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           game.provider.toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchesCategory = _selectedCategory == 'all' || game.category == _selectedCategory;
+      final tagLower = game.tag.toLowerCase().trim();
+      final matchesCategory = _selectedCategory == 'all' ||
+          game.category == _selectedCategory ||
+          (_selectedCategory == 'hot' && (tagLower == 'hot' || tagLower == 'popular' || game.tag == 'شائع' || game.category == 'hot'));
       return matchesSearch && matchesCategory;
     }).toList();
   }
@@ -574,6 +577,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         _buildCategoryChip('الكل', 'all'),
                         const SizedBox(width: 8),
+                        _buildCategoryChip('🔥 الشائع', 'hot'),
+                        const SizedBox(width: 8),
                         _buildCategoryChip('سلوتس', 'slots'),
                         const SizedBox(width: 8),
                         _buildCategoryChip('كازينو مباشر', 'live'),
@@ -755,6 +760,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  // Game Tag badge overlay (🔥 شائع / ✨ جديد / 👑 VIP)
+                  if (game.tag.isNotEmpty)
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: (game.tag.toLowerCase() == 'hot' || game.tag.toLowerCase() == 'popular' || game.tag == 'شائع')
+                              ? const Color(0xFFFF3D00).withOpacity(0.95)
+                              : ((game.tag.toLowerCase() == 'new' || game.tag == 'جديد')
+                                  ? const Color(0xFF00E676).withOpacity(0.95)
+                                  : const Color(0xFFFFD700).withOpacity(0.95)),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          (game.tag.toLowerCase() == 'hot' || game.tag.toLowerCase() == 'popular' || game.tag == 'شائع')
+                              ? '🔥 شائع'
+                              : ((game.tag.toLowerCase() == 'new' || game.tag == 'جديد') ? '✨ جديد' : '👑 ${game.tag}'),
+                          style: GoogleFonts.cairo(
+                            fontSize: 9,
+                            color: (game.tag.toLowerCase() == 'hot' || game.tag.toLowerCase() == 'popular' || game.tag == 'شائع') ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

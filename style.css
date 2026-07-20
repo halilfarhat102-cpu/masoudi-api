@@ -2799,4 +2799,30 @@ tr:last-child td {
     line-height: 1.5;
 }
 
+/* Game Card Tag Badge Overlay */
+.game-tag-badge-overlay {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: linear-gradient(135deg, #FF3D00, #FF6D00);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    z-index: 5;
+    font-family: 'Cairo', sans-serif;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.5px;
+}
+.game-tag-badge-overlay.new,
+.game-tag-badge-overlay.جديد {
+    background: linear-gradient(135deg, #00E676, #00B0FF);
+    color: #000000;
+}
+.game-tag-badge-overlay.vip {
+    background: linear-gradient(135deg, #FFD700, #FFA000);
+    color: #000000;
+}
+
 

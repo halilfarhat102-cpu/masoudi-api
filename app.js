@@ -381,6 +381,16 @@ function executeModalWithdraw() {
 }
 
 
+// Helper to format game tag text for card badges
+function translateTagBadge(tag) {
+    if (!tag) return '';
+    const t = tag.toLowerCase().trim();
+    if (t === 'hot' || t === 'popular' || t === 'شائع') return '🔥 شائع';
+    if (t === 'new' || t === 'جديد') return '✨ جديد';
+    if (t === 'vip') return '👑 VIP';
+    return tag;
+}
+
 // Render Games on Homepage (with Filter & Search logic matching Flutter)
 function renderDynamicGames() {
     const grid = document.getElementById("dynamicGamesGrid");
@@ -390,7 +400,12 @@ function renderDynamicGames() {
     
     // Filter games list
     const filteredGames = dynamicGames.filter(game => {
-        const matchesCategory = (currentCategory === "all" || game.category === currentCategory);
+        const tagLower = (game.tag || '').toLowerCase().trim();
+        const matchesCategory = (
+            currentCategory === "all" || 
+            game.category === currentCategory || 
+            (currentCategory === "hot" && (tagLower === "hot" || tagLower === "popular" || tagLower === "شائع" || game.category === "hot"))
+        );
         const matchesSearch = game.title.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
                               (game.provider && game.provider.toLowerCase().includes(currentSearchQuery.toLowerCase()));
         return matchesCategory && matchesSearch;
@@ -411,9 +426,13 @@ function renderDynamicGames() {
         const card = document.createElement("div");
         card.className = "game-card-premium";
         
+        const tagText = translateTagBadge(game.tag);
+        const tagBadgeHtml = tagText ? `<span class="game-tag-badge-overlay ${game.tag || ''}">${tagText}</span>` : '';
+
         // Use double image layout and a bottom title overlay (exactly mirroring the Flutter UI cards!)
         card.innerHTML = `
             <div class="game-image-box" onclick="launchDynamicGame('${game.id}')">
+                ${tagBadgeHtml}
                 <img src="${game.image}" alt="${game.title}" class="game-img-blur-bg" onerror="this.style.display='none'">
                 <img src="${game.image}" alt="${game.title}" class="game-img-front" onerror="this.src='images/app_icon.png'">
                 <span class="provider-badge">${game.provider || 'مسعودي'}</span>
