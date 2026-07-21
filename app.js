@@ -542,6 +542,53 @@ function renderBanners(bannersList) {
     }
 }
 
+function updatePlayerProfileUI(player) {
+    if (!player) return;
+    playerBalance = parseFloat(player.balance || 0);
+    primaryBalance = parseFloat(player.balance || 0);
+    bonusBalance = parseFloat(player.bonus || 0);
+    updateBalanceUI();
+
+    const pName = document.getElementById("profileName");
+    if (pName) pName.innerText = player.name || "Halil Farhat";
+
+    const pEmail = document.getElementById("profileEmail");
+    if (pEmail) pEmail.innerText = player.email || "halilfarhat102@gmail.com";
+
+    const pId = document.getElementById("profilePlayerId");
+    if (pId) pId.innerText = player.id || "519997";
+
+    const pCurr = document.getElementById("profileCurrency");
+    if (pCurr) pCurr.innerText = (player.currency || "USD") + " ($)";
+
+    if (player.photoUrl) {
+        const topAvatar = document.getElementById("topBarAvatar");
+        if (topAvatar) topAvatar.src = player.photoUrl;
+    }
+}
+
+function renderDynamicCategories(categoryNames) {
+    if (!categoryNames) return;
+    const chipsRow = document.querySelector(".category-chips-row");
+    if (!chipsRow) return;
+
+    const keyMap = {
+        all: "الكل",
+        hot: "🔥 الشائع",
+        slots: categoryNames.slots || "سلوتس",
+        live: categoryNames.live || "كازينو مباشر",
+        table: categoryNames.table || "ألعاب طاولة",
+        crash: categoryNames.crash || "ألعاب فورية"
+    };
+
+    const keys = ["all", "hot", "slots", "live", "table", "crash"];
+    chipsRow.innerHTML = keys.map(k => {
+        const label = keyMap[k] || k;
+        const activeClass = k === currentCategory ? "active" : "";
+        return `<button class="chip ${activeClass}" data-category="${k}" onclick="setCategoryFilter('${k}')">${label}</button>`;
+    }).join('');
+}
+
 // Fetch dynamic games & banners from the API server (sync with DB & Flutter App!)
 async function fetchServerData() {
     try {
@@ -592,6 +639,17 @@ async function fetchServerData() {
                 const remainingBuiltIn = builtInGames.filter(bg => !serverGames.some(sg => sg.id === bg.id));
                 dynamicGames = [...remainingBuiltIn, ...serverGames];
                 renderDynamicGames();
+            }
+
+            // 3. Load Settings & Categories
+            if (data.settings && data.settings.categoryNames) {
+                renderDynamicCategories(data.settings.categoryNames);
+            }
+
+            // 4. Load Active Player Profile (e.g. 519997 or active user)
+            if (data.players && data.players.length > 0) {
+                const activePlayer = data.players.find(p => String(p.id) === '519997') || data.players[0];
+                updatePlayerProfileUI(activePlayer);
             }
         } else {
             throw new Error("API failed");
