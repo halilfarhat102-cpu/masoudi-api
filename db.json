@@ -58,7 +58,7 @@
   "providers": [
     {
       "name": "PG",
-      "url": "https://www.pg-bo.me/#/login?code=MASOUDIGAMES",
+      "url": "https://api.pg-bo.me",
       "key": "6c19673883aa410b98d1c0cb1a3c5edc"
     }
   ],
