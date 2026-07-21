@@ -4,7 +4,7 @@
 let playerBalance = 1671424.00;
 let primaryBalance = 1671424.00;
 let bonusBalance = 0;
-let playerId = "519997";
+let playerId = "303725";
 
 // Load dynamic data from localStorage or set defaults
 let dynamicGames = [];
@@ -683,12 +683,34 @@ function launchDynamicGame(gameId) {
     setTimeout(() => {
         playArea.innerHTML = `<iframe src="${secureLaunchUrl}" class="game-iframe" allow="autoplay; fullscreen" id="gameFrame"></iframe>`;
     }, 1200);
+
+    // ── Real-Time Game Balance Sync and Zero-Balance Auto-Redirect ──
+    if (window.gameBalanceInterval) clearInterval(window.gameBalanceInterval);
+    window.gameBalanceInterval = setInterval(async () => {
+        try {
+            await fetchServerData();
+            if (playerBalance <= 0) {
+                clearInterval(window.gameBalanceInterval);
+                closeGamePlayModal();
+                alert("عفواً، رصيدك غير كافٍ للعب! جاري تحويلك لصفحة شحن المحفظة...");
+                switchTab('wallet');
+            }
+        } catch (e) {
+            console.error("Balance sync error during gameplay:", e);
+        }
+    }, 2500);
 }
 
 function closeGamePlayModal() {
+    if (window.gameBalanceInterval) {
+        clearInterval(window.gameBalanceInterval);
+        window.gameBalanceInterval = null;
+    }
     const playArea = document.getElementById("gamePlayArea");
-    playArea.innerHTML = "";
-    document.getElementById("gamePlayModal").classList.remove("active");
+    if (playArea) playArea.innerHTML = "";
+    const modal = document.getElementById("gamePlayModal");
+    if (modal) modal.classList.remove("active");
+    fetchServerData();
 }
 
 // Bind all interactive functions to the window object for module compatibility
