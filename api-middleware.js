@@ -153,10 +153,10 @@ function findPGPlayer(db, token, playerId) {
     player = db.players.find(p => p.sessionToken && String(p.sessionToken).trim() === tokenStr);
   }
   // 2) Extract embedded player ID if token has sess_ID_timestamp or sess-ID
-  if (!player && tokenStr) {
-    const match = tokenStr.match(/^sess[_-]([a-zA-Z0-9_-]+?)(?:[_-]\d+)?$/);
-    if (match && match[1]) {
-      const extractedId = match[1];
+  if (!player && tokenStr && tokenStr.startsWith('sess')) {
+    const parts = tokenStr.split(/[_-]/);
+    if (parts.length >= 2) {
+      const extractedId = parts[1];
       player = db.players.find(p => String(p.id).trim() === extractedId || (p.name && String(p.name).trim() === extractedId));
     }
   }
@@ -175,8 +175,8 @@ function findPGPlayer(db, token, playerId) {
       id: newId,
       name: 'لاعب مسعودي',
       email: '—',
-      balance: 5000,
-      bonus: 500,
+      balance: 100,
+      bonus: 0,
       currency: db.settings?.pgConfig?.currency || 'USD',
       status: 'active',
       sessionToken: tokenStr || '',
@@ -466,14 +466,14 @@ export async function apiMiddleware(req, res, next) {
               name: newName,
               email: playerInput.email || '—',
               photoUrl: playerInput.photoUrl || '',
-              balance: 5000,
-              bonus: 500,
+              balance: 100,
+              bonus: 0,
               currency: playerInput.currency || db.settings?.pgConfig?.currency || 'USD',
               status: 'active',
               joinDate: new Date().toISOString().split('T')[0],
               lastLogin: new Date().toISOString().split('T')[0],
               transactions: [
-                { type: 'هدية التسجيل', amount: 5000, date: new Date().toLocaleTimeString('ar') }
+                { type: 'هدية التسجيل', amount: 100, date: new Date().toLocaleTimeString('ar') }
               ]
             };
             db.players.push(player);
@@ -1846,8 +1846,8 @@ export async function apiMiddleware(req, res, next) {
             id: String(playerId),
             name: `لاعب ${playerId}`,
             email: '—',
-            balance: 5000,
-            bonus: 500,
+            balance: 100,
+            bonus: 0,
             currency: db2.settings?.pgConfig?.currency || 'USD',
             status: 'active',
             joinDate: new Date().toISOString().split('T')[0],
