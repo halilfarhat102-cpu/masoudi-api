@@ -111,11 +111,19 @@ function findPGPlayer(db, token, playerId) {
   if (tokenStr) {
     player = db.players.find(p => p.sessionToken && String(p.sessionToken).trim() === tokenStr);
   }
-  // 2) Match by player ID exact match (stringified)
+  // 2) Extract embedded player ID if token has sess_ID_timestamp or sess-ID
+  if (!player && tokenStr) {
+    const match = tokenStr.match(/^sess[_-]([a-zA-Z0-9_-]+?)(?:[_-]\d+)?$/);
+    if (match && match[1]) {
+      const extractedId = match[1];
+      player = db.players.find(p => String(p.id).trim() === extractedId || (p.name && String(p.name).trim() === extractedId));
+    }
+  }
+  // 3) Match by player ID exact match (stringified)
   if (!player && pIdStr) {
     player = db.players.find(p => String(p.id).trim() === pIdStr);
   }
-  // 3) Match by player name (PG Soft sometimes sends player_name = player.id)
+  // 4) Match by player name (PG Soft sometimes sends player_name = player.id)
   if (!player && pIdStr) {
     player = db.players.find(p => p.name && String(p.name).trim() === pIdStr);
   }
@@ -1849,12 +1857,26 @@ export async function apiMiddleware(req, res, next) {
       // Generate session token and persist atomically
       let sessionToken = '';
       await runTransaction(async (db2) => {
-        const p2 = (db2.players || []).find(x => x.id === playerId);
-        if (p2) {
-          sessionToken = crypto.createHash('sha256').update(playerId + Date.now() + Math.random()).digest('hex');
-          p2.sessionToken = sessionToken;
-          p2.sessionCreatedAt = new Date().toISOString();
+        if (!db2.players) db2.players = [];
+        let p2 = db2.players.find(x => String(x.id) === String(playerId));
+        if (!p2) {
+          p2 = {
+            id: String(playerId),
+            name: `لاعب ${playerId}`,
+            email: '—',
+            balance: 5000,
+            bonus: 500,
+            currency: db2.settings?.pgConfig?.currency || 'USD',
+            status: 'active',
+            joinDate: new Date().toISOString().split('T')[0],
+            lastLogin: new Date().toISOString().split('T')[0],
+            transactions: []
+          };
+          db2.players.push(p2);
         }
+        sessionToken = 'sess_' + String(playerId) + '_' + Date.now();
+        p2.sessionToken = sessionToken;
+        p2.sessionCreatedAt = new Date().toISOString();
         return db2;
       });
 
