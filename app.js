@@ -1,10 +1,10 @@
 // Player Application Logic (index.html)
 
 // Global State
-let playerBalance = 250500.00;
-let primaryBalance = 240000.00;
-let bonusBalance = 10500.00;
-const playerId = "879204";
+let playerBalance = 1671424.00;
+let primaryBalance = 1671424.00;
+let bonusBalance = 0;
+let playerId = "519997";
 
 // Load dynamic data from localStorage or set defaults
 let dynamicGames = [];
@@ -524,6 +524,7 @@ function renderBanners(bannersList) {
 
 function updatePlayerProfileUI(player) {
     if (!player) return;
+    playerId = String(player.id || "519997");
     playerBalance = parseFloat(player.balance || 0);
     primaryBalance = parseFloat(player.balance || 0);
     bonusBalance = parseFloat(player.bonus || 0);
