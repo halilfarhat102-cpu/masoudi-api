@@ -63,6 +63,44 @@ function extractPGIdentifiers(payload) {
   return { token, playerId };
 }
 
+function logPGCallback(endpointName, req, reqBody, resStatus, resBody, playerId, playerCurrency, returnedCurrency, gameId, sessionToken) {
+  let traceId = 'N/A';
+  try {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    traceId = parsedUrl.searchParams.get('trace_id') || 'N/A';
+  } catch (_) {}
+  console.log(`[PG CALLBACK LOG]
+Timestamp:         ${new Date().toISOString()}
+Trace ID:          ${traceId}
+Endpoint:          ${endpointName}
+Player ID:         ${playerId || 'N/A'}
+Player Currency:   ${playerCurrency || 'N/A'}
+Currency Sent:     ${returnedCurrency || 'N/A'}
+Game ID:           ${gameId || 'N/A'}
+Session Token:     ${sessionToken || 'N/A'}
+HTTP Status:       ${resStatus}
+Request Body:      ${reqBody || 'EMPTY'}
+Response Body:     ${typeof resBody === 'object' ? JSON.stringify(resBody) : resBody}
+`);
+}
+
+function logPGCallbackError(endpointName, req, reqBody, err, playerId) {
+  let traceId = 'N/A';
+  try {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    traceId = parsedUrl.searchParams.get('trace_id') || 'N/A';
+  } catch (_) {}
+  console.error(`[PG CALLBACK ERROR]
+Timestamp:     ${new Date().toISOString()}
+Trace ID:      ${traceId}
+Endpoint:      ${endpointName}
+Player ID:     ${playerId || 'N/A'}
+Request Body:  ${reqBody || 'EMPTY'}
+Error Message: ${err.message}
+Stack Trace:   ${err.stack}
+`);
+}
+
 function findPGPlayer(db, token, playerId) {
   if (!db.players) db.players = [];
   let player = null;
@@ -1264,15 +1302,17 @@ export async function apiMiddleware(req, res, next) {
         if (!foundPlayer) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({
+          const resObj = {
             data: null,
             error: { code: '1034', message: 'Invalid session token' }
-          }));
+          };
+          logPGCallback('VerifySession', req, body, 200, resObj, playerId, null, null, payload.game_code, token);
+          return res.end(JSON.stringify(resObj));
         }
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({
+        const resObj = {
           data: {
             player_name: String(foundPlayer.id),
             player_id: String(foundPlayer.id),
@@ -1280,9 +1320,11 @@ export async function apiMiddleware(req, res, next) {
             nickname: foundPlayer.name || 'Player'
           },
           error: null
-        }));
+        };
+        logPGCallback('VerifySession', req, body, 200, resObj, foundPlayer.id, currency, currency, payload.game_code, token);
+        res.end(JSON.stringify(resObj));
       } catch (e) {
-        console.error('[PG] verify-session error:', e.message);
+        logPGCallbackError('VerifySession', req, body, e, playerId);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -1308,28 +1350,33 @@ export async function apiMiddleware(req, res, next) {
         if (!player) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({
+          const resObj = {
             data: null,
             error: { code: '1000', message: 'Player not found' }
-          }));
+          };
+          logPGCallback('GetBalance', req, body, 200, resObj, playerId, null, null, payload.game_code, token);
+          return res.end(JSON.stringify(resObj));
         }
 
         const currentBal = parseFloat((player.balance || 0).toFixed(2));
+        const playerCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({
+        const resObj = {
           data: {
             player_name: String(player.id),
             player_id: String(player.id),
-            currency: player.currency || db.settings?.pgConfig?.currency || 'USD',
+            currency: playerCurrency,
             balance_amount: currentBal,
             balance: currentBal,
             updated_time: Date.now()
           },
           error: null
-        }));
+        };
+        logPGCallback('GetBalance', req, body, 200, resObj, player.id, player.currency, playerCurrency, payload.game_code, token);
+        res.end(JSON.stringify(resObj));
       } catch (e) {
-        console.error('[PG] get-balance error:', e.message);
+        logPGCallbackError('GetBalance', req, body, e, playerId);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -1407,19 +1454,21 @@ export async function apiMiddleware(req, res, next) {
         if (errorMsg) {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          return res.end(JSON.stringify({
+          const resObj = {
             data: null,
             error: {
               code: errorMsg === 'Insufficient balance' ? '3200' : '1000',
               message: errorMsg
             }
-          }));
+          };
+          logPGCallback('Adjustment', req, body, 200, resObj, playerId || resultPlayerId, null, resultCurrency, payload.game_code, token);
+          return res.end(JSON.stringify(resObj));
         }
 
         const finalBal = parseFloat(resultBalance.toFixed(2));
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({
+        const resObj = {
           data: {
             player_name: String(resultPlayerId),
             player_id: String(resultPlayerId),
@@ -1429,8 +1478,11 @@ export async function apiMiddleware(req, res, next) {
             updated_time: Date.now()
           },
           error: null
-        }));
+        };
+        logPGCallback('Adjustment', req, body, 200, resObj, resultPlayerId, resultCurrency, resultCurrency, payload.game_code, token);
+        res.end(JSON.stringify(resObj));
       } catch (e) {
+        logPGCallbackError('Adjustment', req, body, e, playerId);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -1507,15 +1559,17 @@ export async function apiMiddleware(req, res, next) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         if (errorMsg) {
-          return res.end(JSON.stringify({
+          const resObj = {
             data: null,
             error: {
               code: errorMsg === 'Insufficient balance' ? '3200' : '1000',
               message: errorMsg
             }
-          }));
+          };
+          logPGCallback('BetPayout', req, body, 200, resObj, playerId || resultPlayerId, null, resultCurrency, payload.game_code, token);
+          return res.end(JSON.stringify(resObj));
         }
-        res.end(JSON.stringify({
+        const resObj = {
           data: {
             player_name:    resultPlayerId,
             player_id:      resultPlayerId,
@@ -1523,8 +1577,11 @@ export async function apiMiddleware(req, res, next) {
             balance:        parseFloat((resultBalance / 100).toFixed(2))
           },
           error: null
-        }));
+        };
+        logPGCallback('BetPayout', req, body, 200, resObj, resultPlayerId, resultCurrency, resultCurrency, payload.game_code, token);
+        res.end(JSON.stringify(resObj));
       } catch (e) {
+        logPGCallbackError('BetPayout', req, body, e, playerId);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
@@ -1856,16 +1913,21 @@ export async function apiMiddleware(req, res, next) {
 
       // ─── 1. LOG PRE-REQUEST DETAILS ───
       console.log(`\n═════════════════ [PG Soft GetLaunchURLHTML Request] ═════════════════`);
-      console.log(`Environment:    ${isProd ? 'Production' : 'Staging'}`);
-      console.log(`Request URL:    ${pgUrl}`);
-      console.log(`HTTP Method:    POST`);
-      console.log(`Operator Token: ${maskedToken}`);
-      console.log(`Client IP:      ${rawIp}`);
-      console.log(`Game Code:      ${cleanGameCode}`);
-      console.log(`Path:           ${path}`);
-      console.log(`Extra Args:     ${extraArgs}`);
-      console.log(`Trace ID:       ${traceId}`);
-      console.log(`Request Body:   ${requestBodyString}`);
+      console.log(`Timestamp:       ${new Date().toISOString()}`);
+      console.log(`Environment:     ${isProd ? 'Production' : 'Staging'}`);
+      console.log(`Endpoint Name:   GetLaunchURLHTML`);
+      console.log(`Player ID:       ${playerId}`);
+      console.log(`Player Currency: ${playerCurrency}`);
+      console.log(`Currency Sent:   ${playerCurrency}`);
+      console.log(`Game ID:         ${cleanGameCode}`);
+      console.log(`Session Token:   ${sessionToken}`);
+      console.log(`Request URL:     ${pgUrl}`);
+      console.log(`HTTP Method:     POST`);
+      console.log(`Operator Token:  ${maskedToken}`);
+      console.log(`Client IP:       ${rawIp}`);
+      console.log(`Path:            ${path}`);
+      console.log(`Trace ID:        ${traceId}`);
+      console.log(`Request Body:    ${requestBodyString}`);
       console.log(`═════════════════════════════════════════════════════════════════════\n`);
       
       const pgResponse = await fetch(pgUrl, {
@@ -1882,10 +1944,18 @@ export async function apiMiddleware(req, res, next) {
 
       // ─── 2. LOG POST-RESPONSE DETAILS ───
       console.log(`\n═════════════════ [PG Soft GetLaunchURLHTML Response] ════════════════`);
-      console.log(`HTTP Status:    ${pgResponse.status}`);
-      console.log(`Response Time:  ${responseTimeMs}ms`);
-      console.log(`Response Headers:`, JSON.stringify(responseHeaders, null, 2));
-      console.log(`Response Body:  ${responseText.length > 1000 ? responseText.substring(0, 1000) + '... [TRUNCATED]' : responseText}`);
+      console.log(`Timestamp:       ${new Date().toISOString()}`);
+      console.log(`Endpoint Name:   GetLaunchURLHTML`);
+      console.log(`Player ID:       ${playerId}`);
+      console.log(`Player Currency: ${playerCurrency}`);
+      console.log(`Currency Sent:   ${playerCurrency}`);
+      console.log(`Game ID:         ${cleanGameCode}`);
+      console.log(`Session Token:   ${sessionToken}`);
+      console.log(`Trace ID:        ${traceId}`);
+      console.log(`HTTP Status:     ${pgResponse.status}`);
+      console.log(`Response Time:   ${responseTimeMs}ms`);
+      console.log(`Response Headers: ${JSON.stringify(responseHeaders)}`);
+      console.log(`Response Body:   ${responseText}`);
       console.log(`═════════════════════════════════════════════════════════════════════\n`);
 
       // ─── 3. HANDLE JSON ERROR RESPONSE ───
