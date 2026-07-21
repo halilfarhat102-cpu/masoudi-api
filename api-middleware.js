@@ -155,29 +155,58 @@ function findPGPlayer(db, token, playerId) {
   const pIdStr = playerId ? String(playerId).trim() : null;
   const tokenStr = token ? String(token).trim() : null;
 
-  // 1) Match by session token (most specific)
-  if (tokenStr) {
-    player = db.players.find(p => p.sessionToken && String(p.sessionToken).trim() === tokenStr);
+  // Helper: extract player ID from session token (format: sess_PLAYERID_timestamp)
+  function extractIdFromToken(t) {
+    if (!t || !t.startsWith('sess')) return null;
+    const parts = t.split(/[_-]/);
+    return parts.length >= 2 ? parts[1] : null;
   }
-  // 2) Extract embedded player ID if token has sess_ID_timestamp or sess-ID
-  if (!player && tokenStr && tokenStr.startsWith('sess')) {
-    const parts = tokenStr.split(/[_-]/);
-    if (parts.length >= 2) {
-      const extractedId = parts[1];
-      player = db.players.find(p => String(p.id).trim() === extractedId || (p.name && String(p.name).trim() === extractedId));
+
+  const extractedIdFromToken = extractIdFromToken(tokenStr);
+
+  // 1) Priority: match by extracted ID from session token (most reliable for PG Soft)
+  //    This prevents matching a pg_XXXXX duplicate instead of the real player
+  if (extractedIdFromToken) {
+    player = db.players.find(p => String(p.id).trim() === extractedIdFromToken);
+    // Update this player's sessionToken to the latest one
+    if (player && player.sessionToken !== tokenStr) {
+      player.sessionToken = tokenStr;
     }
   }
-  // 3) Match by player ID exact match (stringified)
+
+  // 2) Match by session token stored on player
+  if (!player && tokenStr) {
+    const byToken = db.players.find(p => p.sessionToken && String(p.sessionToken).trim() === tokenStr);
+    // If found by token but it's a pg_ auto-created account, check if real player also exists
+    if (byToken && String(byToken.id).startsWith('pg_') && extractedIdFromToken) {
+      const realPlayer = db.players.find(p => String(p.id).trim() === extractedIdFromToken);
+      if (realPlayer) {
+        // Merge balance from duplicate to real player and use real player
+        realPlayer.balance = (realPlayer.balance || 0) + (byToken.balance || 0);
+        realPlayer.sessionToken = tokenStr;
+        byToken.balance = 0; // zero out duplicate
+        player = realPlayer;
+      } else {
+        player = byToken;
+      }
+    } else {
+      player = byToken;
+    }
+  }
+
+  // 3) Match by player_name / player_id field exactly
   if (!player && pIdStr) {
     player = db.players.find(p => String(p.id).trim() === pIdStr);
   }
-  // 4) Match by player name (PG Soft sometimes sends player_name = player.id)
+
+  // 4) Match by player name field
   if (!player && pIdStr) {
     player = db.players.find(p => p.name && String(p.name).trim() === pIdStr);
   }
-  // 4) Fallback: if player not found by ID or token, auto-create active player so PG Soft never receives 1034/1000 error
-  if (!player && (pIdStr || tokenStr)) {
-    const newId = pIdStr || ('pg_' + Math.floor(100000 + Math.random() * 900000));
+
+  // 5) Fallback: auto-create player — always use real ID (from token or player_name), never pg_random
+  if (!player && (pIdStr || extractedIdFromToken || tokenStr)) {
+    const newId = pIdStr || extractedIdFromToken || ('pg_' + Math.floor(100000 + Math.random() * 900000));
     player = {
       id: newId,
       name: 'لاعب مسعودي',
@@ -190,6 +219,7 @@ function findPGPlayer(db, token, playerId) {
       joinDate: new Date().toISOString().split('T')[0],
       lastLogin: new Date().toISOString().split('T')[0],
       transactions: []
+
     };
     db.players.push(player);
   }
