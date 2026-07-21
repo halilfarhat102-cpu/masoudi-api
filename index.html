@@ -45,23 +45,34 @@
 
     <div class="app-container">
 
-        <!-- Top App Bar (exactly like the Flutter App) -->
+        <!-- Top App Bar (Desktop & Mobile Header) -->
         <div class="top-app-bar">
             <!-- Left: Cute Fox Mascot Logo -->
-            <div class="top-bar-mascot" onclick="switchTab('home')">
-                <img src="images/fox_fab.png" alt="Mascot" class="top-bar-mascot-img" onerror="this.src='images/app_icon.png'">
+            <div class="top-bar-left">
+                <div class="top-bar-mascot" onclick="switchTab('home')">
+                    <img src="images/fox_fab.png" alt="Mascot" class="top-bar-mascot-img" onerror="this.src='images/app_icon.png'">
+                    <span class="top-bar-brand-title">مسعودي</span>
+                </div>
             </div>
             
-            <!-- Middle: Coin Balance Widget -->
-            <div class="top-bar-coins-widget" onclick="switchTab('wallet')">
-                <span class="coin-icon"><i class="fa-solid fa-wallet" style="color:var(--gold-text);"></i></span>
-                <span id="topBarBalance" class="coin-balance-text">$250,500</span>
+            <!-- Middle: Desktop Nav Links (Hidden on Mobile, Visible on Desktop) -->
+            <div class="desktop-nav-links">
+                <button class="desktop-nav-btn active" id="desk-nav-home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> الرئيسية</button>
+                <button class="desktop-nav-btn" id="desk-nav-wallet" onclick="switchTab('wallet')"><i class="fa-solid fa-wallet"></i> المحفظة</button>
+                <button class="desktop-nav-btn" id="desk-nav-profile" onclick="switchTab('profile')"><i class="fa-solid fa-user"></i> حسابي</button>
             </div>
 
-            <!-- Right: Circular Profile Avatar -->
-            <div class="top-bar-profile" onclick="switchTab('profile')">
-                <div class="top-bar-avatar-container">
-                    <img src="images/player_avatar.png" alt="Profile" class="top-bar-avatar-img" id="topBarAvatar">
+            <!-- Right: Wallet Balance & Profile Avatar -->
+            <div class="top-bar-right">
+                <div class="top-bar-coins-widget" onclick="switchTab('wallet')">
+                    <span class="coin-icon"><i class="fa-solid fa-wallet" style="color:var(--gold-text);"></i></span>
+                    <span id="topBarBalance" class="coin-balance-text">$1,671,424</span>
+                </div>
+
+                <div class="top-bar-profile" onclick="switchTab('profile')">
+                    <div class="top-bar-avatar-container">
+                        <img src="images/player_avatar.png" alt="Profile" class="top-bar-avatar-img" id="topBarAvatar">
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,51 +208,56 @@
                 <div class="profile-hero-card glass-card">
                     <div class="profile-main-info">
                         <div class="avatar-large-container">
-                            <img src="images/player_avatar.png" alt="Avatar" class="avatar-large">
-                            <div class="level-indicator-large">1</div>
+                            <img src="images/player_avatar.png" alt="Avatar" class="avatar-large" id="profileAvatarImg">
+                            <div class="level-indicator-large">VIP</div>
                         </div>
                         <h3 class="profile-name" id="profileName">Halil Farhat</h3>
-                        <span class="vip-status-large"><i class="fa-solid fa-gem text-gold"></i> عضو متميز - رتبة 1 (VIP)</span>
+                        <span class="vip-status-large"><i class="fa-solid fa-gem text-gold"></i> عضو متميز (VIP Status)</span>
                     </div>
 
                     <div class="vip-level-progress">
                         <div class="progress-labels">
-                            <span>التقدم للمستوى الثاني</span>
-                            <span>75%</span>
+                            <span>التقدم للمستوى الذهبي التالي</span>
+                            <span>85%</span>
                         </div>
                         <div class="progress-bar-container">
-                            <div class="progress-bar-fill" style="width: 75%"></div>
+                            <div class="progress-bar-fill" style="width: 85%"></div>
                         </div>
                         <div class="progress-details-text" id="vipProgressText">
-                            تبقى لك إيداع بقيمة 5,000 $ أو لعب بمبلغ 15,000 $ للترقية التلقائية.
+                            تبقى لك إيداع بقيمة $1,000 USD أو لعب بمبلغ $5,000 USD للترقية التلقائية.
                         </div>
                     </div>
                 </div>
 
                 <div class="profile-settings-grid">
                     <div class="settings-card glass-card">
-                        <h4>تفاصيل الحساب الشخصي</h4>
+                        <h4>تفاصيل الحساب الشخصي (معرّف وحالة الحساب)</h4>
+                        <div class="detail-row">
+                            <span class="det-label"><i class="fa-solid fa-id-card"></i> معرّف اللاعب (ID)</span>
+                            <span class="det-val" id="profilePlayerId">519997</span>
+                        </div>
                         <div class="detail-row">
                             <span class="det-label"><i class="fa-regular fa-envelope"></i> البريد الإلكتروني</span>
                             <span class="det-val" id="profileEmail">halilfarhat102@gmail.com</span>
                         </div>
                         <div class="detail-row">
-                            <span class="det-label"><i class="fa-solid fa-id-card"></i> معرف اللاعب (ID)</span>
-                            <span class="det-val" id="profilePlayerId">519997</span>
+                            <span class="det-label"><i class="fa-solid fa-wallet"></i> إجمالي الرصيد الحالي</span>
+                            <span class="det-val text-emerald" id="profileBalance">$1,671,424.00</span>
                         </div>
                         <div class="detail-row">
-                            <span class="det-label"><i class="fa-solid fa-dollar-sign"></i> العملة الحالية</span>
+                            <span class="det-label"><i class="fa-solid fa-dollar-sign"></i> عملة المحفظة</span>
                             <span class="det-val text-emerald" id="profileCurrency">USD ($)</span>
                         </div>
                         <div class="detail-row">
                             <span class="det-label"><i class="fa-solid fa-shield-halved"></i> توثيق الحساب</span>
-                            <span class="det-val text-emerald"><i class="fa-solid fa-circle-check"></i> موثق بالكامل</span>
+                            <span class="det-val text-emerald"><i class="fa-solid fa-circle-check"></i> موثق بالنظام الحقيقي</span>
                         </div>
                     </div>
 
                     <div class="settings-card glass-card">
                         <h4>خيارات الحساب والأمان</h4>
-                        <button class="settings-btn" style="background: rgba(255, 122, 31, 0.15); border: 1px solid var(--gold-primary); font-weight:700;" onclick="signInWithGoogleWeb()"><i class="fa-brands fa-google" style="color:#FF5252;"></i> تسجيل الدخول الحقيقي بحساب جوجل 🚀</button>
+                        <button class="settings-btn" style="background: rgba(255, 122, 31, 0.15); border: 1px solid var(--gold-primary); font-weight:700;" onclick="signInWithGoogleWeb()"><i class="fa-brands fa-google" style="color:#FF5252;"></i> تسجيل الدخول بحساب جوجل 🚀</button>
+                        <button class="settings-btn" onclick="openAgentTransferModal()"><i class="fa-solid fa-paper-plane"></i> تحويل رصيد دولار للاعب آخر</button>
                         <button class="settings-btn"><i class="fa-solid fa-headset"></i> التواصل مع مدير الدعم المخصص</button>
                         <button class="settings-btn text-danger" onclick="logoutPlayer()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
                     </div>

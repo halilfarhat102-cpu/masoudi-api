@@ -126,6 +126,11 @@ function updateBalanceUI() {
     if (gamePlayBalEl) {
         gamePlayBalEl.innerText = '$' + Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
+
+    const profileBalEl = document.getElementById("profileBalance");
+    if (profileBalEl) {
+        profileBalEl.innerText = '$' + Number(total).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
 }
 
 // Render Transactions Table
@@ -170,7 +175,7 @@ function initWinnersTicker() {
     });
 }
 
-// Switch Bottom Tabs
+// Switch Bottom / Top Tabs
 function switchTab(viewName) {
     const views = document.querySelectorAll(".app-view");
     views.forEach(view => view.classList.remove("active"));
@@ -178,13 +183,16 @@ function switchTab(viewName) {
     const navItems = document.querySelectorAll(".bottom-nav-bar .nav-item");
     navItems.forEach(item => item.classList.remove("active"));
     
+    const deskBtns = document.querySelectorAll(".desktop-nav-btn");
+    deskBtns.forEach(btn => btn.classList.remove("active"));
+
     const targetView = document.getElementById(`view-${viewName}`);
     const targetNav = document.getElementById(`nav-${viewName}`);
+    const targetDesk = document.getElementById(`desk-nav-${viewName}`);
     
-    if (targetView && targetNav) {
-        targetView.classList.add("active");
-        targetNav.classList.add("active");
-    }
+    if (targetView) targetView.classList.add("active");
+    if (targetNav) targetNav.classList.add("active");
+    if (targetDesk) targetDesk.classList.add("active");
 }
 
 // Toast Alert Helper
