@@ -363,8 +363,8 @@ function loadPaymentGateways() {
                 row.className = 'pricing-row';
                 row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
                 row.innerHTML = `
-                    <input type="number" class="price-coins" value="${p.coins || ''}" placeholder="ر.س" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
-                    <input type="number" class="price-egp" value="${p.egp || ''}" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                    <input type="number" class="price-coins" value="${p.coins || p.usd || ''}" placeholder="المبلغ ($)" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                    <input type="number" class="price-egp" value="${p.egp || ''}" placeholder="السعر بالجنيه (EGP)" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
                     <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>`;
                 container.appendChild(row);
             });
@@ -380,8 +380,8 @@ function addPricingRow() {
     row.className = 'pricing-row';
     row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
     row.innerHTML = `
-        <input type="number" class="price-coins" placeholder="ر.س" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
-        <input type="number" class="price-egp" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+        <input type="number" class="price-coins" placeholder="المبلغ ($)" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+        <input type="number" class="price-egp" placeholder="السعر بالجنيه (EGP)" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
         <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>`;
     container.appendChild(row);
 }

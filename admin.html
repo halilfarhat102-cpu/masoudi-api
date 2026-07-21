@@ -2364,17 +2364,17 @@
 
                     <!-- Pricing Table -->
                     <div style="background:rgba(255,122,31,0.07);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;">
-                        <h4 style="font-size:13px;color:var(--orange);margin-bottom:12px;"><i class="fa-solid fa-tags"></i> جدول أسعار الشحن (اختياري)</h4>
-                        <p style="font-size:11px;color:#888;margin-bottom:12px;">حدد عروض الشحن التي ستظهر للمستخدمين عند اختيار الشحن من التطبيق.</p>
+                        <h4 style="font-size:13px;color:var(--orange);margin-bottom:12px;"><i class="fa-solid fa-tags"></i> جدول أسعار شحن الدولار ($)</h4>
+                        <p style="font-size:11px;color:#888;margin-bottom:12px;">حدد عروض أسعار شحن الدولار ($) التي ستظهر للمستخدمين عند اختيار الشحن من التطبيق.</p>
                         <div id="pricingTableInputs">
                             <div class="pricing-row" style="display:flex;gap:8px;margin-bottom:8px;">
-                                <input type="number" class="price-coins" placeholder="ر.س" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
-                                <input type="number" class="price-egp" placeholder="جنيه" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                                <input type="number" class="price-coins" placeholder="المبلغ ($)" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
+                                <input type="number" class="price-egp" placeholder="السعر بالجنيه (EGP)" style="width:40%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:#fff;font-family:'Cairo';font-size:13px;outline:none;">
                                 <button onclick="removePricingRow(this)" style="background:rgba(255,82,82,0.15);border:none;color:#FF5252;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px;">✕</button>
                             </div>
                         </div>
                         <button onclick="addPricingRow()" style="background:rgba(255,122,31,0.15);border:1.5px dashed var(--border);color:var(--orange);border-radius:10px;padding:10px 16px;cursor:pointer;font-size:13px;font-family:'Cairo';width:100%;margin-top:4px;">
-                            <i class="fa-solid fa-plus"></i> إضافة خيار شحن جديد
+                            <i class="fa-solid fa-plus"></i> إضافة عرض شحن جديد بالدولار ($)
                         </button>
                     </div>
 
