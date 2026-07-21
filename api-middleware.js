@@ -1230,12 +1230,6 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
-  // ══════════════════════════════════════════════════════════════
-  //  🎮 SEAMLESS WALLET API — Game Provider Integration Endpoints
-  //  These endpoints are called by the game provider (e.g. PG Soft)
-  //  when players bet, win, or need balance verification.
-  // ══════════════════════════════════════════════════════════════
-
   } else if (req.method === 'POST' && (req.url.toLowerCase().includes('verifysession') || req.url.toLowerCase().includes('verify-session'))) {
     // Called by game provider to verify the player's session token
     let body = '';
@@ -1273,8 +1267,8 @@ export async function apiMiddleware(req, res, next) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
-            player_name: foundPlayer.id,
-            player_id: foundPlayer.id,
+            player_name: String(foundPlayer.id),
+            player_id: String(foundPlayer.id),
             currency: currency,
             nickname: foundPlayer.name || 'Player'
           },
@@ -1313,14 +1307,17 @@ export async function apiMiddleware(req, res, next) {
           }));
         }
 
+        const currentBal = parseFloat((player.balance || 0).toFixed(2));
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
-            player_name: player.id,
-            player_id: player.id,
+            player_name: String(player.id),
+            player_id: String(player.id),
             currency: db.settings?.pgConfig?.currency || 'USD',
-            balance: parseFloat(((player.balance || 0) / 100).toFixed(2))
+            balance_amount: currentBal,
+            balance: currentBal,
+            updated_time: Date.now()
           },
           error: null
         }));
@@ -1345,9 +1342,7 @@ export async function apiMiddleware(req, res, next) {
         const payload = parsePGPayload(req.url, body, req.headers.host);
 
         const { token, playerId } = extractPGIdentifiers(payload);
-        // Amount in major currency units (e.g. 1.50 USD)
         const amountRaw = parseFloat(payload.amount || payload.bet_amount || payload.win_amount || payload.transfer_amount || 0);
-        const txType = payload.type || payload.transaction_type || 'adjustment';
         const txId = payload.transaction_id || payload.txid || payload.bet_id || ('TX-' + Date.now());
         const gameName = payload.game_name || payload.game_code || 'Game';
 
@@ -1355,7 +1350,6 @@ export async function apiMiddleware(req, res, next) {
         let resultPlayerId = '';
         let resultCurrency = 'USD';
         let errorMsg = null;
-        let isDuplicate = false;
 
         await runTransaction(async (db) => {
           resultCurrency = db.settings?.pgConfig?.currency || 'USD';
@@ -1368,16 +1362,14 @@ export async function apiMiddleware(req, res, next) {
 
           if (!db.processedTxIds) db.processedTxIds = [];
           if (db.processedTxIds.includes(txId)) {
-            isDuplicate = true;
             resultBalance = player.balance || 0;
             resultPlayerId = player.id;
             return db;
           }
 
-          // Convert to internal coin units (multiply by 100)
-          const amountCoins = Math.round(amountRaw * 100);
-          const isDebit = amountCoins < 0;
-          const absAmount = Math.abs(amountCoins);
+          const amountVal = parseFloat(amountRaw.toFixed(2));
+          const isDebit = amountVal < 0;
+          const absAmount = Math.abs(amountVal);
 
           if (isDebit && (player.balance || 0) < absAmount) {
             errorMsg = 'Insufficient balance';
@@ -1385,18 +1377,17 @@ export async function apiMiddleware(req, res, next) {
             return db;
           }
 
-          player.balance = (player.balance || 0) + amountCoins;
+          player.balance = parseFloat(((player.balance || 0) + amountVal).toFixed(2));
           if (player.balance < 0) player.balance = 0;
 
           if (!player.transactions) player.transactions = [];
           player.transactions.push({
-            type: amountCoins < 0 ? `رهان — ${gameName}` : `فوز — ${gameName}`,
-            amount: amountCoins,
+            type: amountVal < 0 ? `رهان — ${gameName}` : `فوز — ${gameName}`,
+            amount: `${amountVal >= 0 ? '+' : ''}${amountVal} $`,
             txId: txId,
             date: new Date().toLocaleTimeString('ar')
           });
 
-          // Mark transaction as processed
           db.processedTxIds.push(txId);
           if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
 
@@ -1417,14 +1408,17 @@ export async function apiMiddleware(req, res, next) {
           }));
         }
 
+        const finalBal = parseFloat(resultBalance.toFixed(2));
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: {
-            player_name: resultPlayerId,
-            player_id: resultPlayerId,
+            player_name: String(resultPlayerId),
+            player_id: String(resultPlayerId),
             currency: resultCurrency,
-            balance: parseFloat((resultBalance / 100).toFixed(2))
+            balance_amount: finalBal,
+            balance: finalBal,
+            updated_time: Date.now()
           },
           error: null
         }));
@@ -1439,8 +1433,6 @@ export async function apiMiddleware(req, res, next) {
     });
 
   // ── BET PAYOUT: Combined game round result (bet deducted + win added atomically) ──
-  // This is DIFFERENT from /adjustment. PG Soft calls this at end of each game round.
-  // Payload: { token, player_id, bet_amount, win_amount, transaction_id, game_code }
   } else if (req.method === 'POST' && (req.url.toLowerCase().includes('betpayout') || req.url.toLowerCase().includes('cash/transfer'))) {
     let body = '';
     req.on('data', c => { body += c; });
@@ -1458,29 +1450,26 @@ export async function apiMiddleware(req, res, next) {
         let resultPlayerId = '';
         let resultCurrency = 'USD';
         let errorMsg       = null;
-        let isDuplicate    = false;
 
         await runTransaction(async (db) => {
           resultCurrency = db.settings?.pgConfig?.currency || 'USD';
           const player = findPGPlayer(db, token, playerId);
 
-          if (!player) { errorMsg = 'Player not found'; return db; }
+          if (!player) {
+            errorMsg = 'Player not found';
+            return db;
+          }
 
-          // Duplicate transaction guard
           if (!db.processedTxIds) db.processedTxIds = [];
           if (db.processedTxIds.includes(txId)) {
-            isDuplicate    = true;
             resultBalance  = player.balance || 0;
             resultPlayerId = player.id;
             return db;
           }
 
-          const betCoins = Math.round(betAmt * 100);
-          const winCoins = Math.round(winAmt * 100);
-          const netCoins = winCoins - betCoins; // positive = net win, negative = net loss
+          const netChange = parseFloat((winAmt - betAmt).toFixed(2));
 
-          // Check sufficient balance for bet
-          if ((player.balance || 0) < betCoins) {
+          if ((player.balance || 0) < betAmt) {
             errorMsg      = 'Insufficient balance';
             resultBalance = player.balance || 0;
             return db;
