@@ -2825,4 +2825,87 @@ tr:last-child td {
     color: #000000;
 }
 
+/* ==========================================================================
+   Desktop & Tablet Responsive Layout Extensions
+   ========================================================================== */
+
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 900px;
+        border-radius: 24px;
+        margin: 20px auto;
+        min-height: calc(100vh - 40px);
+    }
+    
+    .games-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 16px !important;
+    }
+
+    .wallet-actions-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+
+    .profile-settings-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+
+    .promo-carousel-container {
+        border-radius: 24px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .app-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        border-radius: 28px;
+        padding-bottom: 30px;
+    }
+
+    .top-app-bar {
+        padding: 20px 30px;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .top-bar-coins-widget {
+        padding: 10px 24px;
+        font-size: 16px;
+    }
+
+    .games-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 20px !important;
+    }
+
+    .empty-grid-placeholder {
+        grid-column: span 5 !important;
+    }
+
+    .bottom-nav-bar {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 25px !important;
+        border-radius: 20px !important;
+        padding: 12px 30px !important;
+    }
+
+    .nav-item {
+        flex-direction: row !important;
+        gap: 10px !important;
+        font-size: 14px !important;
+    }
+
+    .nav-item i {
+        font-size: 18px !important;
+    }
+}
+
 
