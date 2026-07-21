@@ -1943,70 +1943,81 @@ export async function apiMiddleware(req, res, next) {
       const responseHeaders = Object.fromEntries(pgResponse.headers.entries());
 
       // ─── 2. LOG POST-RESPONSE DETAILS ───
-      console.log(`\n═════════════════ [PG Soft GetLaunchURLHTML Response] ════════════════`);
-      console.log(`Timestamp:       ${new Date().toISOString()}`);
-      console.log(`Endpoint Name:   GetLaunchURLHTML`);
-      console.log(`Player ID:       ${playerId}`);
-      console.log(`Player Currency: ${playerCurrency}`);
-      console.log(`Currency Sent:   ${playerCurrency}`);
-      console.log(`Game ID:         ${cleanGameCode}`);
-      console.log(`Session Token:   ${sessionToken}`);
-      console.log(`Trace ID:        ${traceId}`);
-      console.log(`HTTP Status:     ${pgResponse.status}`);
-      console.log(`Response Time:   ${responseTimeMs}ms`);
-      console.log(`Response Headers: ${JSON.stringify(responseHeaders)}`);
-      console.log(`Response Body:   ${responseText}`);
+      let parsedJson = null;
+      let launchUrl = null;
+      let errorCode = null;
+      let errorMessage = null;
+
+      if (responseText.trim().startsWith('{')) {
+        try {
+          parsedJson = JSON.parse(responseText);
+          if (parsedJson.data && parsedJson.data.launch_url) {
+            launchUrl = parsedJson.data.launch_url;
+          }
+          if (parsedJson.error) {
+            errorCode = parsedJson.error.code || parsedJson.error;
+            errorMessage = parsedJson.error.message || parsedJson.error.msg || JSON.stringify(parsedJson.error);
+          }
+        } catch (_) {}
+      }
+
+      console.log(`\n═════════════════ [PG Soft GetLaunchURLHTML Detailed Trace] ════════════════`);
+      console.log(`Timestamp:             ${new Date().toISOString()}`);
+      console.log(`Trace ID:              ${traceId}`);
+      console.log(`Player ID:             ${playerId}`);
+      console.log(`Game Code:             ${cleanGameCode}`);
+      console.log(`API URL:               ${pgUrl}`);
+      console.log(`PG Soft HTTP Status:   ${pgResponse.status}`);
+      console.log(`Raw Response Body:     ${responseText}`);
+      console.log(`Parsed JSON Response:  ${parsedJson ? JSON.stringify(parsedJson, null, 2) : 'N/A (HTML Response)'}`);
+      console.log(`Launch URL:            ${launchUrl || 'N/A'}`);
+      console.log(`Error Code:            ${errorCode || 'N/A'}`);
+      console.log(`Error Message:         ${errorMessage || 'N/A'}`);
+      console.log(`Backend Status to App: 200 OK`);
       console.log(`═════════════════════════════════════════════════════════════════════\n`);
 
       // ─── 3. HANDLE JSON ERROR RESPONSE ───
-      if (responseText.trim().startsWith('{')) {
-        try {
-          const errData = JSON.parse(responseText);
-          console.error(`[PG Launcher API Complete JSON Error Response]:`, JSON.stringify(errData, null, 2));
+      if (parsedJson && parsedJson.error) {
+        const errCode = errorCode || 'UNKNOWN';
+        const errMsg = errorMessage || 'An error occurred';
 
-          if (errData.error) {
-            const errCode = errData.error.code || errData.error;
-            const errMsg = errData.error.message || errData.error.msg || JSON.stringify(errData.error);
-
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-            return res.end(`
-              <!DOCTYPE html>
-              <html lang="ar" dir="rtl">
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>خطأ في تشغيل اللعبة - PG Soft</title>
-                <style>
-                  body { background-color: #100906; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-                  .error-card { background: #1A110B; border: 1px solid #3D2A20; border-radius: 16px; padding: 30px; text-align: center; max-width: 450px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-                  .icon { font-size: 48px; margin-bottom: 15px; }
-                  h2 { color: #FF5252; margin: 0 0 10px 0; font-size: 20px; }
-                  .code { color: #FF7A1F; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
-                  .msg { color: #A0A5B5; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
-                  .meta { background: #24160E; padding: 10px; border-radius: 8px; color: #707585; font-size: 11px; margin-bottom: 20px; text-align: right; }
-                  .btn { background: #FF7A1F; color: #ffffff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-                  .btn:hover { background: #E06716; }
-                </style>
-              </head>
-              <body>
-                <div class="error-card">
-                  <div class="icon">⚠️</div>
-                  <h2>خطأ في تشغيل اللعبة</h2>
-                  <div class="code">كود الخطأ: ${errCode}</div>
-                  <div class="msg">${errMsg}</div>
-                  <div class="meta">
-                    <div><strong>البيئة:</strong> ${isProd ? 'Production' : 'Staging'}</div>
-                    <div><strong>كود اللعبة:</strong> ${cleanGameCode}</div>
-                    <div><strong>معرف الطلب:</strong> ${traceId}</div>
-                  </div>
-                  <button class="btn" onclick="window.location.reload()">إعادة المحاولة 🔄</button>
-                </div>
-              </body>
-              </html>
-            `);
-          }
-        } catch (_) {}
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        return res.end(`
+          <!DOCTYPE html>
+          <html lang="ar" dir="rtl">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>خطأ في تشغيل اللعبة - PG Soft</title>
+            <style>
+              body { background-color: #100906; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+              .error-card { background: #1A110B; border: 1px solid #3D2A20; border-radius: 16px; padding: 30px; text-align: center; max-width: 450px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+              .icon { font-size: 48px; margin-bottom: 15px; }
+              h2 { color: #FF5252; margin: 0 0 10px 0; font-size: 20px; }
+              .code { color: #FF7A1F; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+              .msg { color: #A0A5B5; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+              .meta { background: #24160E; padding: 10px; border-radius: 8px; color: #707585; font-size: 11px; margin-bottom: 20px; text-align: right; }
+              .btn { background: #FF7A1F; color: #ffffff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+              .btn:hover { background: #E06716; }
+            </style>
+          </head>
+          <body>
+            <div class="error-card">
+              <div class="icon">⚠️</div>
+              <h2>خطأ في تشغيل اللعبة</h2>
+              <div class="code">كود الخطأ: ${errCode}</div>
+              <div class="msg">${errMsg}</div>
+              <div class="meta">
+                <div><strong>البيئة:</strong> ${isProd ? 'Production' : 'Staging'}</div>
+                <div><strong>كود اللعبة:</strong> ${cleanGameCode}</div>
+                <div><strong>معرف الطلب:</strong> ${traceId}</div>
+              </div>
+              <button class="btn" onclick="window.location.reload()">إعادة المحاولة 🔄</button>
+            </div>
+          </body>
+          </html>
+        `);
       }
 
       // ─── 4. RETURN HTML DIRECTLY ───
