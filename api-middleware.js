@@ -90,6 +90,7 @@ function findPGPlayer(db, token, playerId) {
       email: '—',
       balance: 5000,
       bonus: 500,
+      currency: db.settings?.pgConfig?.currency || 'USD',
       status: 'active',
       sessionToken: tokenStr || '',
       joinDate: new Date().toISOString().split('T')[0],
@@ -380,6 +381,7 @@ export async function apiMiddleware(req, res, next) {
               photoUrl: playerInput.photoUrl || '',
               balance: 5000,
               bonus: 500,
+              currency: playerInput.currency || db.settings?.pgConfig?.currency || 'USD',
               status: 'active',
               joinDate: new Date().toISOString().split('T')[0],
               lastLogin: new Date().toISOString().split('T')[0],
@@ -398,6 +400,8 @@ export async function apiMiddleware(req, res, next) {
             }
             if (playerInput.email) player.email = playerInput.email;
             if (playerInput.photoUrl) player.photoUrl = playerInput.photoUrl;
+            if (playerInput.currency) player.currency = playerInput.currency;
+            if (!player.currency) player.currency = db.settings?.pgConfig?.currency || 'USD';
             player.lastLogin = new Date().toISOString().split('T')[0];
           }
           resultPlayer = player;
@@ -601,6 +605,7 @@ export async function apiMiddleware(req, res, next) {
             email: email || '—',
             balance: parseFloat(balance || 0),
             bonus: 0,
+            currency: currency || db.settings?.pgConfig?.currency || 'USD',
             status: status || 'active',
             joinDate: new Date().toISOString().split('T')[0],
             lastLogin: new Date().toISOString().split('T')[0],
@@ -1245,11 +1250,13 @@ export async function apiMiddleware(req, res, next) {
 
         // Update lastLogin atomically within the transaction lock
         await runTransaction(async (db) => {
-          currency = db.settings?.pgConfig?.currency || 'USD';
           const player = findPGPlayer(db, token, playerId);
           if (player) {
             player.lastLogin = new Date().toISOString().split('T')[0];
+            currency = player.currency || db.settings?.pgConfig?.currency || 'USD';
             foundPlayer = { id: player.id, name: player.name };
+          } else {
+            currency = db.settings?.pgConfig?.currency || 'USD';
           }
           return db;
         });
@@ -1314,7 +1321,7 @@ export async function apiMiddleware(req, res, next) {
           data: {
             player_name: String(player.id),
             player_id: String(player.id),
-            currency: db.settings?.pgConfig?.currency || 'USD',
+            currency: player.currency || db.settings?.pgConfig?.currency || 'USD',
             balance_amount: currentBal,
             balance: currentBal,
             updated_time: Date.now()
@@ -1352,13 +1359,14 @@ export async function apiMiddleware(req, res, next) {
         let errorMsg = null;
 
         await runTransaction(async (db) => {
-          resultCurrency = db.settings?.pgConfig?.currency || 'USD';
           const player = findPGPlayer(db, token, playerId);
 
           if (!player) {
+            resultCurrency = db.settings?.pgConfig?.currency || 'USD';
             errorMsg = 'Player not found';
             return db;
           }
+          resultCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
 
           if (!db.processedTxIds) db.processedTxIds = [];
           if (db.processedTxIds.includes(txId)) {
@@ -1452,13 +1460,14 @@ export async function apiMiddleware(req, res, next) {
         let errorMsg       = null;
 
         await runTransaction(async (db) => {
-          resultCurrency = db.settings?.pgConfig?.currency || 'USD';
           const player = findPGPlayer(db, token, playerId);
 
           if (!player) {
+            resultCurrency = db.settings?.pgConfig?.currency || 'USD';
             errorMsg = 'Player not found';
             return db;
           }
+          resultCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
 
           if (!db.processedTxIds) db.processedTxIds = [];
           if (db.processedTxIds.includes(txId)) {
@@ -1723,7 +1732,7 @@ export async function apiMiddleware(req, res, next) {
           player_id: p.id,
           username: p.name,
           status: p.status || 'active',
-          currency: db.settings?.pgConfig?.currency || 'USD',
+          currency: p.currency || db.settings?.pgConfig?.currency || 'USD',
           balance: ((p.balance || 0) / 100).toFixed(2)
         }));
 
@@ -1830,7 +1839,9 @@ export async function apiMiddleware(req, res, next) {
 
       const cleanGameCode = String(gameCode).replace(/^\/+|\/+$/g, '').trim();
       const path = `/${cleanGameCode}/index.html`;
-      const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=${pgConfig.currency || 'USD'}`;
+      const playerObj = (db.players || []).find(x => String(x.id) === String(playerId));
+      const playerCurrency = playerObj?.currency || pgConfig.currency || 'USD';
+      const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=${playerCurrency}`;
 
       // Build form-urlencoded request body
       const formParams = new URLSearchParams();

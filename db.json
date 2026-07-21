@@ -469,7 +469,8 @@
       "isAgent": true,
       "agentBalance": 4110000,
       "sessionToken": "e61f0138c3666cfe10609b4f5bb1eb21443b4e741331a472c1ad7b530a20771a",
-      "sessionCreatedAt": "2026-07-20T13:57:57.590Z"
+      "sessionCreatedAt": "2026-07-20T13:57:57.590Z",
+      "currency": "USD"
     },
     {
       "id": "303725",
@@ -529,7 +530,8 @@
       ],
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLQjxL4BCYlDyH7yAESLP9ylwLx9A5eL4UWZeG3ySZs8qT3UgoT=s96-c",
       "sessionToken": "1115e4757771afe9c04b89e704678fb02faae2a27191e4acfdda39a7f0ab4b63",
-      "sessionCreatedAt": "2026-07-20T07:29:22.498Z"
+      "sessionCreatedAt": "2026-07-20T07:29:22.498Z",
+      "currency": "USD"
     },
     {
       "id": "127761",
@@ -549,7 +551,8 @@
       ],
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJ8EOTXnvVNTMdAPNJC8q_Ji7bmQW9KrxLjjmY5mZFbo5qIRQ=s96-c",
       "sessionToken": "6f3312927f89dec3fb92d062ad9777b3a4a2f5470e9b1ec770f233436e83ccb0",
-      "sessionCreatedAt": "2026-07-19T13:35:35.214Z"
+      "sessionCreatedAt": "2026-07-19T13:35:35.214Z",
+      "currency": "USD"
     },
     {
       "id": "840624",
@@ -577,7 +580,8 @@
           "amount": 5000,
           "date": "9:37:29 م"
         }
-      ]
+      ],
+      "currency": "USD"
     },
     {
       "id": "694216",
@@ -618,7 +622,8 @@
       ],
       "isAdmin": true,
       "sessionToken": "36163570f172a7b7258ab17cfaff68e3a68978d9be7773e1b6af9a2b41f51ae4",
-      "sessionCreatedAt": "2026-07-20T06:51:17.210Z"
+      "sessionCreatedAt": "2026-07-20T06:51:17.210Z",
+      "currency": "USD"
     },
     {
       "id": "873939",
@@ -636,7 +641,8 @@
           "amount": 5000,
           "date": "5:40:52 م"
         }
-      ]
+      ],
+      "currency": "USD"
     },
     {
       "id": "617526",
@@ -654,7 +660,8 @@
           "amount": 5000,
           "date": "1:30:53 ص"
         }
-      ]
+      ],
+      "currency": "USD"
     },
     {
       "id": "713386",
@@ -672,7 +679,8 @@
           "amount": 5000,
           "date": "7:08:14 ص"
         }
-      ]
+      ],
+      "currency": "USD"
     }
   ],
   "receipts": [
