@@ -483,7 +483,11 @@ export async function apiMiddleware(req, res, next) {
               player.id = playerInput.id;
             }
             if (playerInput.name && !isNumericId(playerInput.name)) {
-              player.name = playerInput.name;
+              const isIncomingPlaceholder = playerInput.name.includes('زائر') || playerInput.name.includes('لاعب') || playerInput.name.includes('Guest') || playerInput.name.includes('player_');
+              const isCurrentPlaceholder = !player.name || player.name.includes('زائر') || player.name.includes('لاعب') || player.name.includes('Guest') || player.name === '—' || player.name.includes('player_');
+              if (isCurrentPlaceholder || !isIncomingPlaceholder) {
+                player.name = playerInput.name;
+              }
             }
             if (playerInput.email) player.email = playerInput.email;
             if (playerInput.photoUrl) player.photoUrl = playerInput.photoUrl;
