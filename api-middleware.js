@@ -1749,6 +1749,8 @@ export async function apiMiddleware(req, res, next) {
       return res.end('<h3>خطأ: معرف اللاعب أو كود اللعبة مفقود</h3>');
     }
 
+    const startTime = Date.now();
+
     try {
       const db = await readDb();
       if (!db.players) db.players = [];
@@ -1833,53 +1835,116 @@ export async function apiMiddleware(req, res, next) {
       formParams.append('url_type', 'game-entry');
       formParams.append('client_ip', rawIp);
 
-      console.log(`Calling PG Soft ${isProd ? 'Production' : 'Staging'} Launcher for player ${playerId}, game ${cleanGameCode}...`);
+      const requestBodyString = formParams.toString();
+      const maskedToken = operatorToken ? '*'.repeat(Math.max(0, operatorToken.length - 6)) + operatorToken.slice(-6) : 'N/A';
+
+      // ─── 1. LOG PRE-REQUEST DETAILS ───
+      console.log(`\n═════════════════ [PG Soft GetLaunchURLHTML Request] ═════════════════`);
+      console.log(`Environment:    ${isProd ? 'Production' : 'Staging'}`);
+      console.log(`Request URL:    ${pgUrl}`);
+      console.log(`HTTP Method:    POST`);
+      console.log(`Operator Token: ${maskedToken}`);
+      console.log(`Client IP:      ${rawIp}`);
+      console.log(`Game Code:      ${cleanGameCode}`);
+      console.log(`Path:           ${path}`);
+      console.log(`Extra Args:     ${extraArgs}`);
+      console.log(`Trace ID:       ${traceId}`);
+      console.log(`Request Body:   ${requestBodyString}`);
+      console.log(`═════════════════════════════════════════════════════════════════════\n`);
       
       const pgResponse = await fetch(pgUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formParams.toString(),
+        body: requestBodyString,
       });
 
+      const responseTimeMs = Date.now() - startTime;
       const responseText = await pgResponse.text();
+      const responseHeaders = Object.fromEntries(pgResponse.headers.entries());
 
-      // Check if PG Soft returned an error JSON instead of launcher HTML
+      // ─── 2. LOG POST-RESPONSE DETAILS ───
+      console.log(`\n═════════════════ [PG Soft GetLaunchURLHTML Response] ════════════════`);
+      console.log(`HTTP Status:    ${pgResponse.status}`);
+      console.log(`Response Time:  ${responseTimeMs}ms`);
+      console.log(`Response Headers:`, JSON.stringify(responseHeaders, null, 2));
+      console.log(`Response Body:  ${responseText.length > 1000 ? responseText.substring(0, 1000) + '... [TRUNCATED]' : responseText}`);
+      console.log(`═════════════════════════════════════════════════════════════════════\n`);
+
+      // ─── 3. HANDLE JSON ERROR RESPONSE ───
       if (responseText.trim().startsWith('{')) {
         try {
           const errData = JSON.parse(responseText);
+          console.error(`[PG Launcher API Complete JSON Error Response]:`, JSON.stringify(errData, null, 2));
+
           if (errData.error) {
             const errCode = errData.error.code || errData.error;
             const errMsg = errData.error.message || errData.error.msg || JSON.stringify(errData.error);
-            console.error(`[PG Launcher API Error] game_code=${cleanGameCode} env=${isProd ? 'PRODUCTION' : 'STAGING'} code=${errCode} msg=${errMsg}`);
+
             res.statusCode = 200;
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             return res.end(`
-              <div style="background:#100906;color:#fff;font-family:sans-serif;padding:30px;text-align:center;direction:rtl;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                <div style="font-size:48px;margin-bottom:15px;">⚠️</div>
-                <h2 style="color:#FF5252;margin-bottom:10px;">خطأ في تشغيل اللعبة</h2>
-                <p style="font-size:15px;color:#FF7A1F;">كود الخطأ: ${errCode}</p>
-                <p style="color:#aaa;font-size:13px;max-width:380px;margin-bottom:10px;">${errMsg}</p>
-                <p style="color:#666;font-size:11px;margin-bottom:20px;">البيئة: ${isProd ? 'Production' : 'Staging'} | كود اللعبة: ${cleanGameCode}</p>
-                <button onclick="window.location.reload()" style="background:#FF7A1F;color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">إعادة المحاولة 🔄</button>
-              </div>
+              <!DOCTYPE html>
+              <html lang="ar" dir="rtl">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>خطأ في تشغيل اللعبة - PG Soft</title>
+                <style>
+                  body { background-color: #100906; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                  .error-card { background: #1A110B; border: 1px solid #3D2A20; border-radius: 16px; padding: 30px; text-align: center; max-width: 450px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+                  .icon { font-size: 48px; margin-bottom: 15px; }
+                  h2 { color: #FF5252; margin: 0 0 10px 0; font-size: 20px; }
+                  .code { color: #FF7A1F; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+                  .msg { color: #A0A5B5; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+                  .meta { background: #24160E; padding: 10px; border-radius: 8px; color: #707585; font-size: 11px; margin-bottom: 20px; text-align: right; }
+                  .btn { background: #FF7A1F; color: #ffffff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+                  .btn:hover { background: #E06716; }
+                </style>
+              </head>
+              <body>
+                <div class="error-card">
+                  <div class="icon">⚠️</div>
+                  <h2>خطأ في تشغيل اللعبة</h2>
+                  <div class="code">كود الخطأ: ${errCode}</div>
+                  <div class="msg">${errMsg}</div>
+                  <div class="meta">
+                    <div><strong>البيئة:</strong> ${isProd ? 'Production' : 'Staging'}</div>
+                    <div><strong>كود اللعبة:</strong> ${cleanGameCode}</div>
+                    <div><strong>معرف الطلب:</strong> ${traceId}</div>
+                  </div>
+                  <button class="btn" onclick="window.location.reload()">إعادة المحاولة 🔄</button>
+                </div>
+              </body>
+              </html>
             `);
           }
         } catch (_) {}
       }
 
-      // Return the HTML directly to the webview
+      // ─── 4. RETURN HTML DIRECTLY ───
       res.statusCode = pgResponse.status;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.end(responseText);
 
     } catch (e) {
-      console.error("Error launching PG game:", e);
+      // ─── 5. WRAP ENTIRE LAUNCHER IN TRY/CATCH & LOG ───
+      console.error(`\n❌ [PG Soft GetLaunchURLHTML Fatal Exception] ❌`);
+      console.error(`Error Message:  ${e.message}`);
+      console.error(`Stack Trace:    ${e.stack}`);
+      console.error(`Request Details: Player ID=${playerId}, Game Code=${gameCode}, URL=${req.url}`);
+      console.error(`═════════════════════════════════════════════════════════════════════\n`);
+
       res.statusCode = 500;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.end(`<h3>حدث خطأ أثناء تشغيل اللعبة: ${e.message}</h3>`);
+      res.end(`
+        <div style="background:#100906;color:#fff;font-family:sans-serif;padding:30px;text-align:center;direction:rtl;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <h2 style="color:#FF5252;">حدث خطأ أثناء الاتصال بالمزود</h2>
+          <p style="color:#aaa;font-size:13px;">${e.message}</p>
+        </div>
+      `);
     }
 
   } else if (reqPath === '/api/game/create-session' && req.method === 'POST') {
