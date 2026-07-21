@@ -2294,51 +2294,67 @@ tr:last-child td {
     pointer-events: none;
 }
 
-/* ===== SPLASH SCREEN — APP ICON STYLE (مطابق للـ APK) ===== */
+/* ===== SPLASH SCREEN — EXACT FLUTTER MATCH ===== */
 .splash-screen {
-    background: linear-gradient(160deg, #0a0600 0%, #120d00 40%, #1a1100 100%);
+    background: radial-gradient(circle at 50% 45%, #291B15 0%, #1A110D 60%, #100906 100%);
 }
 
 .splash-content {
     border: none;
     background: transparent;
     box-shadow: none;
-}
-
-.splash-logo-wrap {
-    position: relative;
-    width: 110px;
-    height: 110px;
-    margin-bottom: 8px;
-}
-
-.splash-app-icon {
-    width: 110px;
-    height: 110px;
-    border-radius: 26px;
-    object-fit: cover;
-    border: 3px solid rgba(255, 122, 31, 0.5);
-    box-shadow: 0 0 40px rgba(255, 122, 31, 0.35), 0 0 80px rgba(255, 122, 31, 0.15);
-    animation: splashIconPulse 2s ease-in-out infinite;
-}
-
-.splash-icon-fallback {
-    display: none;
-    width: 110px;
-    height: 110px;
-    border-radius: 26px;
-    background: linear-gradient(135deg, #2a1a00, #3d2700);
-    border: 3px solid rgba(255, 122, 31, 0.5);
-    box-shadow: 0 0 40px rgba(255, 122, 31, 0.35);
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 44px;
-    color: var(--gold-text);
 }
 
-@keyframes splashIconPulse {
-    0%, 100% { box-shadow: 0 0 30px rgba(255, 122, 31, 0.35), 0 0 60px rgba(255, 122, 31, 0.1); }
-    50% { box-shadow: 0 0 50px rgba(255, 122, 31, 0.55), 0 0 100px rgba(255, 122, 31, 0.2); }
+.splash-fox-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin-bottom: 20px;
+    animation: splashFoxBounce 1.2s ease-in-out infinite alternate;
+}
+
+.splash-fox-img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 3px solid #FF7A1F;
+    box-shadow: 0 0 50px rgba(255, 122, 31, 0.5), 0 0 100px rgba(255, 122, 31, 0.2);
+    background: #291B15;
+}
+
+@keyframes splashFoxBounce {
+    0% { transform: translateY(0px) scale(1); }
+    100% { transform: translateY(-14px) scale(1.02); }
+}
+
+.splash-shimmer-title {
+    font-size: 38px;
+    font-weight: 900;
+    color: #FF7A1F;
+    background: linear-gradient(90deg, #FF7A1F 0%, #FFFFCC 50%, #FF7A1F 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerText 2s linear infinite;
+    letter-spacing: 2px;
+}
+
+@keyframes shimmerText {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+.splash-subtitle-tag {
+    font-size: 14px;
+    font-weight: 600;
+    color: #6B7080;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
 }
 
 /* ===== TOP APP BAR (شريط العنوان العلوي مثل التطبيق) ===== */

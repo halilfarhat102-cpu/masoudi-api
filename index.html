@@ -22,20 +22,19 @@
 </head>
 <body>
 
-    <!-- Splash Screen Start Page -->
+    <!-- Splash Screen Start Page (Matches Flutter App SplashScreen) -->
     <div class="splash-screen" id="splashScreen">
         <div class="splash-content">
-            <div class="splash-logo-wrap">
-                <img src="images/app_icon.png" alt="مسعودي" class="splash-app-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                <div class="splash-icon-fallback"><i class="fa-solid fa-gem"></i></div>
+            <div class="splash-fox-container">
+                <img src="images/fox_fab.png" alt="مسعودي" class="splash-fox-img" onerror="this.src='images/app_icon.png'">
             </div>
-            <h1 class="splash-title">مسعودي</h1>
-            <p class="splash-subtitle">منصة الألعاب الفاخرة</p>
+            <h1 class="splash-shimmer-title">مسعودي</h1>
+            <p class="splash-subtitle-tag">بوابة الألعاب الفاخرة</p>
             <div class="splash-loader" id="splashLoader">
                 <div class="loader-bar" id="loaderBar"></div>
             </div>
             <button class="btn-enter-app" id="btnEnterApp" onclick="enterApp()">
-                <i class="fa-solid fa-play"></i> ابدأ الآن
+                <i class="fa-solid fa-play"></i> ابدأ الآن 🚀
             </button>
         </div>
     </div>
