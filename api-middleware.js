@@ -63,6 +63,47 @@ function extractPGIdentifiers(payload) {
   return { token, playerId };
 }
 
+function validatePGSoftFields(payload, requiredFields, db) {
+  const pgConfig = db?.settings?.pgConfig || {};
+  const validStagingToken = 'I-6c19673883aa410b98d1c0cb1a3c5edc';
+  const validProductionToken = 'a5fd4c1a25904aae8729516557c160d0';
+  const validSecret = 'c89632307f734f6192fa420864a2c847';
+
+  // 1. Validate operator_token
+  if (requiredFields.includes('operator_token')) {
+    const opToken = payload.operator_token || payload.operatorToken || payload.ot;
+    if (!opToken || (opToken !== validStagingToken && opToken !== validProductionToken && opToken !== pgConfig.stagingOperatorToken && opToken !== pgConfig.productionOperatorToken)) {
+      return { code: '1034', message: 'InvalidRequest' };
+    }
+  }
+
+  // 2. Validate secret_key
+  if (requiredFields.includes('secret_key')) {
+    const secretKey = payload.secret_key || payload.secretKey || payload.sk;
+    if (!secretKey || (secretKey !== validSecret && secretKey !== pgConfig.stagingSecretKey && secretKey !== pgConfig.productionSecretKey)) {
+      return { code: '1034', message: 'InvalidRequest' };
+    }
+  }
+
+  // 3. Validate operator_player_session
+  if (requiredFields.includes('operator_player_session')) {
+    const sessionToken = payload.operator_player_session || payload.player_session || payload.sessionToken || payload.token || payload.ops;
+    if (!sessionToken || sessionToken.trim() === '') {
+      return { code: '1034', message: 'InvalidRequest' };
+    }
+  }
+
+  // 4. Validate player_name
+  if (requiredFields.includes('player_name')) {
+    const pName = payload.player_name || payload.player_id || payload.playerId;
+    if (!pName || pName.trim() === '') {
+      return { code: '1034', message: 'InvalidRequest' };
+    }
+  }
+
+  return null;
+}
+
 function logPGCallback(endpointName, req, reqBody, resStatus, resBody, playerId, playerCurrency, returnedCurrency, gameId, sessionToken) {
   let traceId = 'N/A';
   try {
@@ -1281,30 +1322,41 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
-  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('verifysession') || req.url.toLowerCase().includes('verify-session'))) {
+  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('verifysession') || req.url.toLowerCase().includes('verify-session') || req.url.toLowerCase().includes('verifyoperatorplayersession'))) {
     // Called by game provider to verify the player's session token
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       console.log('[PG] verify-session called, url:', req.url, 'body:', body.substring(0, 200));
       try {
+        const db = await readDb();
         const payload = parsePGPayload(req.url, body, req.headers.host);
-        const { token, playerId } = extractPGIdentifiers(payload);
 
+        // Validate operator_token, secret_key, operator_player_session
+        const valErr = validatePGSoftFields(payload, ['operator_token', 'secret_key', 'operator_player_session'], db);
+        if (valErr) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          const resObj = { data: null, error: valErr };
+          logPGCallback('VerifySession', req, body, 200, resObj, null, null, null, payload.game_code, null);
+          return res.end(JSON.stringify(resObj));
+        }
+
+        const { token, playerId } = extractPGIdentifiers(payload);
         let foundPlayer = null;
         let currency = 'USD';
 
         // Update lastLogin atomically within the transaction lock
-        await runTransaction(async (db) => {
-          const player = findPGPlayer(db, token, playerId);
+        await runTransaction(async (db2) => {
+          const player = findPGPlayer(db2, token, playerId);
           if (player) {
             player.lastLogin = new Date().toISOString().split('T')[0];
-            currency = player.currency || db.settings?.pgConfig?.currency || 'USD';
+            currency = player.currency || db2.settings?.pgConfig?.currency || 'USD';
             foundPlayer = { id: player.id, name: player.name };
           } else {
-            currency = db.settings?.pgConfig?.currency || 'USD';
+            currency = db2.settings?.pgConfig?.currency || 'USD';
           }
-          return db;
+          return db2;
         });
 
         if (!foundPlayer) {
@@ -1312,7 +1364,7 @@ export async function apiMiddleware(req, res, next) {
           res.setHeader('Content-Type', 'application/json');
           const resObj = {
             data: null,
-            error: { code: '1034', message: 'Invalid session token' }
+            error: { code: '1034', message: 'InvalidRequest' }
           };
           logPGCallback('VerifySession', req, body, 200, resObj, playerId, null, null, payload.game_code, token);
           return res.end(JSON.stringify(resObj));
@@ -1323,36 +1375,45 @@ export async function apiMiddleware(req, res, next) {
         const resObj = {
           data: {
             player_name: String(foundPlayer.id),
-            player_id: String(foundPlayer.id),
-            currency: currency,
-            nickname: foundPlayer.name || 'Player'
+            nickname: foundPlayer.name || ('لاعب ' + foundPlayer.id),
+            currency: currency
           },
           error: null
         };
         logPGCallback('VerifySession', req, body, 200, resObj, foundPlayer.id, currency, currency, payload.game_code, token);
         res.end(JSON.stringify(resObj));
       } catch (e) {
-        logPGCallbackError('VerifySession', req, body, e, playerId);
+        logPGCallbackError('VerifySession', req, body, e, null);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: null,
-          error: { code: '1200', message: e.message }
+          error: { code: '1034', message: 'InvalidRequest' }
         }));
       }
     });
 
-  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('getbalance') || req.url.toLowerCase().includes('get-balance') || req.url.toLowerCase().includes('cash/get'))) {
+  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('getbalance') || req.url.toLowerCase().includes('get-balance') || req.url.toLowerCase().includes('cash/get') || req.url.toLowerCase().includes('getplayerwallet') || req.url.toLowerCase().includes('get-player-wallet'))) {
     // Called by game provider to get current player balance
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
       console.log('[PG] get-balance called, body:', body.substring(0, 200));
       try {
-        const payload = parsePGPayload(req.url, body, req.headers.host);
-        const { token, playerId } = extractPGIdentifiers(payload);
-
         const db = await readDb();
+        const payload = parsePGPayload(req.url, body, req.headers.host);
+
+        // Validate operator_token, secret_key, player_name
+        const valErr = validatePGSoftFields(payload, ['operator_token', 'secret_key', 'player_name'], db);
+        if (valErr) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          const resObj = { data: null, error: valErr };
+          logPGCallback('GetBalance', req, body, 200, resObj, null, null, null, payload.game_code, null);
+          return res.end(JSON.stringify(resObj));
+        }
+
+        const { token, playerId } = extractPGIdentifiers(payload);
         const player = findPGPlayer(db, token, playerId);
 
         if (!player) {
@@ -1360,7 +1421,7 @@ export async function apiMiddleware(req, res, next) {
           res.setHeader('Content-Type', 'application/json');
           const resObj = {
             data: null,
-            error: { code: '1000', message: 'Player not found' }
+            error: { code: '1034', message: 'InvalidRequest' }
           };
           logPGCallback('GetBalance', req, body, 200, resObj, playerId, null, null, payload.game_code, token);
           return res.end(JSON.stringify(resObj));
@@ -1370,26 +1431,29 @@ export async function apiMiddleware(req, res, next) {
         const playerCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
+        
+        // Formatted exactly according to PG Soft GetPlayerWallet / Cash/Get documentation specification
         const resObj = {
           data: {
+            currency_code: playerCurrency,
+            balance_amount: currentBal,
+            updated_time: Date.now(),
             player_name: String(player.id),
             player_id: String(player.id),
             currency: playerCurrency,
-            balance_amount: currentBal,
-            balance: currentBal,
-            updated_time: Date.now()
+            balance: currentBal
           },
           error: null
         };
         logPGCallback('GetBalance', req, body, 200, resObj, player.id, player.currency, playerCurrency, payload.game_code, token);
         res.end(JSON.stringify(resObj));
       } catch (e) {
-        logPGCallbackError('GetBalance', req, body, e, playerId);
+        logPGCallbackError('GetBalance', req, body, e, null);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
           data: null,
-          error: { code: '1200', message: e.message }
+          error: { code: '1034', message: 'InvalidRequest' }
         }));
       }
     });
