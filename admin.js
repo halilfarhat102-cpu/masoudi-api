@@ -219,8 +219,8 @@ async function loadData() {
         const res = await fetch(API_BASE + '/api/data');
         if (!res.ok) throw new Error('Server error');
         const data = await res.json();
-        providers    = Array.isArray(data.providers) ? data.providers : [];
-        dynamicGames = Array.isArray(data.games) ? data.games : [];
+        providers    = (Array.isArray(data.providers) && data.providers.length > 0) ? data.providers : (JSON.parse(localStorage.getItem('masoudi_providers')) || defaultProviders());
+        dynamicGames = (Array.isArray(data.games) && data.games.length > 0) ? data.games : (JSON.parse(localStorage.getItem('masoudi_games')) || defaultGames());
         players      = Array.isArray(data.players) ? data.players : [];
         settings     = data.settings  || settings;
         banners      = Array.isArray(data.banners) ? data.banners : [];
@@ -253,23 +253,38 @@ async function loadData() {
 
 // ─── Data: Save ──────────────────────────────
 async function saveData() {
-    const payload = { settings, banners, agents, providers, games: dynamicGames, players, receipts, admins };
+    const payload = { settings, banners, agents, providers, games: dynamicGames, receipts };
+    // Save to localStorage as instant fallback
     localStorage.setItem('masoudi_providers', JSON.stringify(providers));
     localStorage.setItem('masoudi_games',     JSON.stringify(dynamicGames));
-    localStorage.setItem('masoudi_players',   JSON.stringify(players));
     localStorage.setItem('masoudi_agents',    JSON.stringify(agents));
     localStorage.setItem('masoudi_banners',   JSON.stringify(banners));
     localStorage.setItem('masoudi_settings',  JSON.stringify(settings));
     localStorage.setItem('masoudi_receipts',  JSON.stringify(receipts));
-    localStorage.setItem('masoudi_admins',    JSON.stringify(admins));
     try {
-        await fetch(API_BASE + '/api/data', {
+        // Try the dedicated safe config endpoint first
+        let res = await fetch(API_BASE + '/api/admin/save-config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
+        // If save-config endpoint is not deployed yet on server (404), fallback to /api/data
+        if (res.status === 404) {
+            res = await fetch(API_BASE + '/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        }
+        const result = await res.json();
+        if (!res.ok || !result.success) {
+            const errMsg = result.error || `HTTP ${res.status}`;
+            console.error('[saveData] Server error:', errMsg);
+            showToast('⚠️ فشل حفظ البيانات على الخادم: ' + errMsg, 'error');
+        }
     } catch (e) {
-        console.error('Failed to sync to server:', e);
+        console.error('[saveData] Network error:', e);
+        showToast('⚠️ خطأ في الاتصال بالخادم، تم الحفظ محلياً فقط', 'error');
     }
 }
 
@@ -647,9 +662,9 @@ function toggleCard(id) {
 
 // ─── Wallet Modal ────────────────────────────
 function openWalletModal(id) {
-    const p = players.find(x => x.id === id);
+    const p = players.find(x => String(x.id) === String(id));
     if (!p) return;
-    currentWalletPlayerId = id;
+    currentWalletPlayerId = p.id;
     document.getElementById('modalPlayerName').textContent = p.name;
     document.getElementById('modalPlayerId').textContent   = p.id;
     document.getElementById('modalBalance').textContent    = `${formatNum(p.balance || 0)} كوين`;
@@ -758,9 +773,9 @@ function resetBalance(id) {
 
 // ─── Delete Player ───────────────────────────
 function openDeleteModal(id) {
-    const p = players.find(x => x.id === id);
+    const p = players.find(x => String(x.id) === String(id));
     if (!p) return;
-    currentDeletePlayerId = id;
+    currentDeletePlayerId = p.id;
     document.getElementById('deletePlayerName').textContent = p.name;
     document.getElementById('deleteModal').classList.add('open');
 }
@@ -1397,7 +1412,7 @@ async function activateP2pAgent() {
     const playerId = playerIdInput?.value?.trim();
     if (!playerId) return showToast('يرجى إدخال معرف اللاعب', 'error');
 
-    const player = players.find(p => p.id === playerId);
+    const player = players.find(p => String(p.id) === String(playerId));
     if (!player) return showToast('معرف اللاعب غير موجود في النظام', 'error');
 
     try {
@@ -1422,7 +1437,7 @@ async function activateP2pAgent() {
 }
 
 async function deactivateP2pAgent(playerId) {
-    const player = players.find(p => p.id === playerId);
+    const player = players.find(p => String(p.id) === String(playerId));
     if (!player) return;
 
     try {
@@ -1449,7 +1464,7 @@ async function sendCoinsToP2pAgent(playerId, inputId) {
     const amount = parseFloat(inputEl?.value);
     if (isNaN(amount) || amount <= 0) return showToast('يرجى إدخال كمية صحيحة', 'error');
 
-    const player = players.find(p => p.id === playerId);
+    const player = players.find(p => String(p.id) === String(playerId));
     if (!player) return;
 
     try {

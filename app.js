@@ -545,7 +545,12 @@ function renderBanners(bannersList) {
 // Fetch dynamic games & banners from the API server (sync with DB & Flutter App!)
 async function fetchServerData() {
     try {
-        const response = await fetch('/api/data');
+        const response = await fetch('/api/data?t=' + Date.now(), {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        });
         if (response.ok) {
             const data = await response.json();
             

@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 
 const dbPath = resolve(__dirname, 'db.json');
 let lastSyncTime = 0;
-const SYNC_TTL_MS = 5 * 1000; // Re-sync from Supabase every 5 seconds (practically instant updates)
+const SYNC_TTL_MS = 30 * 1000; // Re-sync from Supabase every 30 seconds (fast propagation of admin changes)
 
 // Helper to get default database
 function getDefaultDb() {
