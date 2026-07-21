@@ -1818,8 +1818,13 @@ export async function apiMiddleware(req, res, next) {
       const traceId = 'guid-' + crypto.randomUUID();
       const pgUrl = `${baseUrl}/external-game-launcher/api/v1/GetLaunchURLHTML?trace_id=${traceId}`;
 
-      let rawIp = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '196.153.185.113').split(',')[0].trim();
-      if (rawIp.includes(':') || rawIp === '127.0.0.1' || rawIp === 'localhost') {
+      // Extract client IPv4 address from headers (Render reverse proxy passes player IP in x-forwarded-for or x-real-ip)
+      let rawIp = (req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.socket.remoteAddress || '').split(',')[0].trim();
+      if (rawIp.startsWith('::ffff:')) {
+        rawIp = rawIp.replace('::ffff:', '');
+      }
+      // If IP is IPv6, loopback, or invalid IPv4, fallback to valid public IPv4 for local dev to satisfy PG Soft validation
+      if (!rawIp || rawIp.includes(':') || rawIp === '127.0.0.1' || rawIp === 'localhost') {
         rawIp = '196.153.185.113';
       }
 
