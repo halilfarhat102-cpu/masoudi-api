@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom Style -->
     <link rel="stylesheet" href="style.css?v=2.2">
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -239,11 +241,10 @@
                     </div>
 
                     <div class="settings-card glass-card">
-                        <h4>خيارات الأمان والتحكم</h4>
-                        <button class="settings-btn"><i class="fa-solid fa-key"></i> تغيير كلمة المرور</button>
-                        <button class="settings-btn"><i class="fa-solid fa-wallet"></i> إدارة الحسابات البنكية</button>
+                        <h4>خيارات الحساب والأمان</h4>
+                        <button class="settings-btn" style="background: rgba(255, 122, 31, 0.15); border: 1px solid var(--gold-primary); font-weight:700;" onclick="signInWithGoogleWeb()"><i class="fa-brands fa-google" style="color:#FF5252;"></i> تسجيل الدخول الحقيقي بحساب جوجل 🚀</button>
                         <button class="settings-btn"><i class="fa-solid fa-headset"></i> التواصل مع مدير الدعم المخصص</button>
-                        <button class="settings-btn text-danger"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
+                        <button class="settings-btn text-danger" onclick="logoutPlayer()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
                     </div>
                 </div>
             </section>

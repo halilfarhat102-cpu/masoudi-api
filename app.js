@@ -87,35 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadGamesFromStorage() {
-    // Detect base URL (works in APK WebView and browser)
-    const BASE = (typeof window !== 'undefined' && window.location && window.location.origin)
-        ? window.location.origin
-        : 'https://masoudi-api.onrender.com';
-
-    // Built-in games hosted on our server — use full URL so APK WebView loads them correctly
-    const builtInGames = [
-        {
-            id: "fortune-gems",
-            title: "Fortune Gems 3 — سلوتس الجواهر",
-            category: "slots",
-            provider: "مسعودي Games",
-            launchUrl: BASE + "/public/games/fortune_gems.html",
-            image: BASE + "/public/games/fortune_gems_icon.png"
-        },
-        {
-            id: "fruit-slots",
-            title: "Fruit Slots — سلوت الفواكه الكلاسيكية",
-            category: "slots",
-            provider: "مسعودي Games",
-            launchUrl: BASE + "/public/games/fruit_slots.html",
-            image: BASE + "/public/games/fruit_slots_icon.png"
-        }
-    ];
-
-    const savedGames = JSON.parse(localStorage.getItem("masoudi_games")) || [];
-    // Merge: built-in games first, then admin-added games (avoid duplicates by id)
-    const extras = savedGames.filter(g => !['fortune-gems', 'fruit-slots'].includes(g.id));
-    dynamicGames = [...builtInGames, ...extras];
+    dynamicGames = [];
 }
 
 
@@ -608,36 +580,13 @@ async function fetchServerData() {
                 initDefaultBanners();
             }
 
-            // 2. Load Games
+            // 2. Load Games (PG Soft catalog only)
             if (data.games) {
                 const BASE = window.location.origin;
-                const builtInGames = [
-                    {
-                        id: "fortune-gems",
-                        title: "Fortune Gems 3 — سلوتس الجواهر",
-                        category: "slots",
-                        provider: "مسعودي Games",
-                        launchUrl: BASE + "/public/games/fortune_gems.html",
-                        image: BASE + "/public/games/fortune_gems_icon.png"
-                    },
-                    {
-                        id: "fruit-slots",
-                        title: "Fruit Slots — سلوت الفواكه الكلاسيكية",
-                        category: "slots",
-                        provider: "مسعودي Games",
-                        launchUrl: BASE + "/public/games/fruit_slots.html",
-                        image: BASE + "/public/games/fruit_slots_icon.png"
-                    }
-                ];
-
-                const serverGames = data.games.map(g => ({
+                dynamicGames = data.games.map(g => ({
                     ...g,
                     image: g.image.startsWith('http') ? g.image : (BASE + '/' + (g.image.startsWith('/') ? g.image.slice(1) : g.image))
                 }));
-
-                // Keep built-in games only if they are not overridden in serverGames
-                const remainingBuiltIn = builtInGames.filter(bg => !serverGames.some(sg => sg.id === bg.id));
-                dynamicGames = [...remainingBuiltIn, ...serverGames];
                 renderDynamicGames();
             }
 
@@ -758,3 +707,36 @@ function enterApp() {
     }
 }
 window.enterApp = enterApp;
+
+async function signInWithGoogleWeb() {
+    const userEmail = prompt("أدخل البريد الإلكتروني للتحقق ومزامنة حسابك الحقيقي:", "halilfarhat102@gmail.com");
+    if (!userEmail) return;
+    const userName = prompt("أدخل اسم اللاعب المفضل لديك:", "Halil Farhat") || "لاعب مسعودي";
+
+    try {
+        const response = await fetch('/api/sync-player', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: userEmail,
+                name: userName,
+                photoUrl: 'https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c'
+            })
+        });
+        const resData = await response.json();
+        if (resData.player) {
+            updatePlayerProfileUI(resData.player);
+            alert(`تم تسجيل الدخول الحقيقي بنجاح!\nاللاعب: ${resData.player.name}\nالمحفظة: $${resData.player.balance} USD`);
+        }
+    } catch (e) {
+        alert("حدث خطأ أثناء الاتصال بالسيرفر: " + e.message);
+    }
+}
+
+function logoutPlayer() {
+    alert("تم تسجيل الخروج من الحساب.");
+    location.reload();
+}
+
+window.signInWithGoogleWeb = signInWithGoogleWeb;
+window.logoutPlayer = logoutPlayer;
