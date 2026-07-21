@@ -1895,9 +1895,7 @@ export async function apiMiddleware(req, res, next) {
         ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com') 
         : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me/external/');
 
-      if (baseUrl.endsWith('/')) {
-        baseUrl = baseUrl.slice(0, -1);
-      }
+      baseUrl = (baseUrl || '').trim().replace(/\/+$/, '');
       if (baseUrl.endsWith('/external')) {
         baseUrl = baseUrl.slice(0, -9);
       }
