@@ -3,7 +3,6 @@ import { readDb, writeDb, runTransaction } from './db-adapter.js';
 import crypto from 'crypto';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { supabase } from './supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -334,36 +333,17 @@ export async function apiMiddleware(req, res, next) {
         const ext = fileName.split('.').pop() || 'png';
         const safeName = `uploaded_${Date.now()}.${ext}`;
 
-        // 1. Upload to Supabase Storage images bucket
-        console.log(`Uploading ${safeName} to Supabase Storage...`);
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('images')
-          .upload(safeName, fileBuffer, {
-            contentType: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
-            upsert: true
-          });
+        // Save locally to images directory
+        const imagesDir = resolve(__dirname, 'images');
+        if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir, { recursive: true });
+        const savePath = resolve(imagesDir, safeName);
+        fs.writeFileSync(savePath, fileBuffer);
 
-        if (uploadError) {
-          throw new Error(`Supabase Storage upload failed: ${uploadError.message}`);
-        }
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers.host || 'masoudi-api.onrender.com';
+        const uploadUrl = `${protocol}://${host}/images/${safeName}`;
 
-        // Get the permanent public URL
-        const { data: urlData } = supabase.storage
-          .from('images')
-          .getPublicUrl(safeName);
-
-        const uploadUrl = urlData.publicUrl;
-        console.log("Successfully uploaded image to Supabase Storage. URL:", uploadUrl);
-
-        // 2. Save locally as fallback/cache (so local folder is also populated)
-        try {
-          const imagesDir = resolve(__dirname, 'images');
-          if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
-          const savePath = resolve(imagesDir, safeName);
-          fs.writeFileSync(savePath, fileBuffer);
-        } catch (localWriteError) {
-          console.warn("Could not save copy of uploaded image locally:", localWriteError.message);
-        }
+        console.log("Successfully saved uploaded image locally. URL:", uploadUrl);
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ success: true, url: uploadUrl }));
