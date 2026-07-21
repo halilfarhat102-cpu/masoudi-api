@@ -203,65 +203,153 @@
                 </div>
             </section>
 
-            <!-- VIEW 5: PROFILE -->
+            <!-- VIEW 5: PROFILE (Re-designed State-of-the-Art Luxury Profile Dashboard) -->
             <section id="view-profile" class="app-view">
+                
+                <!-- Main Profile Hero Card -->
                 <div class="profile-hero-card glass-card">
-                    <div class="profile-main-info">
+                    <div class="profile-hero-header">
                         <div class="avatar-large-container">
                             <img src="images/player_avatar.png" alt="Avatar" class="avatar-large" id="profileAvatarImg">
-                            <div class="level-indicator-large">VIP</div>
+                            <span class="online-pulse-dot" title="متصل الآن بالنظام الحقيقي"></span>
+                            <div class="level-indicator-large">VIP 1</div>
                         </div>
-                        <h3 class="profile-name" id="profileName">Halil Farhat</h3>
-                        <span class="vip-status-large"><i class="fa-solid fa-gem text-gold"></i> عضو متميز (VIP Status)</span>
+
+                        <div class="profile-identity">
+                            <h3 class="profile-name" id="profileName">Halil Farhat</h3>
+                            <div class="vip-status-large">
+                                <i class="fa-solid fa-gem text-gold"></i>
+                                <span>عضو ملكي متميز (VIP Player)</span>
+                            </div>
+                            
+                            <!-- Copyable Player ID Badge -->
+                            <div class="player-id-copy-badge" onclick="copyPlayerIdToClipboard()" title="اضغط لنسخ معرف اللاعب">
+                                <i class="fa-solid fa-id-card"></i>
+                                <span>معرف اللاعب: <strong id="profilePlayerId">519997</strong></span>
+                                <i class="fa-solid fa-copy copy-icon"></i>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- VIP Level Progress Indicator -->
                     <div class="vip-level-progress">
                         <div class="progress-labels">
-                            <span>التقدم للمستوى الذهبي التالي</span>
-                            <span>85%</span>
+                            <span>التقدم للمستوى الماسي التالي</span>
+                            <span class="progress-pct">85%</span>
                         </div>
                         <div class="progress-bar-container">
                             <div class="progress-bar-fill" style="width: 85%"></div>
                         </div>
                         <div class="progress-details-text" id="vipProgressText">
-                            تبقى لك إيداع بقيمة $1,000 USD أو لعب بمبلغ $5,000 USD للترقية التلقائية.
+                            تبقى لك إيداع بقيمة <strong>$1,000 USD</strong> أو لعب بمبلغ <strong>$5,000 USD</strong> للترقية التلقائية.
+                        </div>
+                    </div>
+
+                    <!-- Live Perks Badges -->
+                    <div class="profile-perks-row">
+                        <div class="perk-chip"><i class="fa-solid fa-bolt text-gold"></i> سحب سري الفوري</div>
+                        <div class="perk-chip"><i class="fa-solid fa-headset text-emerald"></i> مدير دعم VIP</div>
+                        <div class="perk-chip"><i class="fa-solid fa-rotate-left text-gold"></i> استرداد 15% كاش</div>
+                    </div>
+                </div>
+
+                <!-- Financial Live Stats Grid -->
+                <div class="profile-stats-grid">
+                    <div class="stat-mini-card glass-card">
+                        <div class="stat-icon-wrap gold-glow-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-title">إجمالي المحفظة</span>
+                            <h4 class="stat-value text-gold" id="profileBalance">$1,671,424.00</h4>
+                        </div>
+                    </div>
+
+                    <div class="stat-mini-card glass-card">
+                        <div class="stat-icon-wrap emerald-glow-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-title">إجمالي الأرباح</span>
+                            <h4 class="stat-value text-emerald">$428,500.00</h4>
+                        </div>
+                    </div>
+
+                    <div class="stat-mini-card glass-card">
+                        <div class="stat-icon-wrap purple-glow-icon"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-title">العمليات الناجحة</span>
+                            <h4 class="stat-value">142 عملية</h4>
+                        </div>
+                    </div>
+
+                    <div class="stat-mini-card glass-card">
+                        <div class="stat-icon-wrap blue-glow-icon"><i class="fa-solid fa-trophy"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-title">أعلى فوز جاكبوت</span>
+                            <h4 class="stat-value text-gold">$85,000.00</h4>
                         </div>
                     </div>
                 </div>
 
+                <!-- Profile Detailed Settings & Options -->
                 <div class="profile-settings-grid">
+                    <!-- Column 1: Account Information -->
                     <div class="settings-card glass-card">
-                        <h4>تفاصيل الحساب الشخصي (معرّف وحالة الحساب)</h4>
-                        <div class="detail-row">
-                            <span class="det-label"><i class="fa-solid fa-id-card"></i> معرّف اللاعب (ID)</span>
-                            <span class="det-val" id="profilePlayerId">519997</span>
+                        <div class="card-header-row">
+                            <h4><i class="fa-solid fa-user-shield text-gold"></i> تفاصيل الحساب الحقيقي والتوثيق</h4>
                         </div>
                         <div class="detail-row">
                             <span class="det-label"><i class="fa-regular fa-envelope"></i> البريد الإلكتروني</span>
                             <span class="det-val" id="profileEmail">halilfarhat102@gmail.com</span>
                         </div>
                         <div class="detail-row">
-                            <span class="det-label"><i class="fa-solid fa-wallet"></i> إجمالي الرصيد الحالي</span>
-                            <span class="det-val text-emerald" id="profileBalance">$1,671,424.00</span>
+                            <span class="det-label"><i class="fa-solid fa-dollar-sign"></i> عملة المحفظة الحالية</span>
+                            <span class="det-val text-emerald" id="profileCurrency">USD ($) - دولار أمريكي</span>
                         </div>
                         <div class="detail-row">
-                            <span class="det-label"><i class="fa-solid fa-dollar-sign"></i> عملة المحفظة</span>
-                            <span class="det-val text-emerald" id="profileCurrency">USD ($)</span>
+                            <span class="det-label"><i class="fa-regular fa-calendar"></i> تاريخ التسجيل بالنظام</span>
+                            <span class="det-val">12 مايو 2026</span>
                         </div>
                         <div class="detail-row">
-                            <span class="det-label"><i class="fa-solid fa-shield-halved"></i> توثيق الحساب</span>
-                            <span class="det-val text-emerald"><i class="fa-solid fa-circle-check"></i> موثق بالنظام الحقيقي</span>
+                            <span class="det-label"><i class="fa-solid fa-server"></i> المشغل وسيرفر الألعاب</span>
+                            <span class="det-val text-gold">MASOUDIGAMES / PG Soft</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="det-label"><i class="fa-solid fa-shield-halved"></i> توثيق الهية والنظام</span>
+                            <span class="det-val text-emerald"><i class="fa-solid fa-circle-check"></i> موثق وحقيقي 100%</span>
                         </div>
                     </div>
 
+                    <!-- Column 2: Account Actions -->
                     <div class="settings-card glass-card">
-                        <h4>خيارات الحساب والأمان</h4>
-                        <button class="settings-btn" style="background: rgba(255, 122, 31, 0.15); border: 1px solid var(--gold-primary); font-weight:700;" onclick="signInWithGoogleWeb()"><i class="fa-brands fa-google" style="color:#FF5252;"></i> تسجيل الدخول بحساب جوجل 🚀</button>
-                        <button class="settings-btn" onclick="openAgentTransferModal()"><i class="fa-solid fa-paper-plane"></i> تحويل رصيد دولار للاعب آخر</button>
-                        <button class="settings-btn"><i class="fa-solid fa-headset"></i> التواصل مع مدير الدعم المخصص</button>
-                        <button class="settings-btn text-danger" onclick="logoutPlayer()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
+                        <div class="card-header-row">
+                            <h4><i class="fa-solid fa-sliders text-gold"></i> التحكم المباشر وخيارات الأمان</h4>
+                        </div>
+                        
+                        <button class="settings-btn btn-google-sync" onclick="signInWithGoogleWeb()">
+                            <i class="fa-brands fa-google" style="color:#FF5252; font-size:18px;"></i>
+                            <span>تسجيل الدخول ومزامنة حساب جوجل 🚀</span>
+                        </button>
+
+                        <button class="settings-btn" onclick="openAgentTransferModal()">
+                            <i class="fa-solid fa-paper-plane text-gold"></i>
+                            <span>تحويل رصيد دولار للاعب آخر (P2P Transfer)</span>
+                        </button>
+
+                        <button class="settings-btn" onclick="switchTab('wallet')">
+                            <i class="fa-solid fa-wallet text-emerald"></i>
+                            <span>إدارة الإيداع والسحب بالمحفظة</span>
+                        </button>
+
+                        <button class="settings-btn" onclick="alert('جاري توصيلك بمدير الدعم المخصص عبر وتساب الدعم الفني VIP...')">
+                            <i class="fa-solid fa-headset text-gold"></i>
+                            <span>التواصل مع مدير الدعم المخصص VIP</span>
+                        </button>
+
+                        <button class="settings-btn text-danger" onclick="logoutPlayer()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>تسجيل الخروج من الحساب</span>
+                        </button>
                     </div>
                 </div>
+
             </section>
 
         </main>

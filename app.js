@@ -746,5 +746,20 @@ function logoutPlayer() {
     location.reload();
 }
 
+function copyPlayerIdToClipboard() {
+    const pIdEl = document.getElementById("profilePlayerId");
+    const pId = pIdEl ? pIdEl.innerText.trim() : '519997';
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(pId).then(() => {
+            showToast("تم نسخ معرف اللاعب بنجاح: " + pId);
+        }).catch(() => {
+            alert("معرف اللاعب الخاص بك هو: " + pId);
+        });
+    } else {
+        alert("معرف اللاعب الخاص بك هو: " + pId);
+    }
+}
+
 window.signInWithGoogleWeb = signInWithGoogleWeb;
 window.logoutPlayer = logoutPlayer;
+window.copyPlayerIdToClipboard = copyPlayerIdToClipboard;
