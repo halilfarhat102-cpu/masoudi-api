@@ -1458,202 +1458,120 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
-  } else if (req.method === 'POST' && req.url.toLowerCase().includes('adjustment')) {
-    // Called by game provider to deduct (bet) or add (win) balance
+  // ── CASH / TRANSFER (Bet & Win Callback from PG Soft Seamless Wallet API) ──
+  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('cash/transfer') || req.url.toLowerCase().includes('betpayout') || req.url.toLowerCase().includes('adjustment'))) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
-      console.log('[PG] adjustment called, url:', req.url, 'body:', body.substring(0, 300));
+      console.log('[PG] Cash/Transfer called, url:', req.url, 'body:', body.substring(0, 300));
+      let reqPlayerId = null;
+      let reqToken = null;
       try {
+        const db = await readDb();
         const payload = parsePGPayload(req.url, body, req.headers.host);
 
+        // Validate operator_token, secret_key
+        const valErr = validatePGSoftFields(payload, ['operator_token', 'secret_key'], db);
+        if (valErr) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          const resObj = { data: null, error: valErr };
+          logPGCallback('CashTransfer', req, body, 200, resObj, null, null, null, payload.game_id || payload.game_code, null);
+          return res.end(JSON.stringify(resObj));
+        }
+
         const { token, playerId } = extractPGIdentifiers(payload);
-        const amountRaw = parseFloat(payload.amount || payload.bet_amount || payload.win_amount || payload.transfer_amount || 0);
-        const txId = payload.transaction_id || payload.txid || payload.bet_id || ('TX-' + Date.now());
-        const gameName = payload.game_name || payload.game_code || 'Game';
+        reqPlayerId = playerId;
+        reqToken = token;
+
+        const transferAmt = parseFloat(payload.transfer_amount || payload.amount || payload.win_amount || payload.bet_amount || 0);
+        const txId = String(payload.transaction_id || payload.txid || payload.bet_id || ('TX-' + Date.now()));
+        const gameId = payload.game_id || payload.game_code || 'Game';
 
         let resultBalance = 0;
         let resultPlayerId = '';
         let resultCurrency = 'USD';
         let errorMsg = null;
 
-        await runTransaction(async (db) => {
-          const player = findPGPlayer(db, token, playerId);
+        await runTransaction(async (db2) => {
+          const player = findPGPlayer(db2, token, playerId);
 
           if (!player) {
-            resultCurrency = db.settings?.pgConfig?.currency || 'USD';
+            resultCurrency = db2.settings?.pgConfig?.currency || 'USD';
             errorMsg = 'Player not found';
-            return db;
+            return db2;
           }
-          resultCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
+          resultCurrency = player.currency || db2.settings?.pgConfig?.currency || 'USD';
+          resultPlayerId = player.id;
 
-          if (!db.processedTxIds) db.processedTxIds = [];
-          if (db.processedTxIds.includes(txId)) {
+          if (!db2.processedTxIds) db2.processedTxIds = [];
+          if (db2.processedTxIds.includes(txId)) {
             resultBalance = player.balance || 0;
-            resultPlayerId = player.id;
-            return db;
+            return db2;
           }
 
-          const amountVal = parseFloat(amountRaw.toFixed(2));
-          const isDebit = amountVal < 0;
-          const absAmount = Math.abs(amountVal);
+          const changeVal = parseFloat(transferAmt.toFixed(2));
+          const isDebit = changeVal < 0;
+          const absVal = Math.abs(changeVal);
 
-          if (isDebit && (player.balance || 0) < absAmount) {
+          if (isDebit && (player.balance || 0) < absVal) {
             errorMsg = 'Insufficient balance';
             resultBalance = player.balance || 0;
-            return db;
+            return db2;
           }
 
-          player.balance = parseFloat(((player.balance || 0) + amountVal).toFixed(2));
+          // Apply balance change atomically in Dollars
+          player.balance = parseFloat(((player.balance || 0) + changeVal).toFixed(2));
           if (player.balance < 0) player.balance = 0;
 
           if (!player.transactions) player.transactions = [];
           player.transactions.push({
-            type: amountVal < 0 ? `رهان — ${gameName}` : `فوز — ${gameName}`,
-            amount: `${amountVal >= 0 ? '+' : ''}${amountVal} $`,
+            type: changeVal >= 0 ? `فوز 🎉 — لعبة ${gameId}` : `رهان 🎰 — لعبة ${gameId}`,
+            amount: `${changeVal >= 0 ? '+' : ''}${changeVal} $`,
             txId: txId,
             date: new Date().toLocaleTimeString('ar')
           });
 
-          db.processedTxIds.push(txId);
-          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
+          db2.processedTxIds.push(txId);
+          if (db2.processedTxIds.length > 10000) db2.processedTxIds = db2.processedTxIds.slice(-5000);
 
           resultBalance = player.balance;
-          resultPlayerId = player.id;
-          return db;
+          return db2;
         });
 
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+
         if (errorMsg) {
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
           const resObj = {
             data: null,
             error: {
-              code: errorMsg === 'Insufficient balance' ? '3200' : '1000',
+              code: errorMsg === 'Insufficient balance' ? '3200' : '1034',
               message: errorMsg
             }
           };
-          logPGCallback('Adjustment', req, body, 200, resObj, playerId || resultPlayerId, null, resultCurrency, payload.game_code, token);
+          logPGCallback('CashTransfer', req, body, 200, resObj, reqPlayerId || resultPlayerId, null, resultCurrency, gameId, reqToken);
           return res.end(JSON.stringify(resObj));
         }
 
         const finalBal = parseFloat(resultBalance.toFixed(2));
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
         const resObj = {
           data: {
+            currency_code: resultCurrency,
+            balance_amount: finalBal,
+            updated_time: Date.now(),
+            transaction_id: txId,
             player_name: String(resultPlayerId),
             player_id: String(resultPlayerId),
             currency: resultCurrency,
-            balance_amount: finalBal,
-            balance: finalBal,
-            updated_time: Date.now()
+            balance: finalBal
           },
           error: null
         };
-        logPGCallback('Adjustment', req, body, 200, resObj, resultPlayerId, resultCurrency, resultCurrency, payload.game_code, token);
+        logPGCallback('CashTransfer', req, body, 200, resObj, resultPlayerId, resultCurrency, resultCurrency, gameId, reqToken);
         res.end(JSON.stringify(resObj));
       } catch (e) {
-        logPGCallbackError('Adjustment', req, body, e, playerId);
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({
-          data: null,
-          error: { code: '1200', message: e.message }
-        }));
-      }
-    });
-
-  // ── BET PAYOUT: Combined game round result (bet deducted + win added atomically) ──
-  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('betpayout') || req.url.toLowerCase().includes('cash/transfer'))) {
-    let body = '';
-    req.on('data', c => { body += c; });
-    req.on('end', async () => {
-      console.log('[PG] betpayout called, body:', body.substring(0, 300));
-      try {
-        const payload = parsePGPayload(req.url, body, req.headers.host);
-        const { token, playerId } = extractPGIdentifiers(payload);
-        const betAmt   = parseFloat(payload.bet_amount  || payload.bet  || 0);
-        const winAmt   = parseFloat(payload.win_amount  || payload.win  || 0);
-        const txId     = payload.transaction_id || payload.txid || ('BP-' + Date.now());
-        const gameName = payload.game_name || payload.game_code || 'Game';
-
-        let resultBalance  = 0;
-        let resultPlayerId = '';
-        let resultCurrency = 'USD';
-        let errorMsg       = null;
-
-        await runTransaction(async (db) => {
-          const player = findPGPlayer(db, token, playerId);
-
-          if (!player) {
-            resultCurrency = db.settings?.pgConfig?.currency || 'USD';
-            errorMsg = 'Player not found';
-            return db;
-          }
-          resultCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
-
-          if (!db.processedTxIds) db.processedTxIds = [];
-          if (db.processedTxIds.includes(txId)) {
-            resultBalance  = player.balance || 0;
-            resultPlayerId = player.id;
-            return db;
-          }
-
-          const netChange = parseFloat((winAmt - betAmt).toFixed(2));
-
-          if ((player.balance || 0) < betAmt) {
-            errorMsg      = 'Insufficient balance';
-            resultBalance = player.balance || 0;
-            return db;
-          }
-
-          // Apply net change atomically
-          player.balance = (player.balance || 0) + netCoins;
-          if (player.balance < 0) player.balance = 0;
-
-          if (!player.transactions) player.transactions = [];
-          player.transactions.push({
-            type:   netCoins >= 0 ? `فوز 🎉 — ${gameName}` : `رهان — ${gameName}`,
-            amount: netCoins,
-            txId:   txId,
-            date:   new Date().toLocaleTimeString('ar')
-          });
-
-          db.processedTxIds.push(txId);
-          if (db.processedTxIds.length > 10000) db.processedTxIds = db.processedTxIds.slice(-5000);
-
-          resultBalance  = player.balance;
-          resultPlayerId = player.id;
-          return db;
-        });
-
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        if (errorMsg) {
-          const resObj = {
-            data: null,
-            error: {
-              code: errorMsg === 'Insufficient balance' ? '3200' : '1000',
-              message: errorMsg
-            }
-          };
-          logPGCallback('BetPayout', req, body, 200, resObj, playerId || resultPlayerId, null, resultCurrency, payload.game_code, token);
-          return res.end(JSON.stringify(resObj));
-        }
-        const resObj = {
-          data: {
-            player_name:    resultPlayerId,
-            player_id:      resultPlayerId,
-            currency:       resultCurrency,
-            balance:        parseFloat((resultBalance / 100).toFixed(2))
-          },
-          error: null
-        };
-        logPGCallback('BetPayout', req, body, 200, resObj, resultPlayerId, resultCurrency, resultCurrency, payload.game_code, token);
-        res.end(JSON.stringify(resObj));
-      } catch (e) {
-        logPGCallbackError('BetPayout', req, body, e, playerId);
+        logPGCallbackError('CashTransfer', req, body, e, reqPlayerId);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
