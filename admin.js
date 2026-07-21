@@ -446,7 +446,7 @@ function updateStats() {
     const total   = players.reduce((s, p) => s + (p.balance || 0), 0);
     document.getElementById('statTotalPlayers').textContent = players.length;
     document.getElementById('statActivePlayers').textContent = active;
-    document.getElementById('statTotalBalance').textContent  = formatNum(total) + ' كوين';
+    document.getElementById('statTotalBalance').textContent  = formatNum(total) + ' $';
     document.getElementById('playerCountBadge').textContent  = `${players.length} لاعب`;
 }
 
@@ -556,7 +556,7 @@ function buildPlayerCard(p) {
             <div class="player-details-col">
                 <div class="player-name-admin">${p.name} <span style="font-size:11px;color:#888;font-weight:normal;margin-right:6px;">#${p.id}</span></div>
                 <div class="player-badges-row">
-                    <span class="badge-balance">🪙 ${formatNum(p.balance || 0)} كوين</span>
+                    <span class="badge-balance">💵 ${formatNum(p.balance || 0)} $</span>
                     <span class="badge-status" style="background:${statusBg}; color:${statusColor}; border:1px solid ${statusBorder};">
                         <i class="${statusIcon}" style="font-size:8px; margin-left:4px;"></i> ${statusText}
                     </span>
@@ -586,11 +586,11 @@ function buildPlayerCard(p) {
             </div>
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-wallet"></i> الرصيد الرئيسي</span>
-                <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} كوين</span>
+                <span class="val" id="bal-${p.id}">${formatNum(p.balance || 0)} $</span>
             </div>
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-gift"></i> رصيد المكافآت</span>
-                <span class="val" style="color:#00E676;" id="bon-${p.id}">${formatNum(p.bonus || 0)} كوين</span>
+                <span class="val" style="color:#00E676;" id="bon-${p.id}">${formatNum(p.bonus || 0)} $</span>
             </div>
             <div class="control-info-row">
                 <span class="lbl"><i class="fa-solid fa-calendar"></i> تاريخ الانضمام</span>
@@ -638,7 +638,7 @@ function buildMiniTx(txs) {
         const isPos = tx.amount > 0;
         return `<div class="mini-tx-row">
             <span style="color:#aaa;">${tx.type} — ${tx.date}</span>
-            <span class="tx-amt ${isPos?'pos':'neg'}">${isPos?'+':''}${formatNum(tx.amount)} كوين</span>
+            <span class="tx-amt ${isPos?'pos':'neg'}">${isPos?'+':''}${formatNum(tx.amount)} $</span>
         </div>`;
     }).join('');
     return `
@@ -667,8 +667,8 @@ function openWalletModal(id) {
     currentWalletPlayerId = p.id;
     document.getElementById('modalPlayerName').textContent = p.name;
     document.getElementById('modalPlayerId').textContent   = p.id;
-    document.getElementById('modalBalance').textContent    = `${formatNum(p.balance || 0)} كوين`;
-    document.getElementById('modalBonus').textContent      = `${formatNum(p.bonus || 0)} كوين`;
+    document.getElementById('modalBalance').textContent    = `${formatNum(p.balance || 0)} $`;
+    document.getElementById('modalBonus').textContent      = `${formatNum(p.bonus || 0)} $`;
     document.getElementById('modalAmount').value = '';
     document.getElementById('walletModal').classList.add('open');
 }
@@ -1393,7 +1393,7 @@ function renderAdminP2pAgentsTable() {
         <tr>
             <td><strong style="color:var(--orange);">${ag.id}</strong></td>
             <td><span style="color:#fff;font-weight:bold;">${ag.name || 'لاعب مسعودي'}</span></td>
-            <td><span style="color:#00E676;font-weight:bold;">${formatNum(ag.agentBalance || 0)} كوين 🪙</span></td>
+            <td><span style="color:#00E676;font-weight:bold;">${formatNum(ag.agentBalance || 0)} $</span></td>
             <td>
                 <div style="display:flex;gap:6px;align-items:center;max-width:260px;">
                     <input type="number" id="${inputId}" placeholder="كمية الرصيد..." style="margin:0;padding:6px 10px;height:32px;font-size:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;color:#fff;">
