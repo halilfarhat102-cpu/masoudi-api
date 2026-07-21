@@ -64,6 +64,15 @@
   ],
   "games": [
     {
+      "id": "game-olympus-1",
+      "title": "Gates of Olympus (فتحات أوليمبوس ⚡)",
+      "category": "slots",
+      "provider": "PG",
+      "tag": "hot",
+      "launchUrl": "72",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535546986.jpg"
+    },
+    {
       "id": "game-3",
       "title": "(Fortune OX)",
       "category": "slots",
