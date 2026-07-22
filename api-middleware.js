@@ -1901,7 +1901,7 @@ export async function apiMiddleware(req, res, next) {
         productionSecretKey: 'c89632307f734f6192fa420864a2c847'
       };
 
-      const isProd = Boolean(pgConfig.isProduction);
+      const isProd = pgConfig.isProduction !== false;
       const operatorToken = isProd 
         ? (pgConfig.productionOperatorToken || 'a5fd4c1a25904aae8729516557c160d0')
         : (pgConfig.stagingOperatorToken || 'I-6c19673883aa410b98d1c0cb1a3c5edc');
