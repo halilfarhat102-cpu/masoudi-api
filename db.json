@@ -7094,7 +7094,7 @@
   "settings": {
     "pgConfig": {
       "currency": "USD",
-      "isProduction": true,
+      "isProduction": false,
       "productionApiDomain": "https://api.pg-bo.com",
       "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0",
       "productionSecretKey": "c89632307f734f6192fa420864a2c847",
