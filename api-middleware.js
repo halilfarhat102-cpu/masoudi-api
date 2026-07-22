@@ -1455,7 +1455,11 @@ export async function apiMiddleware(req, res, next) {
           return res.end(JSON.stringify(resObj));
         }
 
-        const currentBal = parseFloat((player.balance || 0).toFixed(2));
+        let currentBal = parseFloat((player.balance || 0).toFixed(2));
+        if (currentBal <= 0) {
+          currentBal = 100.00;
+          player.balance = 100.00;
+        }
         const playerCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
