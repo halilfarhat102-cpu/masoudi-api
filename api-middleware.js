@@ -92,15 +92,15 @@ function validatePGSoftFields(payload, requiredFields, db) {
     }
   }
 
-  // 2. Validate secret_key (optional validation — only reject if PRESENT but wrong)
+  // 2. Validate secret_key (must be present and match valid secrets)
   if (requiredFields.includes('secret_key')) {
     const secretKey = payload.secret_key || payload.secretKey || payload.sk;
-    // Only validate if secret_key is provided and is not the PG test placeholder
-    if (secretKey && secretKey !== 'xxxxx' && secretKey !== 'XXXXX') {
-      const allValidSecrets = [validSecret, ...additionalValidSecrets];
-      if (!allValidSecrets.includes(secretKey)) {
-        return { code: '1034', message: 'InvalidRequest' };
-      }
+    if (!secretKey) {
+      return { code: '1034', message: 'InvalidRequest' };
+    }
+    const allValidSecrets = [validSecret, ...additionalValidSecrets];
+    if (!allValidSecrets.includes(secretKey)) {
+      return { code: '1034', message: 'InvalidRequest' };
     }
   }
 
@@ -1345,7 +1345,7 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
-  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('verifysession') || req.url.toLowerCase().includes('verify-session') || req.url.toLowerCase().includes('verifyoperatorplayersession'))) {
+  } else if ((req.method === 'POST' || req.method === 'GET') && (req.url.toLowerCase().includes('verifysession') || req.url.toLowerCase().includes('verify-session') || req.url.toLowerCase().includes('verifyoperatorplayersession'))) {
     // Called by game provider to verify the player's session token
     let body = '';
     req.on('data', c => { body += c; });
@@ -1416,7 +1416,7 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
-  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('getbalance') || req.url.toLowerCase().includes('get-balance') || req.url.toLowerCase().includes('cash/get') || req.url.toLowerCase().includes('getplayerwallet') || req.url.toLowerCase().includes('get-player-wallet'))) {
+  } else if ((req.method === 'POST' || req.method === 'GET') && (req.url.toLowerCase().includes('getbalance') || req.url.toLowerCase().includes('get-balance') || req.url.toLowerCase().includes('cash/get') || req.url.toLowerCase().includes('getplayerwallet') || req.url.toLowerCase().includes('get-player-wallet'))) {
     // Called by game provider to get current player balance
     let body = '';
     req.on('data', c => { body += c; });
@@ -1479,7 +1479,7 @@ export async function apiMiddleware(req, res, next) {
     });
 
   // ── CASH / TRANSFER (Bet & Win Callback from PG Soft Seamless Wallet API) ──
-  } else if (req.method === 'POST' && (req.url.toLowerCase().includes('cash/transfer') || req.url.toLowerCase().includes('betpayout') || req.url.toLowerCase().includes('adjustment'))) {
+  } else if ((req.method === 'POST' || req.method === 'GET') && (req.url.toLowerCase().includes('cash/transfer') || req.url.toLowerCase().includes('betpayout') || req.url.toLowerCase().includes('adjustment'))) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
