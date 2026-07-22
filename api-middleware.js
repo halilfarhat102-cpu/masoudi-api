@@ -1901,13 +1901,15 @@ export async function apiMiddleware(req, res, next) {
         productionSecretKey: 'c89632307f734f6192fa420864a2c847'
       };
 
-      const isProd = pgConfig.isProduction !== false;
-      const operatorToken = isProd 
-        ? (pgConfig.productionOperatorToken || 'a5fd4c1a25904aae8729516557c160d0')
-        : (pgConfig.stagingOperatorToken || 'I-6c19673883aa410b98d1c0cb1a3c5edc');
-      let baseUrl = isProd 
-        ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com')
-        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me');
+      const isProd = Boolean(pgConfig.isProduction);
+      const operatorToken = pgConfig.productionOperatorToken || pgConfig.stagingOperatorToken || 'I-6c19673883aa410b98d1c0cb1a3c5edc';
+      
+      let baseUrl = pgConfig.productionApiDomain || 'https://api.pg-bo.me';
+      if (String(operatorToken).startsWith('I-') || String(operatorToken).startsWith('i-')) {
+        baseUrl = 'https://api.pg-bo.me';
+      } else if (isProd) {
+        baseUrl = 'https://api.pg-bo.com';
+      }
 
       baseUrl = (baseUrl || '').trim().replace(/\/+$/, '');
       if (baseUrl.endsWith('/external')) {
