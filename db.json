@@ -7,7 +7,8 @@
       "title": "(Fortune OX)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "98"
+      "launchUrl": "98",
+      "gameCode": "98"
     },
     {
       "id": "game-1783964222923",
@@ -16,7 +17,8 @@
       "title": "(Mahjong Ways2)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "74"
+      "launchUrl": "74",
+      "gameCode": "74"
     },
     {
       "id": "game-1783964302523",
@@ -25,7 +27,8 @@
       "title": "(Fortune Tiger)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "126"
+      "launchUrl": "126",
+      "gameCode": "126"
     },
     {
       "id": "game-1784535661609",
@@ -34,16 +37,18 @@
       "title": "(Mahjong Ways)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "65"
+      "launchUrl": "65",
+      "gameCode": "65"
     },
     {
       "id": "game-1784539597345",
       "tag": "new",
-      "image": "https://masoudi-api.onrender.com/images/uploaded_1784720972446.jpg",
+      "image": "https://masoudi-api.onrender.com/images/uploaded_1784673274606.jpg",
       "title": "(Leprechaun)",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "60"
+      "launchUrl": "60",
+      "gameCode": "60"
     },
     {
       "id": "game-1784553596274",
@@ -52,16 +57,8 @@
       "title": "Journey",
       "category": "slots",
       "provider": "PG",
-      "launchUrl": "50"
-    },
-    {
-      "id": "game-1784673302902",
-      "tag": "hot",
-      "image": "https://masoudi-api.onrender.com/images/uploaded_1784720960355.jpg",
-      "title": "Test",
-      "category": "slots",
-      "provider": "PG",
-      "launchUrl": "125"
+      "launchUrl": "50",
+      "gameCode": "50"
     }
   ],
   "admins": [],
@@ -81,14 +78,14 @@
   ],
   "banners": [
     {
-      "id": "banner-1784719323045",
+      "id": "banner-1784715552888",
       "icon": "",
       "badge": "",
-      "image": "https://masoudi-api.onrender.com/images/uploaded_1784719305786.jpg",
+      "image": "https://masoudi-api.onrender.com/images/uploaded_1784715546015.png",
       "theme": "orange",
       "title": "",
       "subtitle": "",
-      "detailImage": "https://masoudi-api.onrender.com/images/uploaded_1784719319190.jpg"
+      "detailImage": "https://masoudi-api.onrender.com/images/uploaded_1784715553042.png"
     }
   ],
   "players": [
@@ -96,7 +93,7 @@
       "id": "303725",
       "name": "Master Msuodi",
       "bonus": 0,
-      "email": "لا يوجد بريد مرتبط",
+      "email": "engyhamid860@gmail.com",
       "status": "active",
       "balance": 0,
       "currency": "USD",
@@ -131,14 +128,14 @@
       "bonus": 0,
       "email": "halilfarhat102@gmail.com",
       "status": "active",
-      "balance": 70357.6,
+      "balance": 70429.6,
       "isAgent": true,
       "currency": "USD",
       "joinDate": "2026-07-21",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
       "lastLogin": "2026-07-22",
       "agentBalance": 70000,
-      "sessionToken": "sess_519997_1784734191714",
+      "sessionToken": "sess_519997_1784714704256",
       "transactions": [
         {
           "date": "7:43:33 م",
@@ -3975,236 +3972,9 @@
           "txId": "2079870674222055424-2079870663358808064-106-0",
           "type": "فوز 🎉 — لعبة 124",
           "amount": "+0 $"
-        },
-        {
-          "date": "11:04:05 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": -1
-        },
-        {
-          "date": "11:04:08 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": -1
-        },
-        {
-          "date": "11:04:09 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": 2
-        },
-        {
-          "date": "11:04:09 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": -1
-        },
-        {
-          "date": "11:04:10 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": 2
-        },
-        {
-          "date": "11:04:11 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": -1
-        },
-        {
-          "date": "11:04:12 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": -1
-        },
-        {
-          "date": "11:04:14 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": -50
-        },
-        {
-          "date": "11:04:15 ص",
-          "type": "لعب (Fortune Tiger)",
-          "amount": 500
-        },
-        {
-          "date": "11:06:07 ص",
-          "type": "لعب Journey",
-          "amount": -1
-        },
-        {
-          "date": "11:06:08 ص",
-          "type": "لعب Journey",
-          "amount": 2
-        },
-        {
-          "date": "11:06:09 ص",
-          "type": "لعب Journey",
-          "amount": -1
-        },
-        {
-          "date": "11:06:11 ص",
-          "type": "لعب Journey",
-          "amount": -10
-        },
-        {
-          "date": "11:06:12 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:14 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:16 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:18 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:19 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:21 ص",
-          "type": "لعب Journey",
-          "amount": 100
-        },
-        {
-          "date": "11:06:21 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:22 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:24 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:30 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:31 ص",
-          "type": "لعب Journey",
-          "amount": 100
-        },
-        {
-          "date": "11:06:31 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:32 ص",
-          "type": "لعب Journey",
-          "amount": 100
-        },
-        {
-          "date": "11:06:33 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:35 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:36 ص",
-          "type": "لعب Journey",
-          "amount": 100
-        },
-        {
-          "date": "11:06:36 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:38 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:39 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:40 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:41 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:42 ص",
-          "type": "لعب Journey",
-          "amount": -50
-        },
-        {
-          "date": "11:06:54 ص",
-          "type": "لعب (Mahjong Ways2)",
-          "amount": -1
-        },
-        {
-          "date": "11:06:55 ص",
-          "type": "لعب (Mahjong Ways2)",
-          "amount": -1
-        },
-        {
-          "date": "2:46:49 م",
-          "txId": "TX_TEST_999",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-2 $"
-        },
-        {
-          "date": "2:47:30 م",
-          "txId": "TX_TEST_9992",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-2 $"
-        },
-        {
-          "date": "3:00:55 م",
-          "txId": "TX_AUDIT_1784732455513",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-1 $"
-        },
-        {
-          "date": "3:05:26 م",
-          "txId": "TX_AUDIT_1784732725824",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-1 $"
-        },
-        {
-          "date": "3:09:32 م",
-          "txId": "TX_AUDIT_1784732972019",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-1 $"
-        },
-        {
-          "date": "3:13:24 م",
-          "txId": "TX_AUDIT_1784733204754",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-1 $"
-        },
-        {
-          "date": "3:20:59 م",
-          "txId": "TX_DIAG_1784733659358",
-          "type": "رهان 🎰 — لعبة 126",
-          "amount": "-1 $"
         }
       ],
-      "sessionCreatedAt": "2026-07-22T15:29:51.714Z"
+      "sessionCreatedAt": "2026-07-22T10:05:04.256Z"
     },
     {
       "id": "421293",
@@ -4278,7 +4048,7 @@
       "joinDate": "2026-07-22",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocISHVzuprrxCHaJiJH-REmoCVt_pLegB4LomKpD9qUPBi0-Xg=s96-c",
       "lastLogin": "2026-07-22",
-      "sessionToken": "sess_350461_1784732910188",
+      "sessionToken": "sess_350461_1784695775226",
       "transactions": [
         {
           "date": "1:33:20 ص",
@@ -7317,19 +7087,7 @@
           "amount": "-250 $"
         }
       ],
-      "sessionCreatedAt": "2026-07-22T15:08:30.188Z"
-    },
-    {
-      "id": "123456",
-      "name": "لاعب 123456",
-      "phone": "",
-      "status": "active",
-      "balance": 0,
-      "username": "player_123456",
-      "createdAt": "2026-07-22T10:41:26.618Z",
-      "sessionToken": "sess_123456_1784716886636",
-      "transactions": [],
-      "sessionCreatedAt": "2026-07-22T10:41:26.636Z"
+      "sessionCreatedAt": "2026-07-22T04:49:35.226Z"
     }
   ],
   "receipts": [],
@@ -7337,12 +7095,12 @@
     "pgConfig": {
       "currency": "USD",
       "isProduction": false,
-      "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
-      "productionSecretKey": "c89632307f734f6192fa420864a2c847",
-      "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
+      "productionApiDomain": "https://api.pg-bo.com",
       "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0",
-      "bttMode": 2,
-      "stagingApiDomain": "https://api.pg-bo.me"
+      "productionSecretKey": "c89632307f734f6192fa420864a2c847",
+      "stagingApiDomain": "https://api.pg-bo.me/external/",
+      "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
+      "stagingSecretKey": "c89632307f734f6192fa420864a2c847"
     },
     "coinBuyRate": 10000,
     "showBalance": true,
@@ -8558,14 +8316,7 @@
     "2079870135761502208-2079870135761502208-106-0",
     "2079870142732435456-2079870142732435456-106-0",
     "2079870663358808064-2079870663358808064-106-0",
-    "2079870674222055424-2079870663358808064-106-0",
-    "TX_TEST_999",
-    "TX_TEST_9992",
-    "TX_AUDIT_1784732455513",
-    "TX_AUDIT_1784732725824",
-    "TX_AUDIT_1784732972019",
-    "TX_AUDIT_1784733204754",
-    "TX_DIAG_1784733659358"
+    "2079870674222055424-2079870663358808064-106-0"
   ],
   "supportMessages": [
     {
