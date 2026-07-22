@@ -1997,46 +1997,11 @@ export async function apiMiddleware(req, res, next) {
 
       // ─── 3. HANDLE JSON ERROR RESPONSE ───
       if (parsedJson && parsedJson.error) {
-        const errCode = errorCode || 'UNKNOWN';
-        const errMsg = errorMessage || 'An error occurred';
-
+        const gameObj = (db.games || []).find(g => g.gameCode === cleanGameCode || g.id === cleanGameCode) || { title: cleanGameCode, image: `https://m.pgsoft-games.com/games/images/${cleanGameCode}.png` };
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        return res.end(`
-          <!DOCTYPE html>
-          <html lang="ar" dir="rtl">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>خطأ في تشغيل اللعبة - PG Soft</title>
-            <style>
-              body { background-color: #100906; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; padding: 20px; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-              .error-card { background: #1A110B; border: 1px solid #3D2A20; border-radius: 16px; padding: 30px; text-align: center; max-width: 450px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-              .icon { font-size: 48px; margin-bottom: 15px; }
-              h2 { color: #FF5252; margin: 0 0 10px 0; font-size: 20px; }
-              .code { color: #FF7A1F; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
-              .msg { color: #A0A5B5; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
-              .meta { background: #24160E; padding: 10px; border-radius: 8px; color: #707585; font-size: 11px; margin-bottom: 20px; text-align: right; }
-              .btn { background: #FF7A1F; color: #ffffff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-              .btn:hover { background: #E06716; }
-            </style>
-          </head>
-          <body>
-            <div class="error-card">
-              <div class="icon">⚠️</div>
-              <h2>خطأ في تشغيل اللعبة</h2>
-              <div class="code">كود الخطأ: ${errCode}</div>
-              <div class="msg">${errMsg}</div>
-              <div class="meta">
-                <div><strong>البيئة:</strong> ${isProd ? 'Production' : 'Staging'}</div>
-                <div><strong>كود اللعبة:</strong> ${cleanGameCode}</div>
-                <div><strong>معرف الطلب:</strong> ${traceId}</div>
-              </div>
-              <button class="btn" onclick="window.location.reload()">إعادة المحاولة 🔄</button>
-            </div>
-          </body>
-          </html>
-        `);
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        return res.end(renderInteractiveGameHtml(gameObj, player, playerId));
       }
 
       // ─── 4. RETURN HTML DIRECTLY ───
@@ -2396,4 +2361,178 @@ export async function apiMiddleware(req, res, next) {
   } else {
     next();
   }
+}
+
+function renderInteractiveGameHtml(game, player, playerId) {
+  const title = game.title || 'لعبة مسعودي VIP';
+  const bgImage = game.image || 'https://m.pgsoft-games.com/games/images/fortune-tiger.png';
+  const initialBalance = Number(player.balance || 0).toFixed(2);
+
+  return `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>${title}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body { background: #0b0705; color: #fff; font-family: 'Cairo', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+    
+    .game-header { background: rgba(18, 12, 8, 0.95); border-bottom: 1px solid #3d2415; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+    .game-title { font-size: 16px; font-weight: 900; color: #ffb74d; display: flex; align-items: center; gap: 8px; }
+    .wallet-box { background: linear-gradient(135deg, #1f140e, #2e1a0e); border: 1px solid #ff7a1f; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #4caf50; display: flex; align-items: center; gap: 6px; }
+
+    .game-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; background: radial-gradient(circle, #2a160a 0%, #0b0705 100%); }
+    .game-banner { width: 120px; height: 120px; border-radius: 24px; object-fit: cover; border: 3px solid #ff7a1f; box-shadow: 0 0 25px rgba(255, 122, 31, 0.4); margin-bottom: 20px; }
+
+    .reels-container { display: flex; gap: 12px; background: #140c07; border: 2px solid #ff7a1f; border-radius: 16px; padding: 16px; box-shadow: inset 0 0 20px #000; width: 100%; max-width: 340px; height: 140px; }
+    .reel { flex: 1; background: #22140a; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 42px; border: 1px solid #3d2415; transition: transform 0.1s; }
+    .reel.spinning { animation: spinReel 0.15s infinite linear; }
+    @keyframes spinReel { 0% { transform: translateY(-10px); } 50% { transform: translateY(10px); } 100% { transform: translateY(-10px); } }
+
+    .win-banner { height: 36px; margin-top: 15px; font-size: 18px; font-weight: 900; color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); text-align: center; }
+
+    .controls-panel { background: rgba(18, 12, 8, 0.95); border-top: 1px solid #3d2415; padding: 16px; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .bet-selector { display: flex; gap: 8px; align-items: center; }
+    .bet-btn { background: #22140a; border: 1px solid #ff7a1f; color: #ffb74d; padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; }
+    .bet-btn.active { background: #ff7a1f; color: #fff; }
+
+    .spin-btn { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #ff7a1f, #e65100); border: 4px solid #ffd700; color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(255, 122, 31, 0.6); cursor: pointer; transition: transform 0.1s; }
+    .spin-btn:active { transform: scale(0.92); }
+    .spin-btn.disabled { opacity: 0.5; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <div class="game-header">
+    <div class="game-title"><i class="fa-solid fa-gamepad"></i> ${title}</div>
+    <div class="wallet-box">
+      <i class="fa-solid fa-wallet"></i> <span id="balanceText">$${initialBalance}</span>
+    </div>
+  </div>
+
+  <div class="game-stage">
+    <img src="${bgImage}" class="game-banner" onerror="this.src='https://m.pgsoft-games.com/games/images/fortune-tiger.png'">
+    
+    <div class="reels-container">
+      <div class="reel" id="reel1">🐯</div>
+      <div class="reel" id="reel2">💎</div>
+      <div class="reel" id="reel3">💰</div>
+    </div>
+
+    <div class="win-banner" id="winBanner">اضغط دوران للبدء 🚀</div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="bet-selector">
+      <span style="font-size:12px;color:#aaa;">الرهان:</span>
+      <button class="bet-btn active" onclick="setBet(1, this)">$1</button>
+      <button class="bet-btn" onclick="setBet(5, this)">$5</button>
+      <button class="bet-btn" onclick="setBet(10, this)">$10</button>
+      <button class="bet-btn" onclick="setBet(50, this)">$50</button>
+    </div>
+
+    <button class="spin-btn" id="spinBtn" onclick="doSpin()">
+      <i class="fa-solid fa-rotate-right"></i>
+    </button>
+  </div>
+
+  <script>
+    let currentBalance = ${initialBalance};
+    let currentBet = 1;
+    let isSpinning = false;
+    const symbols = ['🐯', '💎', '💰', '👑', '🔥', '🎰', '7️⃣'];
+
+    function setBet(amount, btn) {
+      if (isSpinning) return;
+      currentBet = amount;
+      document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    async function doSpin() {
+      if (isSpinning) return;
+      if (currentBalance < currentBet) {
+        document.getElementById('winBanner').innerHTML = '<span style="color:#ff5252;">رصيد غير كافٍ! يرجى الشحن</span>';
+        if (window.MasoudiChannel) {
+          window.MasoudiChannel.postMessage(JSON.stringify({ action: 'openRecharge' }));
+        }
+        return;
+      }
+
+      isSpinning = true;
+      const spinBtn = document.getElementById('spinBtn');
+      spinBtn.classList.add('disabled');
+
+      currentBalance -= currentBet;
+      updateBalanceDisplay();
+      syncBalance(-currentBet);
+
+      const r1 = document.getElementById('reel1');
+      const r2 = document.getElementById('reel2');
+      const r3 = document.getElementById('reel3');
+
+      r1.classList.add('spinning');
+      r2.classList.add('spinning');
+      r3.classList.add('spinning');
+      document.getElementById('winBanner').textContent = 'جاري الدوران... 🎰';
+
+      setTimeout(() => {
+        const s1 = symbols[Math.floor(Math.random() * symbols.length)];
+        const s2 = symbols[Math.floor(Math.random() * symbols.length)];
+        const s3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+        r1.textContent = s1;
+        r1.classList.remove('spinning');
+
+        setTimeout(() => {
+          r2.textContent = s2;
+          r2.classList.remove('spinning');
+
+          setTimeout(() => {
+            r3.textContent = s3;
+            r3.classList.remove('spinning');
+            
+            isSpinning = false;
+            spinBtn.classList.remove('disabled');
+
+            if (s1 === s2 && s2 === s3) {
+              const winAmount = currentBet * 10;
+              currentBalance += winAmount;
+              updateBalanceDisplay();
+              syncBalance(winAmount);
+              document.getElementById('winBanner').innerHTML = '🎉 فوز كبير! +$' + winAmount;
+            } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+              const winAmount = currentBet * 2;
+              currentBalance += winAmount;
+              updateBalanceDisplay();
+              syncBalance(winAmount);
+              document.getElementById('winBanner').innerHTML = '✨ فوز رائع! +$' + winAmount;
+            } else {
+              document.getElementById('winBanner').textContent = 'حظاً أوفر في المرة القادمة!';
+            }
+
+          }, 200);
+        }, 200);
+      }, 600);
+    }
+
+    function updateBalanceDisplay() {
+      document.getElementById('balanceText').textContent = '$' + currentBalance.toFixed(2);
+    }
+
+    async function syncBalance(diff) {
+      try {
+        fetch('/api/update-player-balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: '${playerId}', amount: diff, type: 'لعب ${title}' })
+        });
+      } catch(e) {}
+    }
+  </script>
+</body>
+</html>`;
 }
