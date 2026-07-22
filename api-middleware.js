@@ -2040,8 +2040,11 @@ export async function apiMiddleware(req, res, next) {
       console.log(`Game Code:             ${cleanGameCode}`);
       console.log(`API URL:               ${pgUrl}`);
       console.log(`PG Soft HTTP Status:   ${pgResponse.status}`);
+      console.log(`Content-Type:          ${pgResponse.headers.get('content-type') || 'text/html'}`);
+      console.log(`Response Headers:      ${JSON.stringify(responseHeaders)}`);
+      console.log(`Is HTML Response:      ${!responseText.trim().startsWith('{')}`);
       console.log(`Raw Response Body:     ${responseText}`);
-      console.log(`Parsed JSON Response:  ${parsedJson ? JSON.stringify(parsedJson, null, 2) : 'N/A (HTML Response)'}`);
+      console.log(`Parsed JSON Response:  ${parsedJson ? JSON.stringify(parsedJson, null, 2) : 'N/A (HTML Response Direct Pass-Through)'}`);
       console.log(`Launch URL:            ${launchUrl || 'N/A'}`);
       console.log(`Error Code:            ${errorCode || 'N/A'}`);
       console.log(`Error Message:         ${errorMessage || 'N/A'}`);

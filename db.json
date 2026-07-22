@@ -131,14 +131,14 @@
       "bonus": 0,
       "email": "halilfarhat102@gmail.com",
       "status": "active",
-      "balance": 70366.6,
+      "balance": 70362.6,
       "isAgent": true,
       "currency": "USD",
       "joinDate": "2026-07-21",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
       "lastLogin": "2026-07-22",
       "agentBalance": 70000,
-      "sessionToken": "sess_519997_1784731556024",
+      "sessionToken": "sess_519997_1784732025335",
       "transactions": [
         {
           "date": "7:43:33 م",
@@ -4160,9 +4160,21 @@
           "date": "11:06:55 ص",
           "type": "لعب (Mahjong Ways2)",
           "amount": -1
+        },
+        {
+          "date": "2:46:49 م",
+          "txId": "TX_TEST_999",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-2 $"
+        },
+        {
+          "date": "2:47:30 م",
+          "txId": "TX_TEST_9992",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-2 $"
         }
       ],
-      "sessionCreatedAt": "2026-07-22T14:45:56.024Z"
+      "sessionCreatedAt": "2026-07-22T14:53:45.335Z"
     },
     {
       "id": "421293",
@@ -8514,7 +8526,9 @@
     "2079870135761502208-2079870135761502208-106-0",
     "2079870142732435456-2079870142732435456-106-0",
     "2079870663358808064-2079870663358808064-106-0",
-    "2079870674222055424-2079870663358808064-106-0"
+    "2079870674222055424-2079870663358808064-106-0",
+    "TX_TEST_999",
+    "TX_TEST_9992"
   ],
   "supportMessages": [
     {
