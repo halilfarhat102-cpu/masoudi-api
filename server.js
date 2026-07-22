@@ -12,19 +12,29 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
+// Helper to send static files with no-cache headers for instant updates
+const sendNoCacheFile = (filePath, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(resolve(__dirname, filePath));
+};
+
 // Serve static images and public assets
 app.use('/images', express.static(resolve(__dirname, 'images')));
 app.use('/public', express.static(resolve(__dirname, 'public')));
 
-// Serve root static assets directly for instant update without build
-app.get('/style.css', (req, res) => res.sendFile(resolve(__dirname, 'style.css')));
-app.get('/app.js', (req, res) => res.sendFile(resolve(__dirname, 'app.js')));
-app.get('/admin.js', (req, res) => res.sendFile(resolve(__dirname, 'admin.js')));
+// Explicit route handlers for admin files with no-cache headers
+app.get('/admin.html', (req, res) => sendNoCacheFile('admin.html', res));
+app.get('/admin', (req, res) => sendNoCacheFile('admin.html', res));
+app.get('/admin.js', (req, res) => sendNoCacheFile('admin.js', res));
+app.get('/style.css', (req, res) => sendNoCacheFile('style.css', res));
+app.get('/app.js', (req, res) => sendNoCacheFile('app.js', res));
 
-// Mount API middleware directly (avoid express.json() because apiMiddleware handles raw streams)
+// Mount API middleware directly
 app.use(apiMiddleware);
 
-// Serve static files from root folder (and fallback to dist if exists)
+// Serve static files from root folder and dist
 app.use(express.static(__dirname));
 app.use(express.static(resolve(__dirname, 'dist')));
 

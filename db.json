@@ -140,10 +140,12 @@
       "email": "halilfarhat102@gmail.com",
       "status": "active",
       "balance": 48245.7,
+      "isAgent": true,
       "currency": "USD",
       "joinDate": "2026-07-21",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
       "lastLogin": "2026-07-22",
+      "agentBalance": 50000,
       "sessionToken": "sess_519997_1784678358616",
       "transactions": [
         {
@@ -407,6 +409,11 @@
           "txId": "2079699051296718848-2079699023119384576-106-0",
           "type": "فوز 🎉 — لعبة 113",
           "amount": "+0 $"
+        },
+        {
+          "date": "12:52:19 ص",
+          "type": "شحن رصيد وكالة (من الإدارة)",
+          "amount": 50000
         }
       ],
       "sessionCreatedAt": "2026-07-21T23:59:18.616Z"
