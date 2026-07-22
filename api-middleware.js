@@ -2082,7 +2082,7 @@ export async function apiMiddleware(req, res, next) {
       const fallbackSymbol = demoSymbolMap[gameCode] || demoSymbolMap[cleanGameCode] || 'vs20olympgate';
       const fallbackUrl = `https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=${fallbackSymbol}&lang=ar&cur=USD`;
 
-      if (!isProd || responseText.includes('404 Not Found') || responseText.includes('eajzzxhr') || responseText.includes('7ejzzvoy4')) {
+      if (pgResponse.status === 404 || responseText.includes('404 Not Found')) {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
