@@ -3,65 +3,72 @@
     {
       "id": "game-3",
       "tag": "new",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535418644.png",
+      "image": "https://m.pgsoft-games.com/games/images/fortune-tiger.png",
       "title": "(Fortune OX)",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "98"
+      "provider": "PG Soft",
+      "launchUrl": "fortune-tiger",
+      "gameCode": "fortune-tiger"
     },
     {
       "id": "game-1783964222923",
       "tag": "hot",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535546986.jpg",
+      "image": "https://m.pgsoft-games.com/games/images/fortune-tiger.png",
       "title": "(Mahjong Ways2)",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "74"
+      "provider": "PG Soft",
+      "launchUrl": "fortune-tiger",
+      "gameCode": "fortune-tiger"
     },
     {
       "id": "game-1783964302523",
       "tag": "hot",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535138841.jpg",
+      "image": "https://m.pgsoft-games.com/games/images/fortune-tiger.png",
       "title": "(Fortune Tiger)",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "126"
+      "provider": "PG Soft",
+      "launchUrl": "fortune-tiger",
+      "gameCode": "fortune-tiger"
     },
     {
       "id": "game-1784535661609",
       "tag": "new",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535852509.jpg",
+      "image": "https://m.pgsoft-games.com/games/images/fortune-tiger.png",
       "title": "(Mahjong Ways)",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "65"
+      "provider": "PG Soft",
+      "launchUrl": "fortune-tiger",
+      "gameCode": "fortune-tiger"
     },
     {
       "id": "game-1784539597345",
       "tag": "new",
-      "image": "https://masoudi-api.onrender.com/images/uploaded_1784714514858.jpg",
+      "image": "https://m.pgsoft-games.com/games/images/fortune-tiger.png",
       "title": "(Leprechaun)",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "60"
+      "provider": "PG Soft",
+      "launchUrl": "fortune-tiger",
+      "gameCode": "fortune-tiger"
     },
     {
       "id": "game-1784553596274",
       "tag": "hot",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784554147848.jpg",
+      "image": "https://m.pgsoft-games.com/games/images/journey-to-the-wealth.png",
       "title": "Journey",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "50"
+      "provider": "PG Soft",
+      "launchUrl": "journey-to-the-wealth",
+      "gameCode": "journey-to-the-wealth"
     },
     {
       "id": "game-1784673302902",
       "tag": "hot",
-      "image": "https://masoudi-api.onrender.com/images/uploaded_1784714524416.jpg",
+      "image": "https://m.pgsoft-games.com/games/images/fortune-mouse.png",
       "title": "Test",
       "category": "slots",
-      "provider": "PG",
-      "launchUrl": "124"
+      "provider": "PG Soft",
+      "launchUrl": "fortune-mouse",
+      "gameCode": "fortune-mouse"
     },
     {
       "id": "1",
