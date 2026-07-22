@@ -1935,6 +1935,26 @@ export async function apiMiddleware(req, res, next) {
       if (pgSlugToIdMap[cleanGameCode]) {
         cleanGameCode = pgSlugToIdMap[cleanGameCode];
       }
+
+      // Fallback: If cleanGameCode is an internal ID like 'game-1783964302523' or 'game-3', resolve via db.games
+      const gameObj = (db.games || []).find(g => String(g.id) === cleanGameCode || String(g.gameCode) === cleanGameCode || String(g.launchUrl) === cleanGameCode);
+      if (gameObj) {
+        if (gameObj.launchUrl && /^\d+$/.test(gameObj.launchUrl.trim())) {
+          cleanGameCode = gameObj.launchUrl.trim();
+        } else if (gameObj.gameCode && /^\d+$/.test(gameObj.gameCode.trim())) {
+          cleanGameCode = gameObj.gameCode.trim();
+        } else if (gameObj.title) {
+          const tLower = gameObj.title.toLowerCase();
+          if (tLower.includes('tiger')) cleanGameCode = '126';
+          else if (tLower.includes('ox')) cleanGameCode = '98';
+          else if (tLower.includes('mahjong') && (tLower.includes('2') || tLower.includes('ways2'))) cleanGameCode = '74';
+          else if (tLower.includes('mahjong')) cleanGameCode = '65';
+          else if (tLower.includes('leprechaun')) cleanGameCode = '60';
+          else if (tLower.includes('journey')) cleanGameCode = '50';
+          else if (tLower.includes('mouse')) cleanGameCode = '68';
+        }
+      }
+
       const path = `/${cleanGameCode}/index.html`;
       const playerObj = (db.players || []).find(x => String(x.id) === String(playerId));
       const playerCurrency = playerObj?.currency || pgConfig.currency || 'USD';
