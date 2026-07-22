@@ -2296,29 +2296,20 @@ export async function apiMiddleware(req, res, next) {
     try {
       const db = await readDb();
       const pgConfig = db.settings?.pgConfig || {};
-      const isProd = pgConfig.isProduction;
-      const operatorToken = isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken;
-      const secretKey = isProd ? pgConfig.productionSecretKey : pgConfig.stagingSecretKey;
+      const isProd = pgConfig.isProduction === true;
+      const operatorToken = (isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken) || 'I-6c19673883aa410b98d1c0cb1a3c5edc';
+      const secretKey = (isProd ? pgConfig.productionSecretKey : pgConfig.stagingSecretKey) || 'c89632307f734f6192fa420864a2c847';
       const currency = pgConfig.currency || 'USD';
       
-      let baseUrl = isProd 
-        ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com') 
-        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me/external');
-
-      baseUrl = (baseUrl || '').trim().replace(/\/+$/, '');
-      if (baseUrl.endsWith('/external')) {
-        baseUrl = baseUrl.slice(0, -9);
-      }
-
-      const traceId = 'guid-' + crypto.randomUUID();
-      const pgUrl = `${baseUrl}/external/Game/v2/Get?trace_id=${traceId}`;
+      const domain = isProd ? 'https://api.pg-bo.com' : 'https://api.pg-bo.me';
+      const traceId = 'guid-' + Date.now();
+      const pgUrl = `${domain}/external/Game/v2/Get?trace_id=${traceId}`;
 
       const formParams = new URLSearchParams();
-      formParams.append('operator_token', operatorToken || '');
-      formParams.append('secret_key', secretKey || '');
+      formParams.append('operator_token', operatorToken.trim());
+      formParams.append('secret_key', secretKey.trim());
       formParams.append('currency', currency);
       formParams.append('language', 'en-us');
-      formParams.append('status', '1');
 
       const pgRes = await fetch(pgUrl, {
         method: 'POST',
@@ -2334,15 +2325,16 @@ export async function apiMiddleware(req, res, next) {
           if (!db.games) db.games = [];
           pgData.data.forEach(g => {
             const gameIdStr = String(g.gameId || g.game_id || g.id);
-            const exists = db.games.some(x => String(x.id) === gameIdStr || String(x.gameCode) === gameIdStr);
+            const gameCodeStr = g.gameCode || g.game_code || gameIdStr;
+            const exists = db.games.some(x => String(x.id) === gameIdStr || String(x.gameCode) === gameCodeStr);
             if (!exists) {
               db.games.push({
                 id: gameIdStr,
                 title: g.gameName || g.game_name || `PG Game ${gameIdStr}`,
-                category: 'pgsoft',
+                category: 'slots',
                 provider: 'PG Soft',
-                gameCode: gameIdStr,
-                image: g.iconUrl || g.bannerUrl || 'assets/images/games/slot.jpg',
+                gameCode: gameCodeStr,
+                image: `https://m.pgsoft-games.com/games/images/${gameCodeStr}.png`,
                 active: true,
                 minBet: 1,
                 maxBet: 1000
@@ -2357,9 +2349,10 @@ export async function apiMiddleware(req, res, next) {
         res.setHeader('Content-Type', 'application/json');
         return res.end(JSON.stringify({ success: true, addedCount, totalPgGames: pgData.data.length }));
       } else {
+        const errDetail = pgData?.error?.message || (typeof pgData === 'object' ? JSON.stringify(pgData) : String(pgData));
         res.statusCode = 400;
         res.setHeader('Content-Type', 'application/json');
-        return res.end(JSON.stringify({ success: false, error: pgData.error?.message || 'فشل جلب الألعاب من PG Soft. يرجى التأكد من الـ Secret Key و Operator Token' }));
+        return res.end(JSON.stringify({ success: false, error: 'فشل PG Soft: ' + errDetail }));
       }
     } catch (e) {
       res.statusCode = 500;
