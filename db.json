@@ -96,7 +96,7 @@
       "id": "303725",
       "name": "Master Msuodi",
       "bonus": 0,
-      "email": "engyhamid860@gmail.com",
+      "email": "لا يوجد بريد مرتبط",
       "status": "active",
       "balance": 0,
       "currency": "USD",
@@ -131,14 +131,14 @@
       "bonus": 0,
       "email": "halilfarhat102@gmail.com",
       "status": "active",
-      "balance": 70362.6,
+      "balance": 70361.6,
       "isAgent": true,
       "currency": "USD",
       "joinDate": "2026-07-21",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
       "lastLogin": "2026-07-22",
       "agentBalance": 70000,
-      "sessionToken": "sess_519997_1784732197101",
+      "sessionToken": "sess_519997_1784732453158",
       "transactions": [
         {
           "date": "7:43:33 م",
@@ -4172,9 +4172,15 @@
           "txId": "TX_TEST_9992",
           "type": "رهان 🎰 — لعبة 126",
           "amount": "-2 $"
+        },
+        {
+          "date": "3:00:55 م",
+          "txId": "TX_AUDIT_1784732455513",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
         }
       ],
-      "sessionCreatedAt": "2026-07-22T14:56:37.102Z"
+      "sessionCreatedAt": "2026-07-22T15:00:53.158Z"
     },
     {
       "id": "421293",
@@ -8528,7 +8534,8 @@
     "2079870663358808064-2079870663358808064-106-0",
     "2079870674222055424-2079870663358808064-106-0",
     "TX_TEST_999",
-    "TX_TEST_9992"
+    "TX_TEST_9992",
+    "TX_AUDIT_1784732455513"
   ],
   "supportMessages": [
     {
