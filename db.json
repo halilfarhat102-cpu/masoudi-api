@@ -7094,9 +7094,9 @@
   "settings": {
     "pgConfig": {
       "currency": "USD",
-      "isProduction": false,
-      "productionApiDomain": "https://api.pg-bo.me",
-      "productionOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
+      "isProduction": true,
+      "productionApiDomain": "https://api.pg-bo.com",
+      "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0",
       "productionSecretKey": "c89632307f734f6192fa420864a2c847",
       "stagingApiDomain": "https://api.pg-bo.me",
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",

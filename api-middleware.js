@@ -1901,13 +1901,13 @@ export async function apiMiddleware(req, res, next) {
         productionSecretKey: 'c89632307f734f6192fa420864a2c847'
       };
 
-      const isProd = Boolean(pgConfig.isProduction);
-      const operatorToken = pgConfig.productionOperatorToken || pgConfig.stagingOperatorToken || 'I-6c19673883aa410b98d1c0cb1a3c5edc';
+      const isProd = pgConfig.isProduction !== false;
+      const operatorToken = pgConfig.productionOperatorToken || 'a5fd4c1a25904aae8729516557c160d0';
       
-      let baseUrl = pgConfig.productionApiDomain || 'https://api.pg-bo.me';
+      let baseUrl = pgConfig.productionApiDomain || 'https://api.pg-bo.com';
       if (String(operatorToken).startsWith('I-') || String(operatorToken).startsWith('i-')) {
         baseUrl = 'https://api.pg-bo.me';
-      } else if (isProd) {
+      } else {
         baseUrl = 'https://api.pg-bo.com';
       }
 
