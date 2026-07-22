@@ -1938,8 +1938,8 @@ export async function apiMiddleware(req, res, next) {
       }
       const path = `/${cleanGameCode}/index.html`;
       const playerObj = (db.players || []).find(x => String(x.id) === String(playerId));
-      const playerCurrency = playerObj?.currency || pgConfig.currency || 'USD';
-      const extraArgs = `ops=${sessionToken}&btt=1&l=ar&cr=${playerCurrency}`;
+      const bttMode = pgConfig.bttMode || 2;
+      const extraArgs = `ops=${sessionToken}&btt=${bttMode}&l=ar&cr=${playerCurrency}`;
 
       // Build form-urlencoded request body
       const formParams = new URLSearchParams();
