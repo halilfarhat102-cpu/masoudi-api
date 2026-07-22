@@ -131,14 +131,14 @@
       "bonus": 0,
       "email": "halilfarhat102@gmail.com",
       "status": "active",
-      "balance": 70361.6,
+      "balance": 70357.6,
       "isAgent": true,
       "currency": "USD",
       "joinDate": "2026-07-21",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
       "lastLogin": "2026-07-22",
       "agentBalance": 70000,
-      "sessionToken": "sess_519997_1784732453158",
+      "sessionToken": "sess_519997_1784734191714",
       "transactions": [
         {
           "date": "7:43:33 م",
@@ -4178,9 +4178,33 @@
           "txId": "TX_AUDIT_1784732455513",
           "type": "رهان 🎰 — لعبة 126",
           "amount": "-1 $"
+        },
+        {
+          "date": "3:05:26 م",
+          "txId": "TX_AUDIT_1784732725824",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
+        },
+        {
+          "date": "3:09:32 م",
+          "txId": "TX_AUDIT_1784732972019",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
+        },
+        {
+          "date": "3:13:24 م",
+          "txId": "TX_AUDIT_1784733204754",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
+        },
+        {
+          "date": "3:20:59 م",
+          "txId": "TX_DIAG_1784733659358",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
         }
       ],
-      "sessionCreatedAt": "2026-07-22T15:00:53.158Z"
+      "sessionCreatedAt": "2026-07-22T15:29:51.714Z"
     },
     {
       "id": "421293",
@@ -4254,7 +4278,7 @@
       "joinDate": "2026-07-22",
       "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocISHVzuprrxCHaJiJH-REmoCVt_pLegB4LomKpD9qUPBi0-Xg=s96-c",
       "lastLogin": "2026-07-22",
-      "sessionToken": "sess_350461_1784695775226",
+      "sessionToken": "sess_350461_1784732910188",
       "transactions": [
         {
           "date": "1:33:20 ص",
@@ -7293,7 +7317,7 @@
           "amount": "-250 $"
         }
       ],
-      "sessionCreatedAt": "2026-07-22T04:49:35.226Z"
+      "sessionCreatedAt": "2026-07-22T15:08:30.188Z"
     },
     {
       "id": "123456",
@@ -8535,7 +8559,11 @@
     "2079870674222055424-2079870663358808064-106-0",
     "TX_TEST_999",
     "TX_TEST_9992",
-    "TX_AUDIT_1784732455513"
+    "TX_AUDIT_1784732455513",
+    "TX_AUDIT_1784732725824",
+    "TX_AUDIT_1784732972019",
+    "TX_AUDIT_1784733204754",
+    "TX_DIAG_1784733659358"
   ],
   "supportMessages": [
     {
