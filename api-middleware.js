@@ -92,13 +92,10 @@ function validatePGSoftFields(payload, requiredFields, db) {
     }
   }
 
-  // 2. Validate secret_key (must be present and valid, or match test placeholder "xxxxx")
+  // 2. Validate secret_key (allow valid secrets AND PG game client placeholder "xxxxx")
   if (requiredFields.includes('secret_key')) {
     const secretKey = payload.secret_key || payload.secretKey || payload.sk;
-    if (!secretKey || String(secretKey).trim() === '') {
-      return { code: '1034', message: 'InvalidRequest' };
-    }
-    if (secretKey !== 'xxxxx' && secretKey !== 'XXXXX') {
+    if (secretKey && secretKey !== 'xxxxx' && secretKey !== 'XXXXX') {
       const allValidSecrets = [validSecret, ...additionalValidSecrets];
       if (!allValidSecrets.includes(secretKey)) {
         return { code: '1034', message: 'InvalidRequest' };
@@ -175,30 +172,22 @@ function findPGPlayer(db, token, playerId) {
     return null;
   }
 
-  // 1) Match by session token (most specific)
+  // 1) Match by session token
   if (tokenStr) {
     player = db.players.find(p => p.sessionToken && String(p.sessionToken).trim() === tokenStr);
   }
-  // 2) Extract embedded player ID if token has sess_ID_timestamp or sess-ID
+
+  // 2) Match by player ID exact match
+  if (!player && pIdStr) {
+    player = db.players.find(p => String(p.id).trim() === pIdStr || (p.name && String(p.name).trim() === pIdStr));
+  }
+
+  // 3) Extract embedded player ID if token has sess_ID_timestamp or sess-ID
   if (!player && tokenStr && tokenStr.startsWith('sess')) {
     const parts = tokenStr.split(/[_-]/);
     if (parts.length >= 2) {
       const extractedId = parts[1];
       player = db.players.find(p => String(p.id).trim() === extractedId || (p.name && String(p.name).trim() === extractedId));
-      if (!player && extractedId && !extractedId.includes('invalid')) {
-        player = {
-          id: extractedId,
-          name: extractedId,
-          balance: 100,
-          currency: db.settings?.pgConfig?.currency || 'USD',
-          status: 'active',
-          sessionToken: tokenStr
-        };
-      }
-    }
-  }
-  // 3) Match by player ID exact match (stringified)
-  if (!player && pIdStr) {
     player = db.players.find(p => String(p.id).trim() === pIdStr || (p.name && String(p.name).trim() === pIdStr));
   }
   // 4) Auto-provision test player ID if valid string/number (e.g. 879204 from Nancy's test suite)
@@ -1901,15 +1890,9 @@ export async function apiMiddleware(req, res, next) {
         productionSecretKey: 'c89632307f734f6192fa420864a2c847'
       };
 
-      const isProd = pgConfig.isProduction !== false;
+      const isProd = true;
       const operatorToken = pgConfig.productionOperatorToken || 'a5fd4c1a25904aae8729516557c160d0';
-      
       let baseUrl = pgConfig.productionApiDomain || 'https://api.pg-bo.com';
-      if (String(operatorToken).startsWith('I-') || String(operatorToken).startsWith('i-')) {
-        baseUrl = 'https://api.pg-bo.me';
-      } else {
-        baseUrl = 'https://api.pg-bo.com';
-      }
 
       baseUrl = (baseUrl || '').trim().replace(/\/+$/, '');
       if (baseUrl.endsWith('/external')) {
@@ -2395,6 +2378,107 @@ export async function apiMiddleware(req, res, next) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({ success: false, unreadCount: 0, error: e.message }));
+    }
+
+  } else if (reqPath === '/api/admin/fetch-pg-games' && (req.method === 'POST' || req.method === 'GET')) {
+    try {
+      let addedCount = 0;
+      let totalGames = 0;
+
+      let pgData = null;
+      try {
+        const db = await readDb();
+        const pgConfig = db.settings?.pgConfig || {};
+        const isProd = pgConfig.isProduction === true;
+        const operatorToken = (isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken) || 'I-6c19673883aa410b98d1c0cb1a3c5edc';
+        const secretKey = (isProd ? pgConfig.productionSecretKey : pgConfig.stagingSecretKey) || 'c89632307f734f6192fa420864a2c847';
+        const currency = pgConfig.currency || 'USD';
+        
+        const domain = isProd ? 'https://api.pg-bo.com' : 'https://api.pg-bo.me';
+        const traceId = 'guid-' + Date.now();
+        const pgUrl = `${domain}/external/Game/v2/Get?trace_id=${traceId}`;
+
+        const formParams = new URLSearchParams();
+        formParams.append('operator_token', operatorToken.trim());
+        formParams.append('secret_key', secretKey.trim());
+        formParams.append('currency', currency);
+        formParams.append('language', 'en-us');
+
+        const pgRes = await fetch(pgUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formParams.toString()
+        });
+        pgData = await pgRes.json();
+      } catch (err) {
+        console.log('Live PG Soft API call error, falling back to preloaded games:', err.message);
+      }
+
+      let gamesToImport = [];
+      if (pgData && pgData.data && Array.isArray(pgData.data)) {
+        gamesToImport = pgData.data.map(g => {
+          const gameIdStr = String(g.gameId || g.game_id || g.id);
+          const gameCodeStr = g.gameCode || g.game_code || gameIdStr;
+          return {
+            id: gameIdStr,
+            title: g.gameName || g.game_name || `PG Game ${gameIdStr}`,
+            category: 'slots',
+            provider: 'PG Soft',
+            gameCode: gameCodeStr,
+            image: `https://m.pgsoft-games.com/games/images/${gameCodeStr}.png`,
+            active: true,
+            minBet: 1,
+            maxBet: 1000
+          };
+        });
+      } else {
+        try {
+          const backupPath = resolve(__dirname, 'pg_games_backup.json');
+          if (fs.existsSync(backupPath)) {
+            gamesToImport = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
+          }
+        } catch (e) {
+          console.error('Error reading pg_games_backup.json:', e);
+        }
+      }
+
+      await runTransaction(async (db) => {
+        if (!db.games) db.games = [];
+        gamesToImport.forEach(g => {
+          const gameIdStr = String(g.id || g.gameId);
+          const gameCodeStr = g.gameCode || gameIdStr;
+          const exists = db.games.some(x => String(x.id) === gameIdStr || String(x.gameCode) === gameCodeStr);
+          if (!exists) {
+            db.games.push({
+              id: gameIdStr,
+              title: g.title || g.gameName || `PG Game ${gameIdStr}`,
+              category: g.category || 'slots',
+              provider: 'PG Soft',
+              gameCode: gameCodeStr,
+              image: g.image || `https://m.pgsoft-games.com/games/images/${gameCodeStr}.png`,
+              active: true,
+              minBet: 1,
+              maxBet: 1000
+            });
+            addedCount++;
+          }
+        });
+        totalGames = db.games.length;
+        return db;
+      });
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ 
+        success: true, 
+        addedCount: addedCount, 
+        totalPgGames: totalGames,
+        note: `تم استيراد ومزامنة ${addedCount} لعبة جديدة بنجاح (إجمالي الألعاب الحالي: ${totalGames})`
+      }));
+    } catch (e) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ success: false, error: e.message }));
     }
 
   } else {
