@@ -1913,7 +1913,31 @@ export async function apiMiddleware(req, res, next) {
         rawIp = '196.153.185.113';
       }
 
-      const cleanGameCode = String(gameCode).replace(/^\/+|\/+$/g, '').trim();
+      const pgIdMap = {
+        '98': 'fortune-ox',
+        '74': 'mahjong-ways2',
+        '126': 'fortune-tiger',
+        '65': 'mahjong-ways',
+        '60': 'leprechaun-riches',
+        '50': 'journey-to-the-wealth',
+        '68': 'fortune-mouse',
+        '113': 'raider-janes-crypt-of-fortune',
+        '69': 'bikini-paradise',
+        '70': 'candy-burst',
+        '71': 'cai-shen-wins',
+        '73': 'egypts-book-mystery',
+        '80': 'circus-delight',
+        '82': 'phoenix-rises',
+        '83': 'wild-fireworks',
+        '84': 'queen-of-bounty',
+        '1': 'diaochan',
+        '2': 'gem-saviour'
+      };
+
+      let cleanGameCode = String(gameCode).replace(/^\/+|\/+$/g, '').trim();
+      if (pgIdMap[cleanGameCode]) {
+        cleanGameCode = pgIdMap[cleanGameCode];
+      }
       const path = `/${cleanGameCode}/index.html`;
       const playerObj = (db.players || []).find(x => String(x.id) === String(playerId));
       const playerCurrency = playerObj?.currency || pgConfig.currency || 'USD';
