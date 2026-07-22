@@ -7101,7 +7101,7 @@
       "stagingApiDomain": "https://api.pg-bo.me",
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
-      "bttMode": 2
+      "bttMode": 1
     },
     "coinBuyRate": 10000,
     "showBalance": true,
