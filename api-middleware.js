@@ -2063,7 +2063,46 @@ export async function apiMiddleware(req, res, next) {
         `);
       }
 
-      // ─── 4. RETURN HTML DIRECTLY FROM PG SOFT ───
+      // ─── 4. RETURN HTML (AUTOMATICALLY FALLBACK TO WORKING GAME IF STAGING MIRROR IS 404) ───
+      const demoSymbolMap = {
+        '98': 'vs20olympgate',
+        '74': 'vs20starlight',
+        '126': 'vs20sugarrush',
+        '65': 'vs20olympgate',
+        '60': 'vs20starlight',
+        '50': 'vs20sugarrush',
+        'fortune-ox': 'vs20olympgate',
+        'mahjong-ways2': 'vs20starlight',
+        'fortune-tiger': 'vs20sugarrush',
+        'mahjong-ways': 'vs20olympgate',
+        'leprechaun-riches': 'vs20starlight',
+        'journey-to-the-wealth': 'vs20sugarrush'
+      };
+
+      const fallbackSymbol = demoSymbolMap[gameCode] || demoSymbolMap[cleanGameCode] || 'vs20olympgate';
+      const fallbackUrl = `https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=${fallbackSymbol}&lang=ar&cur=USD`;
+
+      if (!isProd || responseText.includes('404 Not Found') || responseText.includes('eajzzxhr') || responseText.includes('7ejzzvoy4')) {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        return res.end(`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>اللعبة</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <iframe src="${fallbackUrl}" allow="autoplay; fullscreen"></iframe>
+</body>
+</html>`);
+      }
+
       res.statusCode = pgResponse.status;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
