@@ -2292,6 +2292,81 @@ export async function apiMiddleware(req, res, next) {
       res.end(JSON.stringify({ success: false, unreadCount: 0, error: e.message }));
     }
 
+  } else if (reqPath === '/api/admin/fetch-pg-games' && (req.method === 'POST' || req.method === 'GET')) {
+    try {
+      const db = await readDb();
+      const pgConfig = db.settings?.pgConfig || {};
+      const isProd = pgConfig.isProduction;
+      const operatorToken = isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken;
+      const secretKey = isProd ? pgConfig.productionSecretKey : pgConfig.stagingSecretKey;
+      const currency = pgConfig.currency || 'USD';
+      
+      let baseUrl = isProd 
+        ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com') 
+        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me/external');
+
+      baseUrl = (baseUrl || '').trim().replace(/\/+$/, '');
+      if (baseUrl.endsWith('/external')) {
+        baseUrl = baseUrl.slice(0, -9);
+      }
+
+      const traceId = 'guid-' + crypto.randomUUID();
+      const pgUrl = `${baseUrl}/external/Game/v2/Get?trace_id=${traceId}`;
+
+      const formParams = new URLSearchParams();
+      formParams.append('operator_token', operatorToken || '');
+      formParams.append('secret_key', secretKey || '');
+      formParams.append('currency', currency);
+      formParams.append('language', 'en-us');
+      formParams.append('status', '1');
+
+      const pgRes = await fetch(pgUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formParams.toString()
+      });
+
+      const pgData = await pgRes.json();
+      
+      if (pgData && pgData.data && Array.isArray(pgData.data)) {
+        let addedCount = 0;
+        await runTransaction(async (db) => {
+          if (!db.games) db.games = [];
+          pgData.data.forEach(g => {
+            const gameIdStr = String(g.gameId || g.game_id || g.id);
+            const exists = db.games.some(x => String(x.id) === gameIdStr || String(x.gameCode) === gameIdStr);
+            if (!exists) {
+              db.games.push({
+                id: gameIdStr,
+                title: g.gameName || g.game_name || `PG Game ${gameIdStr}`,
+                category: 'pgsoft',
+                provider: 'PG Soft',
+                gameCode: gameIdStr,
+                image: g.iconUrl || g.bannerUrl || 'assets/images/games/slot.jpg',
+                active: true,
+                minBet: 1,
+                maxBet: 1000
+              });
+              addedCount++;
+            }
+          });
+          return db;
+        });
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify({ success: true, addedCount, totalPgGames: pgData.data.length }));
+      } else {
+        res.statusCode = 400;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify({ success: false, error: pgData.error?.message || 'فشل جلب الألعاب من PG Soft. يرجى التأكد من الـ Secret Key و Operator Token' }));
+      }
+    } catch (e) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ success: false, error: e.message }));
+    }
+
   } else {
     next();
   }

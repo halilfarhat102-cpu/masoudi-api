@@ -2441,3 +2441,20 @@ function adminLogout() {
     showToast('تم تسجيل الخروج من لوحة التحكم');
 }
 window.adminLogout = adminLogout;
+
+async function fetchAndSyncPgGames() {
+    showToast('جاري طلب واستيراد الألعاب من PG Soft...');
+    try {
+        const res = await fetch('/api/admin/fetch-pg-games', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            showToast(`تمت المزامنة بنجاح! تم استيراد ${data.addedCount} لعبة جديدة من أصل ${data.totalPgGames} 🚀`);
+            await loadData();
+        } else {
+            showToast(data.error || 'فشل جلب الألعاب من PG Soft', 'error');
+        }
+    } catch(e) {
+        showToast('تعذر الاتصال بالخادم لمزامنة الألعاب', 'error');
+    }
+}
+window.fetchAndSyncPgGames = fetchAndSyncPgGames;
