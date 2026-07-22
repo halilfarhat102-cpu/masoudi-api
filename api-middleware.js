@@ -1590,7 +1590,8 @@ export async function apiMiddleware(req, res, next) {
           data: {
             currency_code: resultCurrency,
             balance_amount: finalBal,
-            updated_time: Date.now()
+            updated_time: Date.now(),
+            transaction_id: String(txId)
           },
           error: null
         };
