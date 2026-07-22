@@ -3120,4 +3120,23 @@ tr:last-child td {
     gap: 8px;
 }
 
+.custom_alert .content .message {
+  font-size: 14px;
+  margin: 0 auto;
+  width: 90%;
+  white-space: normal;
+  color: #333;          /* ensure text is visible */
+}
+
+.custom_alert .content .message_padding {
+  padding: 8px 0;       /* cleaner spacing */
+}
+
+.errorlabel {
+  font-size: 12px;      /* slightly larger */
+  color: red;           /* make errors stand out */
+  font-weight: bold;
+}
+
+
 
