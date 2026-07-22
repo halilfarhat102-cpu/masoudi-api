@@ -1399,10 +1399,11 @@ export async function apiMiddleware(req, res, next) {
 
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
+        const cleanNickname = (foundPlayer.name || ('Player_' + foundPlayer.id)).replace(/[^\x00-\x7F]+/g, '').trim() || ('Player_' + foundPlayer.id);
         const resObj = {
           data: {
             player_name: String(foundPlayer.id),
-            nickname: foundPlayer.name || ('لاعب ' + foundPlayer.id),
+            nickname: cleanNickname,
             currency: currency
           },
           error: null
