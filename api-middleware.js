@@ -84,11 +84,11 @@ function validatePGSoftFields(payload, requiredFields, db) {
   if (requiredFields.includes('operator_token')) {
     const opToken = payload.operator_token || payload.operatorToken || payload.ot;
     if (!opToken) {
-      return { code: '1034', message: 'InvalidRequest' };
+      return { code: '1034', message: 'InvalidRequest', reason: 'Missing operator_token' };
     }
     const allValid = [validStagingToken, validProductionToken, ...additionalValidTokens];
     if (!allValid.includes(opToken)) {
-      return { code: '1034', message: 'InvalidRequest' };
+      return { code: '1034', message: 'InvalidRequest', reason: `Invalid operator_token: "${opToken}"` };
     }
   }
 
@@ -98,7 +98,7 @@ function validatePGSoftFields(payload, requiredFields, db) {
     if (secretKey && secretKey !== 'xxxxx' && secretKey !== 'XXXXX') {
       const allValidSecrets = [validSecret, ...additionalValidSecrets];
       if (!allValidSecrets.includes(secretKey)) {
-        return { code: '1034', message: 'InvalidRequest' };
+        return { code: '1034', message: 'InvalidRequest', reason: `Invalid secret_key` };
       }
     }
   }
@@ -107,7 +107,7 @@ function validatePGSoftFields(payload, requiredFields, db) {
   if (requiredFields.includes('operator_player_session')) {
     const sessionToken = payload.operator_player_session || payload.player_session || payload.sessionToken || payload.token || payload.ops;
     if (!sessionToken || sessionToken.trim() === '') {
-      return { code: '1034', message: 'InvalidRequest' };
+      return { code: '1034', message: 'InvalidRequest', reason: 'Missing operator_player_session' };
     }
   }
 
@@ -115,7 +115,7 @@ function validatePGSoftFields(payload, requiredFields, db) {
   if (requiredFields.includes('player_name')) {
     const pName = payload.player_name || payload.player_id || payload.playerId;
     if (!pName || String(pName).trim() === '') {
-      return { code: '1034', message: 'InvalidRequest' };
+      return { code: '1034', message: 'InvalidRequest', reason: 'Missing player_name' };
     }
   }
 
@@ -1359,18 +1359,40 @@ export async function apiMiddleware(req, res, next) {
     let body = '';
     req.on('data', c => { body += c; });
     req.on('end', async () => {
-      console.log('[PG] verify-session called, url:', req.url, 'body:', body.substring(0, 200));
+      let traceId = 'N/A';
+      try {
+        const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+        traceId = parsedUrl.searchParams.get('trace_id') || 'N/A';
+      } catch (_) {}
+
       try {
         const db = await readDb();
         const payload = parsePGPayload(req.url, body, req.headers.host);
 
+        const opToken = payload.operator_token || payload.operatorToken || payload.ot || 'N/A';
+        const secretKey = payload.secret_key || payload.secretKey || payload.sk || 'N/A';
+        const maskedSecret = secretKey.length > 4 ? secretKey.substring(0, 2) + '***' + secretKey.slice(-2) : '***';
+        const sessToken = payload.operator_player_session || payload.player_session || payload.sessionToken || payload.token || payload.ops || 'N/A';
+        const gameId = payload.game_id || payload.game_code || payload.gameId || 'N/A';
+        const clientIp = payload.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'N/A';
+
         // Validate operator_token, secret_key, operator_player_session
         const valErr = validatePGSoftFields(payload, ['operator_token', 'secret_key', 'operator_player_session'], db);
         if (valErr) {
+          const reasonStr = valErr.reason || 'Field Validation Failed';
+          console.error(`\n❌ [PG VerifySession REJECTED - Error 1034]`);
+          console.error(`Reason:                  ${reasonStr}`);
+          console.error(`Trace ID:                ${traceId}`);
+          console.error(`Operator Token:          ${opToken}`);
+          console.error(`Secret Key (Masked):     ${maskedSecret}`);
+          console.error(`Operator Player Session: ${sessToken}`);
+          console.error(`Game ID:                 ${gameId}`);
+          console.error(`Client IP:               ${clientIp}\n`);
+
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          const resObj = { data: null, error: valErr };
-          logPGCallback('VerifySession', req, body, 200, resObj, null, null, null, payload.game_code, null);
+          const resObj = { data: null, error: { code: '1034', message: 'InvalidRequest' } };
+          logPGCallback('VerifySession', req, body, 200, resObj, null, null, null, gameId, sessToken);
           return res.end(JSON.stringify(resObj));
         }
 
@@ -1392,13 +1414,22 @@ export async function apiMiddleware(req, res, next) {
         });
 
         if (!foundPlayer) {
+          console.error(`\n❌ [PG VerifySession REJECTED - Error 1034]`);
+          console.error(`Reason:                  Player / Session Not Found`);
+          console.error(`Trace ID:                ${traceId}`);
+          console.error(`Operator Token:          ${opToken}`);
+          console.error(`Secret Key (Masked):     ${maskedSecret}`);
+          console.error(`Operator Player Session: ${sessToken}`);
+          console.error(`Game ID:                 ${gameId}`);
+          console.error(`Client IP:               ${clientIp}\n`);
+
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
           const resObj = {
             data: null,
             error: { code: '1034', message: 'InvalidRequest' }
           };
-          logPGCallback('VerifySession', req, body, 200, resObj, playerId, null, null, payload.game_code, token);
+          logPGCallback('VerifySession', req, body, 200, resObj, playerId, null, null, gameId, token);
           return res.end(JSON.stringify(resObj));
         }
 
@@ -1413,9 +1444,12 @@ export async function apiMiddleware(req, res, next) {
           },
           error: null
         };
-        logPGCallback('VerifySession', req, body, 200, resObj, foundPlayer.id, currency, currency, payload.game_code, token);
+        logPGCallback('VerifySession', req, body, 200, resObj, foundPlayer.id, currency, currency, gameId, token);
         res.end(JSON.stringify(resObj));
       } catch (e) {
+        console.error(`\n❌ [PG VerifySession REJECTED - Error 1034]`);
+        console.error(`Reason:                  Exception Thrown (${e.message})`);
+        console.error(`Trace ID:                ${traceId}\n`);
         logPGCallbackError('VerifySession', req, body, e, null);
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
