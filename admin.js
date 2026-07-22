@@ -107,12 +107,7 @@ function initAdminHeader() {
 }
 
 // ─── Admin Logout ─────────────────────────────
-function adminLogout() {
-    sessionStorage.removeItem('adminToken');
-    sessionStorage.removeItem('adminName');
-    sessionStorage.removeItem('adminRole');
-    window.location.replace('/admin-login.html');
-}
+// (Defined below)
 
 // ─── Change Password ──────────────────────────
 async function doChangePassword() {
