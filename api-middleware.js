@@ -1970,7 +1970,7 @@ export async function apiMiddleware(req, res, next) {
       const playerObj = (db.players || []).find(x => String(x.id) === String(playerId));
       const playerCurrency = playerObj?.currency || pgConfig.currency || 'USD';
       const cleanCurrency = String(playerCurrency).replace(/[^a-zA-Z]/g, '').toUpperCase().trim();
-      const bttMode = pgConfig.bttMode || (pgConfig.isProduction ? 1 : 2);
+      const bttMode = pgConfig.bttMode || 2;
       const extraArgs = `ops=${sessionToken}&cr=${cleanCurrency}&l=ar&btt=${bttMode}`;
 
       // Build form-urlencoded request body
