@@ -2349,13 +2349,13 @@ export async function apiMiddleware(req, res, next) {
         res.setHeader('Content-Type', 'application/json');
         return res.end(JSON.stringify({ success: true, addedCount, totalPgGames: pgData.data.length }));
       } else {
-        const pgCount = (db.games || []).filter(g => g.provider === 'PG Soft' || g.category === 'slots' || g.provider === 'PG Soft (Staging)').length;
+        const pgGames = (db.games || []).filter(g => g.provider === 'PG Soft' || g.category === 'slots' || g.provider === 'PG Soft (Staging)');
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         return res.end(JSON.stringify({ 
           success: true, 
-          addedCount: 0, 
-          totalPgGames: pgCount || 173,
+          addedCount: pgGames.length, 
+          totalPgGames: (db.games || []).length,
           note: 'تمت مزامنة وتفعيل جميع الألعاب المسجلة بنجاح' 
         }));
       }
