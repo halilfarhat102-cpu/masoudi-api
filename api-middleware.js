@@ -1378,10 +1378,10 @@ export async function apiMiddleware(req, res, next) {
           const player = findPGPlayer(db2, token, playerId);
           if (player) {
             player.lastLogin = new Date().toISOString().split('T')[0];
-            currency = player.currency || db2.settings?.pgConfig?.currency || 'USD';
+            currency = String(player.currency || db2.settings?.pgConfig?.currency || 'USD').toUpperCase().trim();
             foundPlayer = { id: player.id, name: player.name };
           } else {
-            currency = db2.settings?.pgConfig?.currency || 'USD';
+            currency = String(db2.settings?.pgConfig?.currency || 'USD').toUpperCase().trim();
           }
           return db2;
         });
@@ -1460,7 +1460,7 @@ export async function apiMiddleware(req, res, next) {
           currentBal = 100.00;
           player.balance = 100.00;
         }
-        const playerCurrency = player.currency || db.settings?.pgConfig?.currency || 'USD';
+        const playerCurrency = String(player.currency || db.settings?.pgConfig?.currency || 'USD').toUpperCase().trim();
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         
