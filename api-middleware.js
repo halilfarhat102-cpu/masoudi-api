@@ -2004,7 +2004,15 @@ export async function apiMiddleware(req, res, next) {
         return res.end(renderInteractiveGameHtml(gameObj, player, playerId));
       }
 
-      // ─── 4. RETURN HTML DIRECTLY ───
+      // ─── 4. RETURN HTML (FALLBACK TO INTERACTIVE ENGINE IF STAGING MIRROR OR ERROR IS PRESENT) ───
+      const gameObj = (db.games || []).find(g => g.gameCode === cleanGameCode || g.id === cleanGameCode) || { title: cleanGameCode, image: `https://m.pgsoft-games.com/games/images/${cleanGameCode}.png` };
+      if (!isProd || responseText.includes('7ejzzvoy4') || responseText.includes('eajzzxhr') || responseText.includes('access_denied')) {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        return res.end(renderInteractiveGameHtml(gameObj, playerObj, playerId));
+      }
+
       res.statusCode = pgResponse.status;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
