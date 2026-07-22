@@ -92,10 +92,13 @@ function validatePGSoftFields(payload, requiredFields, db) {
     }
   }
 
-  // 2. Validate secret_key (allow valid secrets AND PG game client placeholder "xxxxx")
+  // 2. Validate secret_key (must be present and valid, or match test placeholder "xxxxx")
   if (requiredFields.includes('secret_key')) {
     const secretKey = payload.secret_key || payload.secretKey || payload.sk;
-    if (secretKey && secretKey !== 'xxxxx' && secretKey !== 'XXXXX') {
+    if (!secretKey || String(secretKey).trim() === '') {
+      return { code: '1034', message: 'InvalidRequest' };
+    }
+    if (secretKey !== 'xxxxx' && secretKey !== 'XXXXX') {
       const allValidSecrets = [validSecret, ...additionalValidSecrets];
       if (!allValidSecrets.includes(secretKey)) {
         return { code: '1034', message: 'InvalidRequest' };
