@@ -1888,11 +1888,9 @@ export async function apiMiddleware(req, res, next) {
         productionSecretKey: 'c89632307f734f6192fa420864a2c847'
       };
 
-      const isProd = pgConfig.isProduction;
-      const operatorToken = isProd ? pgConfig.productionOperatorToken : pgConfig.stagingOperatorToken;
-      let baseUrl = isProd 
-        ? (pgConfig.productionApiDomain || 'https://api.pg-bo.com') 
-        : (pgConfig.stagingApiDomain || 'https://api.pg-bo.me/external/');
+      const isProd = true;
+      const operatorToken = pgConfig.productionOperatorToken || 'a5fd4c1a25904aae8729516557c160d0';
+      let baseUrl = pgConfig.productionApiDomain || 'https://api.pg-bo.com';
 
       baseUrl = (baseUrl || '').trim().replace(/\/+$/, '');
       if (baseUrl.endsWith('/external')) {
