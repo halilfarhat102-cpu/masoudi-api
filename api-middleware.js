@@ -1911,30 +1911,30 @@ export async function apiMiddleware(req, res, next) {
         rawIp = '196.153.185.113';
       }
 
-      const pgIdMap = {
-        '98': 'fortune-ox',
-        '74': 'mahjong-ways2',
-        '126': 'fortune-tiger',
-        '65': 'mahjong-ways',
-        '60': 'leprechaun-riches',
-        '50': 'journey-to-the-wealth',
-        '68': 'fortune-mouse',
-        '113': 'raider-janes-crypt-of-fortune',
-        '69': 'bikini-paradise',
-        '70': 'candy-burst',
-        '71': 'cai-shen-wins',
-        '73': 'egypts-book-mystery',
-        '80': 'circus-delight',
-        '82': 'phoenix-rises',
-        '83': 'wild-fireworks',
-        '84': 'queen-of-bounty',
-        '1': 'diaochan',
-        '2': 'gem-saviour'
+      const pgSlugToIdMap = {
+        'fortune-ox': '98',
+        'mahjong-ways2': '74',
+        'fortune-tiger': '126',
+        'mahjong-ways': '65',
+        'leprechaun-riches': '60',
+        'journey-to-the-wealth': '50',
+        'fortune-mouse': '68',
+        'raider-janes-crypt-of-fortune': '113',
+        'bikini-paradise': '69',
+        'candy-burst': '70',
+        'cai-shen-wins': '71',
+        'egypts-book-mystery': '73',
+        'circus-delight': '80',
+        'phoenix-rises': '82',
+        'wild-fireworks': '83',
+        'queen-of-bounty': '84',
+        'diaochan': '1',
+        'gem-saviour': '2'
       };
 
       let cleanGameCode = String(gameCode).replace(/^\/+|\/+$/g, '').trim();
-      if (pgIdMap[cleanGameCode]) {
-        cleanGameCode = pgIdMap[cleanGameCode];
+      if (pgSlugToIdMap[cleanGameCode]) {
+        cleanGameCode = pgSlugToIdMap[cleanGameCode];
       }
       const path = `/${cleanGameCode}/index.html`;
       const playerObj = (db.players || []).find(x => String(x.id) === String(playerId));
