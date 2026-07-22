@@ -7340,7 +7340,8 @@
       "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
       "productionSecretKey": "c89632307f734f6192fa420864a2c847",
       "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
-      "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0"
+      "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0",
+      "bttMode": 1
     },
     "coinBuyRate": 10000,
     "showBalance": true,
