@@ -1473,6 +1473,18 @@
                         <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
                     </div>
 
+                    <div class="menu-card" onclick="switchTab('tab-support')" style="position:relative;">
+                        <div class="menu-card-icon" style="background: linear-gradient(135deg, #00E676, #00B0FF);">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div class="menu-card-text">
+                            <h4 class="menu-card-title">الدعم الفني والرسائل</h4>
+                            <p class="menu-card-desc">تواصل مباشر ورسائل اللاعبين</p>
+                        </div>
+                        <span id="dashUnreadSupportBadge" style="display:none;position:absolute;top:10px;left:10px;background:#FF3D00;color:#fff;font-size:10px;font-weight:bold;padding:2px 8px;border-radius:10px;">0</span>
+                        <i class="fa-solid fa-chevron-left menu-card-arrow"></i>
+                    </div>
+
                     <div class="menu-card" onclick="switchTab('tab-game-config')">
                         <div class="menu-card-icon" style="background: linear-gradient(135deg, #E040FB, #651FFF);">
                             <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -2028,7 +2040,7 @@
                         </select>
                     </div>
                     <div class="form-field" style="margin-bottom:20px;">
-                        <label>صورة البنر (الخلفية الممتدة)</label>
+                        <label>صورة البنر (الخلفية الممتدة الرئيسية)</label>
                         <div style="display:flex;gap:6px;align-items:center;">
                             <input type="file" id="bannerImageUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('bannerImageUpload', 'newBannerImage', 'bannerUploadStatus')">
                             <button class="btn-action btn-add-funds" onclick="triggerImageUpload('bannerImageUpload', 'newBannerImage', 'bannerUploadStatus')" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
@@ -2037,6 +2049,18 @@
                             <input type="text" id="newBannerImage" placeholder="مثال: images/slots.png" style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
                         </div>
                         <span id="bannerUploadStatus" style="font-size:11px;color:#888;margin-top:4px;display:block;">يمكنك كتابة المسار يدوياً أو الضغط على رفع</span>
+                    </div>
+
+                    <div class="form-field" style="margin-bottom:20px;">
+                        <label>صورة صفحة الإعلان التفصيلية (تفتح بملء الشاشة عند الضغط على البنر)</label>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="file" id="bannerDetailUpload" accept="image/*" style="display:none;" onchange="uploadLocalImage('bannerDetailUpload', 'newBannerDetailImage', 'bannerDetailUploadStatus')">
+                            <button class="btn-action btn-add-funds" onclick="triggerImageUpload('bannerDetailUpload', 'newBannerDetailImage', 'bannerDetailUploadStatus')" style="padding:10px 14px;font-size:12px;margin:0;width:auto;flex-shrink:0;border-radius:10px;height:42px;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> رفع صورة الإعلان
+                            </button>
+                            <input type="text" id="newBannerDetailImage" placeholder="اختر صورة الإعلان التفصيلية عند الضغط..." style="margin:0;height:42px;background:rgba(0,0,0,0.3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;width:100%;">
+                        </div>
+                        <span id="bannerDetailUploadStatus" style="font-size:11px;color:#888;margin-top:4px;display:block;">تظهر بملء الشاشة عند ضغط البنّر (إن تركتها فارغة ستُفتح صورة البنر نفسها)</span>
                     </div>
 
                     <button class="btn-submit btn-submit-deposit" onclick="addNewBanner()" style="width:100%;">
@@ -2419,6 +2443,36 @@
                 </div>
             </div>
 
+            <!-- ═══════════════ TAB: SUPPORT / MESSAGES ═══════════════ -->
+            <div id="tab-support" class="tab-panel" style="display: none;">
+                <!-- Back Button -->
+                <button class="btn-back" onclick="window.goBackToGrid()">
+                    <i class="fa-solid fa-arrow-right"></i> رجوع للخلف
+                </button>
+
+                <div class="section-header-row" style="margin-bottom:16px;">
+                    <h3><i class="fa-solid fa-headset" style="color:var(--orange);margin-left:6px;"></i>الدعم الفني ورسائل اللاعبين</h3>
+                    <button class="btn-action btn-add-funds" onclick="loadAdminSupportData()" style="padding:7px 14px;font-size:11px;">
+                        <i class="fa-solid fa-rotate"></i> تحديث الرسائل
+                    </button>
+                </div>
+
+                <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;min-height:560px;">
+                    <!-- Left: Player Conversations List -->
+                    <div class="glass-card" style="padding:14px;display:flex;flex-direction:column;gap:10px;height:560px;overflow-y:auto;" id="supportConversationsList">
+                        <div style="text-align:center;color:#888;padding:20px;font-size:12px;">جاري تحميل المحادثات...</div>
+                    </div>
+
+                    <!-- Right: Selected Conversation View & Reply Chat -->
+                    <div class="glass-card" style="padding:16px;display:flex;flex-direction:column;height:560px;" id="supportChatBox">
+                        <div style="text-align:center;color:#888;margin:auto;font-size:13px;">
+                            <i class="fa-solid fa-comments" style="font-size:40px;color:var(--orange);margin-bottom:12px;display:block;"></i>
+                            اختر محادثة من القائمة الجانبية لبدء المراسلة والتواصل مع اللاعب
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
         </div> <!-- Closing main-content -->
     </div> <!-- Closing admin-wrapper -->
@@ -2602,6 +2656,80 @@
                 <button class="btn-modal-cancel" onclick="closeModal('addAdminModal')">إلغاء</button>
                 <button class="btn-modal-confirm" onclick="doAddAdmin()">إنشاء</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ─── Edit Banner Modal ─── -->
+    <div class="modal-overlay" id="editBannerModal">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-pen-to-square" style="margin-left:8px;"></i>تعديل البنر الإعلاني</h3>
+            <input type="hidden" id="editBannerIndex">
+            
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">عنوان البنر (اختياري)</label>
+            <input type="text" id="editBannerTitle" placeholder="مثال: خصم 50% على الشحن">
+            
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">الوصف الفرعي (اختياري)</label>
+            <input type="text" id="editBannerSubtitle" placeholder="مثال: اشحن الآن واحصل على أفضل العروض">
+            
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">رابط/مسار الصورة الرئيسية للبنر</label>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                <input type="text" id="editBannerImage" placeholder="مثال: assets/images/banner1.jpg" style="flex:1;">
+                <button type="button" class="btn-action" onclick="document.getElementById('editBannerImageFile').click()" style="padding:0 12px;font-size:12px;">
+                    <i class="fa-solid fa-upload"></i> رفع
+                </button>
+                <input type="file" id="editBannerImageFile" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(this, 'editBannerImage', 'editBannerImageStatus')">
+            </div>
+            <div id="editBannerImageStatus" style="font-size:10px;color:#888;margin-top:-8px;margin-bottom:8px;"></div>
+
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">رابط/مسار صورة صفحة التفاصيل (عند الضغط)</label>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                <input type="text" id="editBannerDetailImage" placeholder="أدخل رابط صورة العرض الترويجي..." style="flex:1;">
+                <button type="button" class="btn-action" onclick="document.getElementById('editBannerDetailFile').click()" style="padding:0 12px;font-size:12px;">
+                    <i class="fa-solid fa-upload"></i> رفع
+                </button>
+                <input type="file" id="editBannerDetailFile" accept="image/*" style="display:none;" onchange="window.handleAdminImageUpload(this, 'editBannerDetailImage', 'editBannerDetailStatus')">
+            </div>
+            <div id="editBannerDetailStatus" style="font-size:10px;color:#888;margin-top:-8px;margin-bottom:8px;"></div>
+
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:6px;">ثيم البنر (اللون الرئيسي)</label>
+            <select id="editBannerTheme" style="width:100%;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:14px;outline:none;">
+                <option value="orange">برتقالي ذهبي (Orange)</option>
+                <option value="emerald">زمردي (Emerald)</option>
+                <option value="purple">بنفسجي (Purple)</option>
+                <option value="gold">ذهبي ملوكي (Gold)</option>
+                <option value="crimson">أحمر قرمزي (Crimson)</option>
+            </select>
+
+            <div class="modal-actions">
+                <button class="btn-modal-cancel" onclick="closeModal('editBannerModal')">إلغاء</button>
+                <button class="btn-modal-confirm" onclick="saveEditedBanner()">حفظ التعديلات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Admin Login Overlay ─── -->
+    <div id="adminLoginOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0d0805;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:rgba(30,18,12,0.95);border:1.5px solid var(--orange);border-radius:20px;padding:32px 28px;width:100%;max-width:420px;box-shadow:0 20px 50px rgba(0,0,0,0.8);text-align:center;">
+            <div style="width:70px;height:70px;background:linear-gradient(135deg, #FF7A1F, #D45A00);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 10px 25px rgba(255,122,31,0.4);">
+                <i class="fa-solid fa-user-shield" style="font-size:32px;color:#fff;"></i>
+            </div>
+            <h2 style="color:#fff;font-size:20px;font-weight:bold;margin-bottom:6px;">تسجيل الدخول لوحة التحكم</h2>
+            <p style="color:#aaa;font-size:12px;margin-bottom:24px;">الرجاء إدخال اسم المستخدم وكلمة المرور للمتابعة</p>
+
+            <div style="text-align:right;margin-bottom:14px;">
+                <label style="font-size:11px;color:#bbb;display:block;margin-bottom:6px;">اسم المستخدم</label>
+                <input type="text" id="loginUsernameInput" placeholder="أدخل اسم المستخدم..." style="width:100%;background:rgba(0,0,0,0.5);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:14px;outline:none;" onkeypress="if(event.key==='Enter') doAdminLogin()">
+            </div>
+
+            <div style="text-align:right;margin-bottom:20px;">
+                <label style="font-size:11px;color:#bbb;display:block;margin-bottom:6px;">كلمة المرور</label>
+                <input type="password" id="loginPasswordInput" placeholder="أدخل كلمة المرور..." style="width:100%;background:rgba(0,0,0,0.5);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:14px;outline:none;" onkeypress="if(event.key==='Enter') doAdminLogin()">
+            </div>
+
+            <button onclick="doAdminLogin()" class="btn-action btn-add-funds" style="width:100%;padding:13px;font-size:15px;font-weight:bold;margin:0;border-radius:12px;cursor:pointer;">
+                <i class="fa-solid fa-right-to-bracket" style="margin-left:6px;"></i> دخول لوحة التحكم
+            </button>
+            <div id="loginErrorMsg" style="color:#FF5252;font-size:12px;margin-top:12px;display:none;"></div>
         </div>
     </div>
 

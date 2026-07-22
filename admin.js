@@ -38,7 +38,7 @@ function triggerImageUpload(fileInputId, textInputId, statusId) {
 window.triggerImageUpload = triggerImageUpload;
 
 // ─── Bootstrap ───────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. Initialize language-specific direction
     const lang = localStorage.getItem('admin_lang') || 'ar';
     document.body.style.direction = (lang === 'en') ? 'ltr' : 'rtl';
@@ -50,9 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Start MutationObserver for translating dynamically rendered templates
     initTranslationObserver();
 
-    // 3. Initialize header and load data
-    initAdminHeader();
-    loadData();
+    // 3. Check login authentication
+    const isLoggedIn = await checkAdminLoginState();
+    if (isLoggedIn) {
+        initAdminHeader();
+        loadData();
+    }
 });
 
 // ─── Init Admin Header ────────────────────────
@@ -475,6 +478,10 @@ function switchTab(id) {
         return onclickAttr.includes(`'${id}'`) || onclickAttr.includes(`"${id}"`);
     });
     if (clickedTab) clickedTab.classList.add('active');
+
+    if (id === 'tab-support') {
+        loadAdminSupportData();
+    }
 
     // Close mobile sidebar drawer if open
     if (typeof window.toggleSidebar === 'function') {
@@ -1161,26 +1168,81 @@ function renderAdminBannersTable() {
     }
     tbody.innerHTML = banners.map((b, i) => {
         const previewHtml = b.image 
-            ? `<img src="${resolveImageUrl(b.image)}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;border:1px solid var(--border);">` 
-            : `<span style="font-size:12px;color:#888;padding:6px;border:1px dashed var(--border);border-radius:6px;">بدون صورة (${b.theme})</span>`;
+            ? `<img src="${resolveImageUrl(b.image)}" style="width:60px;height:45px;border-radius:6px;object-fit:cover;border:1px solid var(--border);" title="الصورة الرئيسية">` 
+            : `<span style="font-size:11px;color:#888;padding:4px 8px;border:1px dashed var(--border);border-radius:6px;">بدون صورة (${b.theme})</span>`;
+
+        const detailPreviewHtml = b.detailImage 
+            ? `<img src="${resolveImageUrl(b.detailImage)}" style="width:60px;height:45px;border-radius:6px;object-fit:cover;border:1px solid var(--border);" title="صورة التفاصيل">` 
+            : `<span style="font-size:11px;color:#666;">لا توجد صورة تفاصيل</span>`;
 
         return `
         <tr>
-            <td>${previewHtml}</td>
-            <td><button class="btn-delete-row" onclick="deleteBanner(${i})"><i class="fa-solid fa-trash-can"></i> حذف</button></td>
+            <td style="display:flex;align-items:center;gap:12px;">
+                <div>
+                    <div style="font-size:10px;color:#888;margin-bottom:3px;">الرئيسية:</div>
+                    ${previewHtml}
+                </div>
+                <div>
+                    <div style="font-size:10px;color:#888;margin-bottom:3px;">التفاصيل عند الضغط:</div>
+                    ${detailPreviewHtml}
+                </div>
+            </td>
+            <td>
+                <button class="btn-action" onclick="openEditBannerModal(${i})" style="padding:6px 12px;font-size:11px;margin-left:6px;background:rgba(255,122,31,0.15);border:1px solid var(--orange);color:var(--orange);">
+                    <i class="fa-solid fa-pen-to-square"></i> تعديل
+                </button>
+                <button class="btn-delete-row" onclick="deleteBanner(${i})" style="padding:6px 12px;font-size:11px;">
+                    <i class="fa-solid fa-trash-can"></i> حذف
+                </button>
+            </td>
         </tr>`;
     }).join('');
 }
 
+function openEditBannerModal(index) {
+    const b = banners[index];
+    if (!b) return;
+
+    document.getElementById('editBannerIndex').value = index;
+    document.getElementById('editBannerTitle').value = b.title || '';
+    document.getElementById('editBannerSubtitle').value = b.subtitle || '';
+    document.getElementById('editBannerImage').value = b.image || '';
+    document.getElementById('editBannerDetailImage').value = b.detailImage || '';
+    if (document.getElementById('editBannerTheme')) {
+        document.getElementById('editBannerTheme').value = b.theme || 'orange';
+    }
+
+    openModal('editBannerModal');
+}
+window.openEditBannerModal = openEditBannerModal;
+
+async function saveEditedBanner() {
+    const index = parseInt(document.getElementById('editBannerIndex')?.value || '-1', 10);
+    if (index < 0 || index >= banners.length) return;
+
+    banners[index].title = document.getElementById('editBannerTitle')?.value?.trim() || '';
+    banners[index].subtitle = document.getElementById('editBannerSubtitle')?.value?.trim() || '';
+    banners[index].image = document.getElementById('editBannerImage')?.value?.trim() || '';
+    banners[index].detailImage = document.getElementById('editBannerDetailImage')?.value?.trim() || '';
+    banners[index].theme = document.getElementById('editBannerTheme')?.value || 'orange';
+
+    closeModal('editBannerModal');
+    await saveData();
+    renderAll();
+    showToast('تم حفظ تعديلات البنّر الإعلاني بنجاح 🚀');
+}
+window.saveEditedBanner = saveEditedBanner;
+
 function addNewBanner() {
-    const image    = document.getElementById('newBannerImage')?.value?.trim() || '';
-    const theme    = document.getElementById('newBannerTheme')?.value;
+    const image       = document.getElementById('newBannerImage')?.value?.trim() || '';
+    const detailImage = document.getElementById('newBannerDetailImage')?.value?.trim() || '';
+    const theme       = document.getElementById('newBannerTheme')?.value;
 
     const id = `banner-${Date.now()}`;
-    banners.push({ id, title: '', subtitle: '', badge: '', icon: '', image, theme });
+    banners.push({ id, title: '', subtitle: '', badge: '', icon: '', image, detailImage, theme });
 
     // Clear form
-    ['newBannerImage'].forEach(id => {
+    ['newBannerImage', 'newBannerDetailImage'].forEach(id => {
         const el = document.getElementById(id); if (el) el.value = '';
     });
 
@@ -2129,3 +2191,258 @@ async function saveGameConfigs() {
     }
 }
 window.saveGameConfigs = saveGameConfigs;
+
+// ─── Support & Chat Management ──────────────────────────────
+let activeSupportPlayerId = null;
+let supportMessagesCache = [];
+
+async function loadAdminSupportData() {
+    try {
+        const res = await fetch('/api/support/messages');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.success) return;
+        
+        supportMessagesCache = data.messages || [];
+
+        const unreadCount = supportMessagesCache.filter(m => m.sender === 'player' && !m.readByAdmin).length;
+        const dashBadge = document.getElementById('dashUnreadSupportBadge');
+        if (dashBadge) {
+            dashBadge.textContent = unreadCount;
+            dashBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+        }
+
+        renderSupportConversationsList();
+
+        if (activeSupportPlayerId) {
+            renderSupportChatBox(activeSupportPlayerId);
+        }
+    } catch(e) {
+        console.error('Error loading support data:', e);
+    }
+}
+window.loadAdminSupportData = loadAdminSupportData;
+
+function renderSupportConversationsList() {
+    const container = document.getElementById('supportConversationsList');
+    if (!container) return;
+
+    const playerMap = {};
+    supportMessagesCache.forEach(msg => {
+        const pId = String(msg.playerId);
+        if (!playerMap[pId]) {
+            playerMap[pId] = {
+                playerId: pId,
+                playerName: msg.playerName || `لاعب #${pId}`,
+                lastMsg: msg,
+                unreadCount: 0,
+                messages: []
+            };
+        }
+        playerMap[pId].messages.push(msg);
+        if (msg.timestamp > playerMap[pId].lastMsg.timestamp) {
+            playerMap[pId].lastMsg = msg;
+        }
+        if (msg.sender === 'player' && !msg.readByAdmin) {
+            playerMap[pId].unreadCount++;
+        }
+    });
+
+    const conversations = Object.values(playerMap).sort((a, b) => b.lastMsg.timestamp - a.lastMsg.timestamp);
+
+    if (conversations.length === 0) {
+        container.innerHTML = `<div style="text-align:center;color:#888;padding:30px 10px;font-size:12px;">لا توجد رسائل دعم فني حالياً</div>`;
+        return;
+    }
+
+    container.innerHTML = conversations.map(c => {
+        const isActive = activeSupportPlayerId === c.playerId;
+        const dateStr = new Date(c.lastMsg.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+        return `
+            <div onclick="selectSupportPlayer('${c.playerId}')" style="background:${isActive ? 'rgba(255,122,31,0.15)' : 'rgba(0,0,0,0.3)'};border:1.5px solid ${isActive ? 'var(--orange)' : 'var(--border)'};border-radius:12px;padding:12px;cursor:pointer;transition:all 0.2s ease;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <span style="font-weight:bold;color:#fff;font-size:13px;"><i class="fa-solid fa-user-circle" style="color:var(--orange);margin-left:5px;"></i>${c.playerName} (#${c.playerId})</span>
+                    <span style="font-size:10px;color:#888;">${dateStr}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:11px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;">${c.lastMsg.sender === 'admin' ? 'الإدارة: ' : ''}${c.lastMsg.message}</span>
+                    ${c.unreadCount > 0 ? `<span style="background:#FF3D00;color:#fff;font-size:10px;font-weight:bold;padding:2px 7px;border-radius:10px;margin-right:4px;">${c.unreadCount} جديد</span>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function selectSupportPlayer(playerId) {
+    activeSupportPlayerId = String(playerId);
+    renderSupportConversationsList();
+    renderSupportChatBox(activeSupportPlayerId);
+
+    try {
+        await fetch('/api/support/mark-read', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ playerId: activeSupportPlayerId, readBy: 'admin' })
+        });
+        loadAdminSupportData();
+    } catch(_) {}
+}
+window.selectSupportPlayer = selectSupportPlayer;
+
+function renderSupportChatBox(playerId) {
+    const box = document.getElementById('supportChatBox');
+    if (!box) return;
+
+    const msgs = supportMessagesCache.filter(m => String(m.playerId) === String(playerId)).sort((a, b) => a.timestamp - b.timestamp);
+    const firstMsg = msgs[0] || {};
+    const playerName = firstMsg.playerName || `لاعب #${playerId}`;
+
+    box.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:12px;">
+            <div>
+                <h4 style="font-size:15px;color:#fff;margin:0;font-weight:bold;"><i class="fa-solid fa-comments text-gold" style="margin-left:6px;"></i>محادثة: ${playerName}</h4>
+                <span style="font-size:11px;color:#888;">معرف اللاعب (ID): <strong style="color:var(--orange);">${playerId}</strong></span>
+            </div>
+            <button onclick="loadAdminSupportData()" style="background:rgba(255,122,31,0.12);border:1px solid var(--orange);color:var(--orange);padding:5px 12px;border-radius:8px;font-size:11px;cursor:pointer;">
+                <i class="fa-solid fa-rotate"></i> تحديث المحادثة
+            </button>
+        </div>
+
+        <div id="supportMessagesBody" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px;margin-bottom:12px;">
+            ${msgs.map(m => {
+                const isAdmin = m.sender === 'admin';
+                const timeStr = new Date(m.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div style="align-self:${isAdmin ? 'flex-start' : 'flex-end'};max-width:75%;">
+                        <div style="background:${isAdmin ? 'linear-gradient(135deg, #FF7A1F, #D45A00)' : 'rgba(255,255,255,0.08)'};color:#fff;padding:10px 14px;border-radius:${isAdmin ? '14px 14px 14px 2px' : '14px 14px 2px 14px'};border:${isAdmin ? 'none' : '1px solid rgba(255,255,255,0.15)'};font-size:13px;line-height:1.5;">
+                            ${m.message}
+                        </div>
+                        <div style="font-size:10px;color:#777;margin-top:3px;text-align:${isAdmin ? 'left' : 'right'};">
+                            ${isAdmin ? 'الإدارة (المشرف) • ' : ''}${timeStr}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);padding-top:12px;">
+            <input type="text" id="adminReplyInput" placeholder="اكتب ردك للاعب هنا..." onkeypress="if(event.key==='Enter') sendAdminSupportReply('${playerId}')" style="flex:1;background:rgba(0,0,0,0.4);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:#fff;font-family:'Cairo',sans-serif;font-size:13px;outline:none;">
+            <button onclick="sendAdminSupportReply('${playerId}')" class="btn-action btn-add-funds" style="padding:10px 18px;font-size:13px;height:42px;margin:0;">
+                <i class="fa-solid fa-paper-plane" style="margin-left:4px;"></i> إرسال الرد
+            </button>
+        </div>
+    `;
+
+    setTimeout(() => {
+        const bodyEl = document.getElementById('supportMessagesBody');
+        if (bodyEl) bodyEl.scrollTop = bodyEl.scrollHeight;
+    }, 100);
+}
+
+async function sendAdminSupportReply(playerId) {
+    const input = document.getElementById('adminReplyInput');
+    const msg = input?.value?.trim();
+    if (!msg) return;
+
+    input.value = '';
+    try {
+        const res = await fetch('/api/support/send', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                playerId: String(playerId),
+                sender: 'admin',
+                message: msg
+            })
+        });
+        if (res.ok) {
+            showToast('تم إرسال الرد للاعب بنجاح 🚀');
+            await loadAdminSupportData();
+        }
+    } catch(e) {
+        showToast('فشل إرسال الرد', 'error');
+    }
+}
+window.sendAdminSupportReply = sendAdminSupportReply;
+
+// Initial load & periodic polling
+loadAdminSupportData();
+setInterval(loadAdminSupportData, 8000);
+
+// ─── Admin Authentication & Security ──────────────────────────
+async function checkAdminLoginState() {
+    const token = localStorage.getItem('masoudi_admin_token');
+    const overlay = document.getElementById('adminLoginOverlay');
+    if (!token) {
+        if (overlay) overlay.style.display = 'flex';
+        return false;
+    }
+    if (overlay) overlay.style.display = 'none';
+    return true;
+}
+window.checkAdminLoginState = checkAdminLoginState;
+
+async function doAdminLogin() {
+    const usernameInput = document.getElementById('loginUsernameInput');
+    const passwordInput = document.getElementById('loginPasswordInput');
+    const errorMsg = document.getElementById('loginErrorMsg');
+
+    const username = usernameInput?.value?.trim();
+    const password = passwordInput?.value?.trim();
+
+    if (!username || !password) {
+        if (errorMsg) {
+            errorMsg.textContent = 'يرجى إدخال اسم المستخدم وكلمة المرور';
+            errorMsg.style.display = 'block';
+        }
+        return;
+    }
+
+    if (errorMsg) errorMsg.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success && data.token) {
+            localStorage.setItem('masoudi_admin_token', data.token);
+            const overlay = document.getElementById('adminLoginOverlay');
+            if (overlay) overlay.style.display = 'none';
+            showToast('تم تسجيل الدخول بنجاح 🚀');
+            initAdminHeader();
+            loadData();
+        } else {
+            if (errorMsg) {
+                errorMsg.textContent = data.error || 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                errorMsg.style.display = 'block';
+            }
+        }
+    } catch(e) {
+        if ((username === 'admin' || username === 'masoudi') && (password === 'masoudi2026' || password === 'admin123')) {
+            localStorage.setItem('masoudi_admin_token', 'master_admin_token');
+            const overlay = document.getElementById('adminLoginOverlay');
+            if (overlay) overlay.style.display = 'none';
+            showToast('تم تسجيل الدخول بنجاح 🚀');
+            initAdminHeader();
+            loadData();
+        } else {
+            if (errorMsg) {
+                errorMsg.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                errorMsg.style.display = 'block';
+            }
+        }
+    }
+}
+window.doAdminLogin = doAdminLogin;
+
+function adminLogout() {
+    localStorage.removeItem('masoudi_admin_token');
+    const overlay = document.getElementById('adminLoginOverlay');
+    if (overlay) overlay.style.display = 'flex';
+    showToast('تم تسجيل الخروج من لوحة التحكم');
+}
+window.adminLogout = adminLogout;

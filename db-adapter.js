@@ -14,7 +14,7 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://masoudidb_use
 
 const dbPool = new Pool({
   connectionString: connectionString,
-  ssl: connectionString.includes('render.com') ? { rejectUnauthorized: false } : false
+  ssl: connectionString.includes('render.com') || connectionString.includes('dpg-') ? { rejectUnauthorized: false } : false
 });
 
 function getDefaultDb() {

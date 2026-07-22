@@ -1,737 +1,541 @@
 {
-  "settings": {
-    "enablePreview": true,
-    "showBalance": true,
-    "showLiveBadge": true,
-    "playButtonText": "العب الآن",
-    "coinBuyRate": 10000,
-    "coinSellRate": 20000,
-    "categoryNames": {
-      "slots": "سلوتس",
-      "live": "كازينو مباشر",
-      "table": "ألعاب الطاولة",
-      "crash": "ألعاب فورية"
-    },
-    "pgConfig": {
-      "isProduction": false,
-      "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
-      "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
-      "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0",
-      "productionSecretKey": "c89632307f734f6192fa420864a2c847",
-      "currency": "USD"
-    }
-  },
-  "banners": [
-    {
-      "id": "banner-1783249648300",
-      "title": "مرحباً بك في عالم الألعاب",
-      "subtitle": "اكتشف أفضل الألعاب واستمتع بتجربة لا تنتهي من المرح والإثار��",
-      "badge": "جديد",
-      "icon": "🎮",
-      "image": "images/uploaded_1783249646987.png",
-      "theme": "orange"
-    },
-    {
-      "id": "banner-1783251638276",
-      "title": "سياسة التط��يق",
-      "subtitle": "نلتزم بحماية بياناتك وخصوصيتك وتقديم تجربة آمنة وموثوقة لك في مسعودي",
-      "badge": "تنبيه",
-      "icon": "🔒",
-      "image": "images/uploaded_1783251631980.png",
-      "theme": "emerald"
-    }
-  ],
-  "agents": [
-    {
-      "id": "agent-1783265344524",
-      "name": "خالد",
-      "countries": [
-        "🇪🇬 مصر"
-      ],
-      "country": "🇪🇬 مصر",
-      "phone": "+201008827375",
-      "paymentMethods": "فودافون كاش",
-      "rate": "1$=10,000 كوينز",
-      "playerId": "519997"
-    }
-  ],
-  "providers": [
-    {
-      "name": "PG",
-      "url": "https://api.pg-bo.me",
-      "key": "6c19673883aa410b98d1c0cb1a3c5edc"
-    }
-  ],
   "games": [
     {
-      "id": "game-olympus-1",
-      "title": "Gates of Olympus (فتحات أوليمبوس ⚡)",
-      "category": "slots",
-      "provider": "Pragmatic",
-      "tag": "hot",
-      "launchUrl": "https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=vs20olympgate&lang=ar&cur=USD",
-      "image": "https://socialtournaments.b-cdn.net/wp-content/uploads/2021/02/Gates-of-Olympus.png"
-    },
-    {
       "id": "game-3",
+      "tag": "new",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535418644.png",
       "title": "(Fortune OX)",
       "category": "slots",
       "provider": "PG",
-      "tag": "new",
-      "launchUrl": "98",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535418644.png"
+      "launchUrl": "98"
     },
     {
       "id": "game-1783964222923",
+      "tag": "hot",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535546986.jpg",
       "title": "(Mahjong Ways2)",
       "category": "slots",
       "provider": "PG",
-      "tag": "hot",
-      "launchUrl": "74",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535546986.jpg"
+      "launchUrl": "74"
     },
     {
       "id": "game-1783964302523",
+      "tag": "hot",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535138841.jpg",
       "title": "(Fortune Tiger)",
       "category": "slots",
       "provider": "PG",
-      "tag": "hot",
-      "launchUrl": "126",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535138841.jpg"
+      "launchUrl": "126"
     },
     {
       "id": "game-1784535661609",
+      "tag": "new",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535852509.jpg",
       "title": "(Mahjong Ways)",
       "category": "slots",
       "provider": "PG",
-      "tag": "new",
-      "launchUrl": "65",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784535852509.jpg"
+      "launchUrl": "65"
     },
     {
       "id": "game-1784539597345",
-      "title": "Hs",
+      "tag": "new",
+      "image": "https://masoudi-api.onrender.com/images/uploaded_1784673274606.jpg",
+      "title": "(Leprechaun)",
       "category": "slots",
       "provider": "PG",
-      "tag": "new",
-      "launchUrl": "60",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784539592659.jpg"
+      "launchUrl": "60"
     },
     {
       "id": "game-1784553596274",
+      "tag": "hot",
+      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784554147848.jpg",
       "title": "Journey",
       "category": "slots",
       "provider": "PG",
+      "launchUrl": "50"
+    },
+    {
+      "id": "game-1784673302902",
       "tag": "hot",
-      "launchUrl": "50",
-      "image": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784554147848.jpg"
+      "image": "https://masoudi-api.onrender.com/images/uploaded_1784673297348.jpg",
+      "title": "Test",
+      "category": "slots",
+      "provider": "PG",
+      "launchUrl": "113"
+    }
+  ],
+  "admins": [],
+  "agents": [
+    {
+      "id": "agent-1784664364692",
+      "name": "Msuodi",
+      "rate": "سعر الشحن 1$ = 50 جنيه مصري",
+      "phone": "01008827375",
+      "country": "🇪🇬 مصر",
+      "playerId": "519997",
+      "countries": [
+        "🇪🇬 مصر"
+      ],
+      "paymentMethods": "فودافون كاش / انستا باي"
+    }
+  ],
+  "banners": [
+    {
+      "id": "banner-1784673125630",
+      "icon": "",
+      "badge": "",
+      "image": "https://masoudi-api.onrender.com/images/uploaded_1784673126726.jpg",
+      "theme": "orange",
+      "title": "",
+      "subtitle": ""
+    },
+    {
+      "id": "banner-1784673131286",
+      "icon": "",
+      "badge": "",
+      "image": "https://masoudi-api.onrender.com/images/uploaded_1784673132340.jpg",
+      "theme": "orange",
+      "title": "",
+      "subtitle": ""
     }
   ],
   "players": [
     {
-      "id": "519997",
-      "name": "Halil Farhat",
-      "email": "halilfarhat102@gmail.com",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
-      "balance": 1671424,
-      "bonus": 0,
-      "status": "active",
-      "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-20",
-      "transactions": [
-        {
-          "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "6:46:29 ص"
-        },
-        {
-          "type": "إضافة رصيد",
-          "amount": 555555,
-          "date": "7:09:03 ص"
-        },
-        {
-          "type": "تصفير الرصيد",
-          "amount": 0,
-          "date": "7:20:41 ص"
-        },
-        {
-          "type": "إضافة رصيد",
-          "amount": 52424,
-          "date": "7:35:08 ص"
-        },
-        {
-          "type": "شحن كوينز وكيل (من الإدارة)",
-          "amount": 5000,
-          "date": "2:31:40 م"
-        },
-        {
-          "type": "شحن كوينز وكيل (من الإدارة)",
-          "amount": 50000,
-          "date": "2:31:47 م"
-        },
-        {
-          "type": "شحن رصيد وكالة (من الإدارة)",
-          "amount": 5000,
-          "date": "2:45:48 م"
-        },
-        {
-          "type": "شحن رصيد وكالة (من الإدارة)",
-          "amount": 500000,
-          "date": "2:46:09 م"
-        },
-        {
-          "type": "تحويل كوينز إلى لاعب (Master Msuodi)",
-          "amount": -50000,
-          "date": "2:46:56 م"
-        },
-        {
-          "type": "سحب سريع",
-          "amount": -50000,
-          "date": "2:46:57 م"
-        },
-        {
-          "type": "شحن رصيد وكالة (من الإدارة)",
-          "amount": 50000,
-          "date": "2:51:54 م"
-        },
-        {
-          "type": "خصم رصيد",
-          "amount": -50000,
-          "date": "2:55:00 م"
-        },
-        {
-          "type": "شراء كوينز من لاعب (Master Msuodi)",
-          "amount": 5000,
-          "date": "3:33:35 م"
-        },
-        {
-          "type": "شراء كوينز من لاعب (Master Msuodi)",
-          "amount": 50000,
-          "date": "3:34:51 م"
-        },
-        {
-          "type": "شراء كوينز من لاعب (Master Msuodi)",
-          "amount": 50000,
-          "date": "3:42:12 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -7424,
-          "date": "5:40:27 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 7424,
-          "date": "5:40:27 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 48576,
-          "date": "5:50:21 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -48576,
-          "date": "5:50:21 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -7424,
-          "date": "9:18:14 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 7424,
-          "date": "9:18:14 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -7000,
-          "date": "9:19:11 م"
-        },
-        {
-          "type": "تحويل كوينز إلى لاعب (Halil Farhat)",
-          "amount": -500000,
-          "date": "9:28:55 م"
-        },
-        {
-          "type": "شحن من الوكيل (Halil Farhat)",
-          "amount": 500000,
-          "date": "9:28:55 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -500000,
-          "date": "9:29:03 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 500000,
-          "date": "9:29:04 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -26000,
-          "date": "9:29:29 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 175000,
-          "date": "9:29:35 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -24000,
-          "date": "9:30:10 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -13000,
-          "date": "9:30:52 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 40000,
-          "date": "9:30:59 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -29000,
-          "date": "9:31:33 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 360000,
-          "date": "9:31:39 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -37000,
-          "date": "9:32:14 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -64000,
-          "date": "9:32:56 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 900000,
-          "date": "9:33:02 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -16000,
-          "date": "9:33:12 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -150000,
-          "date": "9:33:37 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -180000,
-          "date": "9:34:19 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 500000,
-          "date": "9:34:26 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -200000,
-          "date": "9:59:04 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 750000,
-          "date": "9:59:10 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -370000,
-          "date": "10:01:33 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 2475000,
-          "date": "10:01:39 م"
-        },
-        {
-          "type": "بيع كوينز للوكيل (خالد)",
-          "amount": -4000000,
-          "date": "10:04:04 م"
-        },
-        {
-          "type": "شراء كوينز من لاعب (Halil Farhat)",
-          "amount": 4000000,
-          "date": "10:04:04 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -120000,
-          "date": "11:24:01 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 150000,
-          "date": "11:24:08 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -621424,
-          "date": "8:12:52 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 621424,
-          "date": "8:12:53 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -5000,
-          "date": "8:43:37 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -6000,
-          "date": "8:43:38 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -115000,
-          "date": "8:43:44 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 130000,
-          "date": "8:43:51 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -200000,
-          "date": "9:12:44 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 200000,
-          "date": "9:12:45 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -2000,
-          "date": "9:12:49 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -320000,
-          "date": "9:13:05 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 375000,
-          "date": "9:13:12 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -12000,
-          "date": "4:12:04 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -240000,
-          "date": "4:12:29 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 500000,
-          "date": "4:12:35 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -240000,
-          "date": "4:13:10 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 625000,
-          "date": "4:13:17 م"
-        },
-        {
-          "type": "شحن من التطبيق (فودافون كاش)",
-          "amount": 360000,
-          "date": "٤:١٤:١٠ م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -1671424,
-          "date": "12:51:55 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 1671424,
-          "date": "12:51:55 م"
-        }
-      ],
-      "isAgent": true,
-      "agentBalance": 4110000,
-      "sessionToken": "e61f0138c3666cfe10609b4f5bb1eb21443b4e741331a472c1ad7b530a20771a",
-      "sessionCreatedAt": "2026-07-20T13:57:57.590Z",
-      "currency": "USD"
-    },
-    {
       "id": "303725",
       "name": "Master Msuodi",
+      "bonus": 0,
       "email": "engyhamid860@gmail.com",
-      "balance": 5000,
-      "bonus": 500,
       "status": "active",
-      "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-20",
-      "transactions": [
-        {
-          "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "2:44:11 م"
-        },
-        {
-          "type": "شحن من الوكيل (Halil Farhat)",
-          "amount": 50000,
-          "date": "2:46:56 م"
-        },
-        {
-          "type": "بيع كوينز للوكيل (خالد)",
-          "amount": -5000,
-          "date": "3:33:35 م"
-        },
-        {
-          "type": "سحب سريع",
-          "amount": 5000,
-          "date": "3:33:35 م"
-        },
-        {
-          "type": "بيع كوينز للوكيل (خالد)",
-          "amount": -50000,
-          "date": "3:34:51 م"
-        },
-        {
-          "type": "سحب سريع",
-          "amount": 50000,
-          "date": "3:34:51 م"
-        },
-        {
-          "type": "بيع كوينز للوكيل (خالد)",
-          "amount": -50000,
-          "date": "3:42:12 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 1306424,
-          "date": "11:28:14 ص"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -1306424,
-          "date": "11:28:14 ص"
-        }
-      ],
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLQjxL4BCYlDyH7yAESLP9ylwLx9A5eL4UWZeG3ySZs8qT3UgoT=s96-c",
-      "sessionToken": "1115e4757771afe9c04b89e704678fb02faae2a27191e4acfdda39a7f0ab4b63",
-      "sessionCreatedAt": "2026-07-20T07:29:22.498Z",
-      "currency": "USD"
-    },
-    {
-      "id": "127761",
-      "name": "PartyU customers service",
-      "email": "management135790@gmail.com",
-      "balance": 5000,
-      "bonus": 500,
-      "status": "active",
-      "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-13",
-      "transactions": [
-        {
-          "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "3:56:07 م"
-        }
-      ],
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJ8EOTXnvVNTMdAPNJC8q_Ji7bmQW9KrxLjjmY5mZFbo5qIRQ=s96-c",
-      "sessionToken": "6f3312927f89dec3fb92d062ad9777b3a4a2f5470e9b1ec770f233436e83ccb0",
-      "sessionCreatedAt": "2026-07-19T13:35:35.214Z",
-      "currency": "USD"
-    },
-    {
-      "id": "840624",
-      "name": "الامبرا طور",
-      "email": "hyhyfarhad12369@gmail.com",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocKd6RA_rxaHYSoeAvtWz0V3KoF_awiP8huPcKR9GPoWTvHUKWw=s96-c",
-      "balance": 5000,
-      "bonus": 500,
-      "status": "active",
-      "joinDate": "2026-07-05",
-      "lastLogin": "2026-07-19",
-      "transactions": [
-        {
-          "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "5:55:02 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -5000,
-          "date": "9:37:28 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 5000,
-          "date": "9:37:29 م"
-        }
-      ],
-      "currency": "USD"
-    },
-    {
-      "id": "694216",
-      "name": "shrouk ramdan",
-      "email": "hyhyfarhad12361@gmail.com",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocKSUsT9bGl6m__x-jmMmkOaBLDv2I05hBz9Ibn3Ub_MIWl6bJU=s96-c",
       "balance": 0,
-      "bonus": 500,
-      "status": "active",
-      "joinDate": "2026-07-13",
-      "lastLogin": "2026-07-20",
+      "currency": "USD",
+      "joinDate": "2026-07-21",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLQjxL4BCYlDyH7yAESLP9ylwLx9A5eL4UWZeG3ySZs8qT3UgoT=s96-c",
+      "lastLogin": "2026-07-22",
+      "sessionToken": "sess_303725_1784679186640",
       "transactions": [
         {
+          "date": "7:42:09 م",
           "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "5:25:39 م"
+          "amount": 100
         },
         {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": 2424,
-          "date": "9:13:20 م"
+          "date": "12:13:46 ص",
+          "txId": "2079721529616236544-2079721529616236544-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-75 $"
         },
         {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -2424,
-          "date": "9:13:21 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -4000,
-          "date": "9:13:43 م"
-        },
-        {
-          "type": "لعب لعبة (Big Farm)",
-          "amount": -1000,
-          "date": "9:17:51 م"
+          "date": "12:13:53 ص",
+          "txId": "2079721557348974592-2079721557348974592-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-25 $"
         }
       ],
-      "isAdmin": true,
-      "sessionToken": "36163570f172a7b7258ab17cfaff68e3a68978d9be7773e1b6af9a2b41f51ae4",
-      "sessionCreatedAt": "2026-07-20T06:51:17.210Z",
-      "currency": "USD"
+      "sessionCreatedAt": "2026-07-22T00:13:06.640Z"
     },
     {
-      "id": "873939",
-      "name": "Hamo Mo",
-      "email": "hamomo1022@gmail.com",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocKAGVyAZPxv9ldh90fRUssgeqx1nVsNiKMfZ4JKwImvr6v2=s96-c",
-      "balance": 5000,
-      "bonus": 500,
+      "id": "519997",
+      "name": "Halil Farhat",
+      "bonus": 0,
+      "email": "halilfarhat102@gmail.com",
       "status": "active",
-      "joinDate": "2026-07-13",
-      "lastLogin": "2026-07-13",
+      "balance": 48245.7,
+      "currency": "USD",
+      "joinDate": "2026-07-21",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJELFMXgdKsguHqyYJGkwAof7yOdzEZwWXfdqUJbLXJxw9OuOk=s96-c",
+      "lastLogin": "2026-07-22",
+      "sessionToken": "sess_519997_1784678358616",
       "transactions": [
         {
+          "date": "7:43:33 م",
           "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "5:40:52 م"
-        }
-      ],
-      "currency": "USD"
-    },
-    {
-      "id": "617526",
-      "name": "S R J",
-      "email": "srj954035@gmail.com",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocI03d7D_6YSVKNGb14ZF4pwdWbTYMmVXqaiJ2yjuUllOITg8A=s96-c",
-      "balance": 5000,
-      "bonus": 500,
-      "status": "active",
-      "joinDate": "2026-07-14",
-      "lastLogin": "2026-07-14",
-      "transactions": [
+          "amount": 100
+        },
         {
-          "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "1:30:53 ص"
-        }
-      ],
-      "currency": "USD"
-    },
-    {
-      "id": "713386",
-      "name": "Parking 1",
-      "email": "p61304672@gmail.com",
-      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLWvxJGYDI1n2kOgqflBXXl0NJYQnLQaeCpnTPpn1gU1NwUsA=s96-c",
-      "balance": 5000,
-      "bonus": 500,
-      "status": "active",
-      "joinDate": "2026-07-15",
-      "lastLogin": "2026-07-15",
-      "transactions": [
+          "date": "7:50:33 م",
+          "txId": "2079655285101821952-2079655285101821952-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-17.5 $"
+        },
         {
-          "type": "هدية التسجيل",
-          "amount": 5000,
-          "date": "7:08:14 ص"
+          "date": "7:50:34 م",
+          "txId": "2079655293909860352-2079655293909860352-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-17.5 $"
+        },
+        {
+          "date": "7:50:36 م",
+          "txId": "2079655300461363200-2079655300461363200-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-17.5 $"
+        },
+        {
+          "date": "7:50:37 م",
+          "txId": "2079655306496966656-2079655306496966656-106-0",
+          "type": "فوز 🎉 — لعبة 126",
+          "amount": "+0 $"
+        },
+        {
+          "date": "7:50:43 م",
+          "txId": "2079655330492579840-2079655330492579840-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-9 $"
+        },
+        {
+          "date": "7:50:50 م",
+          "txId": "2079655360142114816-2079655360142114816-106-0",
+          "type": "فوز 🎉 — لعبة 126",
+          "amount": "+100 $"
+        },
+        {
+          "date": "7:50:59 م",
+          "txId": "2079655398771654656-2079655398771654656-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-30 $"
+        },
+        {
+          "date": "7:51:04 م",
+          "txId": "2079655419382464512-2079655419382464512-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-75 $"
+        },
+        {
+          "date": "7:51:11 م",
+          "txId": "2079655446712549376-2079655446712549376-106-0",
+          "type": "فوز 🎉 — لعبة 126",
+          "amount": "+5 $"
+        },
+        {
+          "date": "7:51:16 م",
+          "txId": "2079655467562434560-2079655467562434560-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-25 $"
+        },
+        {
+          "date": "7:51:26 م",
+          "txId": "2079655512017862656-2079655512017862656-106-0",
+          "type": "فوز 🎉 — لعبة 126",
+          "amount": "+12.5 $"
+        },
+        {
+          "date": "7:51:32 م",
+          "txId": "2079655536638427136-2079655536638427136-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-15 $"
+        },
+        {
+          "date": "7:51:40 م",
+          "txId": "2079655570184470528-2079655570184470528-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-10 $"
+        },
+        {
+          "date": "7:51:47 م",
+          "txId": "2079655599779479552-2079655599779479552-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
+        },
+        {
+          "date": "10:04:17 م",
+          "type": "إضافة رصيد رئيسي ✅",
+          "amount": 50000
+        },
+        {
+          "date": "10:30:14 م",
+          "txId": "2079695471860908032-2079695471860908032-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
+        },
+        {
+          "date": "10:30:16 م",
+          "txId": "2079695483252637696-2079695483252637696-106-0",
+          "type": "فوز 🎉 — لعبة 126",
+          "amount": "+0.6 $"
+        },
+        {
+          "date": "10:32:57 م",
+          "txId": "2079696156635561984-2079696156635561984-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-1 $"
+        },
+        {
+          "date": "10:33:05 م",
+          "txId": "2079696189468573696-2079696189468573696-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-250 $"
+        },
+        {
+          "date": "10:33:07 م",
+          "txId": "2079696200889663488-2079696200889663488-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-250 $"
+        },
+        {
+          "date": "10:33:10 م",
+          "txId": "2079696212671463424-2079696212671463424-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-250 $"
+        },
+        {
+          "date": "10:33:14 م",
+          "txId": "2079696226391031808-2079696226391031808-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-250 $"
+        },
+        {
+          "date": "10:33:16 م",
+          "txId": "2079696237795344384-2079696237795344384-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-250 $"
+        },
+        {
+          "date": "10:33:19 م",
+          "txId": "2079696248218189824-2079696248218189824-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-250 $"
+        },
+        {
+          "date": "10:33:21 م",
+          "txId": "2079696259282763776-2079696259282763776-106-0",
+          "type": "رهان 🎰 — لعبة 126",
+          "amount": "-100 $"
+        },
+        {
+          "date": "10:36:03 م",
+          "txId": "2079696939162664960-2079696939162664960-106-0",
+          "type": "رهان 🎰 — لعبة 102",
+          "amount": "-2.25 $"
+        },
+        {
+          "date": "10:36:08 م",
+          "txId": "2079696958708121600-2079696939162664960-106-0",
+          "type": "فوز 🎉 — لعبة 102",
+          "amount": "+0 $"
+        },
+        {
+          "date": "10:36:21 م",
+          "txId": "2079697013217296384-2079697013217296384-106-0",
+          "type": "رهان 🎰 — لعبة 102",
+          "amount": "-20 $"
+        },
+        {
+          "date": "10:36:26 م",
+          "txId": "2079697033349955584-2079697033349955584-106-0",
+          "type": "رهان 🎰 — لعبة 102",
+          "amount": "-20 $"
+        },
+        {
+          "date": "10:38:18 م",
+          "txId": "2079697502260559872-2079697502260559872-106-0",
+          "type": "رهان 🎰 — لعبة 103",
+          "amount": "-3 $"
+        },
+        {
+          "date": "10:38:25 م",
+          "txId": "2079697530874101760-2079697530874101760-106-0",
+          "type": "رهان 🎰 — لعبة 103",
+          "amount": "-20 $"
+        },
+        {
+          "date": "10:39:17 م",
+          "txId": "2079697750815014912-2079697750815014912-106-0",
+          "type": "رهان 🎰 — لعبة 104",
+          "amount": "-3 $"
+        },
+        {
+          "date": "10:39:26 م",
+          "txId": "2079697786898612224-2079697786898612224-106-0",
+          "type": "رهان 🎰 — لعبة 104",
+          "amount": "-20 $"
+        },
+        {
+          "date": "10:39:28 م",
+          "txId": "2079697798068043776-2079697798068043776-106-0",
+          "type": "رهان 🎰 — لعبة 104",
+          "amount": "-20 $"
+        },
+        {
+          "date": "10:40:23 م",
+          "txId": "2079698026007494656-2079698026007494656-106-0",
+          "type": "رهان 🎰 — لعبة 106",
+          "amount": "-20 $"
+        },
+        {
+          "date": "10:40:26 م",
+          "txId": "2079698038389080064-2079698038389080064-106-0",
+          "type": "رهان 🎰 — لعبة 106",
+          "amount": "-12 $"
+        },
+        {
+          "date": "10:40:30 م",
+          "txId": "2079698055350845440-2079698038389080064-106-0",
+          "type": "فوز 🎉 — لعبة 106",
+          "amount": "+0 $"
+        },
+        {
+          "date": "10:40:32 م",
+          "txId": "2079698066562220032-2079698066562220032-106-0",
+          "type": "رهان 🎰 — لعبة 106",
+          "amount": "-8 $"
+        },
+        {
+          "date": "10:40:36 م",
+          "txId": "2079698083293298688-2079698066562220032-106-0",
+          "type": "فوز 🎉 — لعبة 106",
+          "amount": "+0 $"
+        },
+        {
+          "date": "10:44:17 م",
+          "txId": "2079699010628747264-2079699010628747264-106-0",
+          "type": "رهان 🎰 — لعبة 113",
+          "amount": "-3 $"
+        },
+        {
+          "date": "10:44:20 م",
+          "txId": "2079699023119384576-2079699023119384576-106-0",
+          "type": "رهان 🎰 — لعبة 113",
+          "amount": "-1.8 $"
+        },
+        {
+          "date": "10:44:24 م",
+          "txId": "2079699038000775168-2079699023119384576-106-0",
+          "type": "فوز 🎉 — لعبة 113",
+          "amount": "+0.15 $"
+        },
+        {
+          "date": "10:44:27 م",
+          "txId": "2079699051296718848-2079699023119384576-106-0",
+          "type": "فوز 🎉 — لعبة 113",
+          "amount": "+0 $"
         }
       ],
-      "currency": "USD"
+      "sessionCreatedAt": "2026-07-21T23:59:18.616Z"
     }
   ],
-  "receipts": [
+  "receipts": [],
+  "settings": {
+    "pgConfig": {
+      "currency": "USD",
+      "isProduction": false,
+      "stagingSecretKey": "c89632307f734f6192fa420864a2c847",
+      "productionSecretKey": "c89632307f734f6192fa420864a2c847",
+      "stagingOperatorToken": "I-6c19673883aa410b98d1c0cb1a3c5edc",
+      "productionOperatorToken": "a5fd4c1a25904aae8729516557c160d0"
+    },
+    "coinBuyRate": 10000,
+    "showBalance": true,
+    "coinSellRate": 48,
+    "categoryNames": {
+      "live": "كازينو مباشر",
+      "crash": "ألعاب فورية",
+      "slots": "سلوتس",
+      "table": "ألعاب الطاولة"
+    },
+    "enablePreview": true,
+    "showLiveBadge": true,
+    "playButtonText": "العب الآن",
+    "paymentGateways": {
+      "bank": {
+        "active": false,
+        "holder": "",
+        "account": "",
+        "bankName": ""
+      },
+      "orange": {
+        "name": "",
+        "active": false,
+        "number": ""
+      },
+      "pricing": [
+        {
+          "egp": 50,
+          "coins": 1
+        },
+        {
+          "egp": 250,
+          "coins": 5
+        },
+        {
+          "egp": 500,
+          "coins": 10
+        },
+        {
+          "egp": 1000,
+          "coins": 20
+        },
+        {
+          "egp": 5000,
+          "coins": 100
+        }
+      ],
+      "etisalat": {
+        "name": "",
+        "active": false,
+        "number": ""
+      },
+      "instapay": {
+        "name": "",
+        "active": false,
+        "number": ""
+      },
+      "vodafone": {
+        "name": "Msuodi",
+        "active": true,
+        "number": "01008827375"
+      }
+    }
+  },
+  "providers": [
     {
-      "id": "rcpt-1784304798385",
-      "playerId": "519997",
-      "playerName": "لاعب مسعودي",
-      "gateway": "فودافون كاش",
-      "amount": "2000 جنيه",
-      "coins": 360000,
-      "imageUrl": "https://raivprjvcmvzmagdcwru.supabase.co/storage/v1/object/public/images/uploaded_1784304796642.jpg",
-      "date": "١٧‏/٧‏/٢٠٢٦، ٤:١٣:١٨ م",
-      "status": "approved"
+      "key": "6c19673883aa410b98d1c0cb1a3c5edc",
+      "url": "https://api.pg-bo.me",
+      "name": "PG"
     }
   ],
-  "admins": [
-    {
-      "id": "admin-1",
-      "username": "admin",
-      "displayName": "المشرف العام",
-      "passwordHash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
-      "role": "superadmin",
-      "createdAt": "2026-07-05"
-    },
-    {
-      "id": "admin-1783977037114",
-      "username": "admin1",
-      "displayName": "shrouk ramdan",
-      "passwordHash": "a6eabd8d16259037bf73c5f941a7350090cff1df3da886dec91686e74ceeaaae",
-      "role": "admin",
-      "allowedTabs": [
-        "players",
-        "receipts",
-        "games",
-        "providers",
-        "agents",
-        "p2p",
-        "payment",
-        "settings"
-      ],
-      "playerId": "694216",
-      "createdAt": "2026-07-13"
-    }
+  "processedTxIds": [
+    "2079655285101821952-2079655285101821952-106-0",
+    "2079655293909860352-2079655293909860352-106-0",
+    "2079655300461363200-2079655300461363200-106-0",
+    "2079655306496966656-2079655306496966656-106-0",
+    "2079655330492579840-2079655330492579840-106-0",
+    "2079655360142114816-2079655360142114816-106-0",
+    "2079655398771654656-2079655398771654656-106-0",
+    "2079655419382464512-2079655419382464512-106-0",
+    "2079655446712549376-2079655446712549376-106-0",
+    "2079655467562434560-2079655467562434560-106-0",
+    "2079655512017862656-2079655512017862656-106-0",
+    "2079655536638427136-2079655536638427136-106-0",
+    "2079655570184470528-2079655570184470528-106-0",
+    "2079655599779479552-2079655599779479552-106-0",
+    "2079695471860908032-2079695471860908032-106-0",
+    "2079695483252637696-2079695483252637696-106-0",
+    "2079696156635561984-2079696156635561984-106-0",
+    "2079696189468573696-2079696189468573696-106-0",
+    "2079696200889663488-2079696200889663488-106-0",
+    "2079696212671463424-2079696212671463424-106-0",
+    "2079696226391031808-2079696226391031808-106-0",
+    "2079696237795344384-2079696237795344384-106-0",
+    "2079696248218189824-2079696248218189824-106-0",
+    "2079696259282763776-2079696259282763776-106-0",
+    "2079696939162664960-2079696939162664960-106-0",
+    "2079696958708121600-2079696939162664960-106-0",
+    "2079697013217296384-2079697013217296384-106-0",
+    "2079697033349955584-2079697033349955584-106-0",
+    "2079697502260559872-2079697502260559872-106-0",
+    "2079697530874101760-2079697530874101760-106-0",
+    "2079697750815014912-2079697750815014912-106-0",
+    "2079697786898612224-2079697786898612224-106-0",
+    "2079697798068043776-2079697798068043776-106-0",
+    "2079698026007494656-2079698026007494656-106-0",
+    "2079698038389080064-2079698038389080064-106-0",
+    "2079698055350845440-2079698038389080064-106-0",
+    "2079698066562220032-2079698066562220032-106-0",
+    "2079698083293298688-2079698066562220032-106-0",
+    "2079699010628747264-2079699010628747264-106-0",
+    "2079699023119384576-2079699023119384576-106-0",
+    "2079699038000775168-2079699023119384576-106-0",
+    "2079699051296718848-2079699023119384576-106-0",
+    "2079721529616236544-2079721529616236544-106-0",
+    "2079721557348974592-2079721557348974592-106-0"
   ]
 }

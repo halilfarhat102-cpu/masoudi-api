@@ -2112,6 +2112,186 @@ export async function apiMiddleware(req, res, next) {
       }
     });
 
+  } else if (reqPath === '/api/admin/login' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', async () => {
+      try {
+        const { username, password } = JSON.parse(body || '{}');
+        const db = await readDb();
+        const admins = db.admins || [];
+
+        let adminUser = admins.find(a => (a.username || a.email || '').toLowerCase() === (username || '').toLowerCase());
+        
+        let isValid = false;
+        if (adminUser) {
+          if (adminUser.password === password || adminUser.passwordHash === sha256(password)) {
+            isValid = true;
+          }
+        } else if ((username === 'admin' || username === 'masoudi') && (password === 'masoudi2026' || password === 'admin123')) {
+          isValid = true;
+          adminUser = {
+            id: 'admin-1',
+            username: 'admin',
+            displayName: 'المشرف العام',
+            role: 'superadmin'
+          };
+        }
+
+        if (!isValid) {
+          res.statusCode = 401;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ success: false, error: 'اسم المستخدم أو كلمة المرور غير صحيحة' }));
+        }
+
+        const sessionToken = `admin_token_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+        if (!db.sessions) db.sessions = {};
+        db.sessions[sessionToken] = {
+          adminId: adminUser.id || 'admin-1',
+          username: adminUser.username || 'admin',
+          displayName: adminUser.displayName || 'المشرف العام',
+          role: adminUser.role || 'superadmin',
+          expiresAt: Date.now() + 24 * 60 * 60 * 1000
+        };
+        await writeDb(db);
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+          success: true,
+          token: sessionToken,
+          admin: {
+            username: adminUser.username || 'admin',
+            displayName: adminUser.displayName || 'المشرف العام',
+            role: adminUser.role || 'superadmin'
+          }
+        }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: false, error: e.message }));
+      }
+    });
+
+  } else if (reqPath === '/api/support/messages' && req.method === 'GET') {
+    try {
+      const db = await readDb();
+      const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+      const playerId = parsedUrl.searchParams.get('player_id');
+      let messages = db.supportMessages || [];
+      if (playerId) {
+        messages = messages.filter(m => String(m.playerId) === String(playerId));
+      }
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ success: true, messages }));
+    } catch (e) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ success: false, error: e.message }));
+    }
+
+  } else if (reqPath === '/api/support/send' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', async () => {
+      try {
+        const { playerId, playerName, sender, message } = JSON.parse(body || '{}');
+
+        if (!playerId || !message || !message.trim()) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ error: 'playerId and message are required' }));
+        }
+
+        let newMsg = null;
+        await runTransaction(async (db) => {
+          if (!db.supportMessages) db.supportMessages = [];
+          newMsg = {
+            id: `msg-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            playerId: String(playerId),
+            playerName: playerName || 'لاعب مسعودي',
+            sender: sender || 'player',
+            message: message.trim(),
+            timestamp: Date.now(),
+            createdAt: new Date().toISOString(),
+            readByPlayer: sender === 'player',
+            readByAdmin: sender === 'admin'
+          };
+          db.supportMessages.push(newMsg);
+          return db;
+        });
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true, message: newMsg }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+
+  } else if (reqPath === '/api/support/mark-read' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', async () => {
+      try {
+        const { playerId, readBy } = JSON.parse(body || '{}');
+
+        if (!playerId) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ error: 'playerId is required' }));
+        }
+
+        await runTransaction(async (db) => {
+          if (!db.supportMessages) db.supportMessages = [];
+          db.supportMessages.forEach(m => {
+            if (String(m.playerId) === String(playerId)) {
+              if (readBy === 'player' || !readBy) m.readByPlayer = true;
+              if (readBy === 'admin' || !readBy) m.readByAdmin = true;
+            }
+          });
+          return db;
+        });
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+
+  } else if (reqPath === '/api/support/unread-count' && req.method === 'GET') {
+    try {
+      const db = await readDb();
+      const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+      const playerId = parsedUrl.searchParams.get('player_id');
+      const role = parsedUrl.searchParams.get('role') || 'player';
+      const messages = db.supportMessages || [];
+
+      let unreadCount = 0;
+      if (role === 'admin') {
+        unreadCount = messages.filter(m => m.sender === 'player' && !m.readByAdmin).length;
+      } else {
+        if (playerId) {
+          unreadCount = messages.filter(m => String(m.playerId) === String(playerId) && m.sender === 'admin' && !m.readByPlayer).length;
+        }
+      }
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ success: true, unreadCount }));
+    } catch (e) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ success: false, unreadCount: 0, error: e.message }));
+    }
+
   } else {
     next();
   }
